@@ -17,7 +17,7 @@ import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import { app } from "../../../services/firebaseConfig";
 import { isExistAccount } from "../../../api/auth";
 import toast from '../../../utils/toast';
-
+import LoadingOverlay from "../../../components/LoadingOverlay";
 
 export default function ThemNguoiOScreen({ route }) {
     const { maHopDong, soPhong } = route.params;
@@ -305,25 +305,12 @@ export default function ThemNguoiOScreen({ route }) {
                 {/* BOTTOM BUTTON */}
 
                 <View style={styles.bottom}>
-                    <TouchableOpacity
-                        style={[
-                            styles.button,
-                            loading && { opacity: 0.7 }
-                        ]}
-                        onPress={() => handleNext()}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <ActivityIndicator size="small" color="#000" />
-                        ) : (
-                            <Text style={styles.buttonText}>Thêm thành viên</Text>
-                        )}
+                    <TouchableOpacity style={[styles.button, loading && { opacity: 0.7 }]} onPress={() => handleNext()}>
+                        <Text style={styles.buttonText}>Thêm thành viên</Text>
                         <MaterialIcons name="check-circle" size={22} color="#fff" />
-
                     </TouchableOpacity>
 
                 </View>
-
 
             </ScrollView>
             <FirebaseRecaptchaVerifierModal
@@ -331,6 +318,7 @@ export default function ThemNguoiOScreen({ route }) {
                 firebaseConfig={app.options}
             />
 
+            <LoadingOverlay visible={loading} />
         </View>
     );
 }
@@ -509,7 +497,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        gap: 10
+        gap: 10,
+        marginBottom: 20
     },
 
     buttonText: {

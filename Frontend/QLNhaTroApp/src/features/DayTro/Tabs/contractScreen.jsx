@@ -19,6 +19,7 @@ import LottieView from "lottie-react-native";
 import { Dimensions } from "react-native";
 import ComboBox from "../../../components/ComboBox";
 import { getMonthDiff } from "../../../utils/formatNgaySinh";
+import { ActionConfirmModal } from "../../../components/ActionConfirmModal";
 
 const PRIMARY = "#13c8ec";
 const BG = "#101f22";
@@ -224,7 +225,6 @@ export default function contractScreen() {
                     Tạo hợp đồng
                 </Text>
             </TouchableOpacity>
-
         </View>
     );
 }

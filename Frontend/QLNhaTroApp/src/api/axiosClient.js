@@ -1,47 +1,39 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
-const axiosClient = axios.create({
-    baseURL: "https://eveline-prenasal-concha.ngrok-free.dev/api/",
-    timeout: 10000,
-    headers: {
-        "Content-Type": "application/json",
-    },
+const api = axios.create({
+  baseURL: "https://eveline-prenasal-concha.ngrok-free.dev/api",
+  timeout: 10000,
+  headers: {
+    "Content-Type": "application/json"
+  }
 });
 
-axiosClient.interceptors.request.use(
-    async (config) => {
-        // gắn token nếu có
-        const token = await SecureStore.getItemAsync("accessToken");
+api.interceptors.request.use(
+  async (config) => {
 
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
+    const token = await SecureStore.getItemAsync("accessToken");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+
+  },
+  (error) => Promise.reject(error)
 );
 
-axiosClient.interceptors.response.use(
-    (response) => response.data,
-    async (error) => {
-        if (error.response?.status === 401) {
+api.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
 
-            const refreshToken = await SecureStore.getItemAsync("refreshToken");
+    if (error.response) {
+      console.log("API Error:", error.response.data);
+    }
 
-            const res = await axios.post("http://your-api/refresh", refreshToken);
-
-            const newAccessToken = res.data.accessToken;
-
-            await SecureStore.setItemAsync("accessToken", newAccessToken);
-
-            error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-
-            return axios(error.config);
-        }
-
-        Promise.reject(error.response?.data || error);
+    return Promise.reject(error);
   }
 );
 
-export default axiosClient;
+export default api;

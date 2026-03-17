@@ -17,3 +17,9 @@ export function getTenRole(maVaiTro) {
     const key = Object.keys(ROLES).find(k => ROLES[k] === maVaiTro);
     return key ? TEN_ROLE[key] : "";
 }
+
+export function getTenRoleByValue(value) {
+    const strValue = String(value);
+    const key = Object.keys(ROLES).find(k => ROLES[k] === strValue);
+    return key ? TEN_ROLE[key] : "";
+}

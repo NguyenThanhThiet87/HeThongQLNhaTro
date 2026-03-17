@@ -53,7 +53,7 @@ export default StyleSheet.create({
     backgroundColor: "#182b2f",
     borderRadius: 16,
     textAlign: "center",
-    fontSize: 22,
+    fontSize: 15,
     color: "white",
     borderWidth: 1,
     borderColor: "#333"

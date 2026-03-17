@@ -6,7 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import DashboardScreen from "../features/TrangChu/Tabs/DashboardScreen";
 import HopDongStack from "./HopDongStack";
 import HoaDonStack from "./HoaDonStack";
-import ProfileScreen from "../features/CaNhan/Tabs/ProfileScreen";
+import CaNhanStack from "./CaNhanStack";
 import TrangChuStack from "./TrangChuStack";
 
 const Tab = createBottomTabNavigator();
@@ -14,7 +14,7 @@ const Tab = createBottomTabNavigator();
 const PRIMARY = "#13c8ec";
 const SURFACE = "#1a2c30";
 
-export default function BottomTabNavigator() {
+export default function BottomTabNavigatorOwner() {
 
   return (
     <Tab.Navigator
@@ -72,7 +72,7 @@ export default function BottomTabNavigator() {
 
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={CaNhanStack}
         options={{ tabBarLabel: "Cá nhân" }}
       />
 

@@ -10,6 +10,8 @@ export default function ComboBox({
   placeholder = "Chọn",
   value,
   onChange,
+  search = false,
+  searchPlaceholder="Tìm kiếm...",
   rightIconColor = "#666",
   rightIconSize = 16,
   width,
@@ -34,6 +36,8 @@ export default function ComboBox({
       renderRightIcon={() => (
         <MaterialIcons name="expand-more" size={rightIconSize} color={rightIconColor} />
       )}
+      search={search}
+      searchPlaceholder={searchPlaceholder}
       {...props}
     />
   );

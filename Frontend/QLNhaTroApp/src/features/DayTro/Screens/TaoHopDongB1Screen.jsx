@@ -17,7 +17,7 @@ import { getDayNhaTrosApi, getPhongTrosApi } from "../../../api/PhongTro";
 import { getCurrentUser } from "../../../utils/decodeToken";
 
 import { Dropdown } from "react-native-element-dropdown";
-import formatCurrency from "../../../utils/formatCurrency";
+import {formatCurrency} from "../../../utils/formatCurrency";
 import toast from '../../../utils/toast';
 import { validateGiaDien, validateGiaNuoc } from "../../../utils/formatGiaDienNuoc";
 import DateTimePicker from '@react-native-community/datetimepicker';

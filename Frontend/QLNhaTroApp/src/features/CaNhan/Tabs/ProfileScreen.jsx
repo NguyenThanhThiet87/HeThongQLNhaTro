@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {useNavigation} from "@react-navigation/native";
+import { useAuth } from "../../../context/AuthContext";
 
 import {
     View,
@@ -13,9 +14,12 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { getNguoiDungApi } from "../../../api/NguoiDung";
 import { getCurrentUser } from "../../../utils/decodeToken";
-import { getTenRole } from "../../../constants/roles";
+import { getTenRoleByValue } from "../../../constants/roles";
 import * as SecureStore from "expo-secure-store";
 import { ActivityIndicator } from "react-native";
+
+import { SettingItem } from "../../../components/SettingItem";
+
 const PRIMARY = "#13c8ec";
 const BG_DARK = "#101f22";
 const SURFACE = "#162a2e";
@@ -23,6 +27,7 @@ const BORDER = "#1f3a40";
 
 export default function ProfileScreen() {
     const navigation = useNavigation();
+    const { logout } = useAuth();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -43,59 +48,10 @@ export default function ProfileScreen() {
         setLoading(true);
         await SecureStore.deleteItemAsync("accessToken");
         await SecureStore.deleteItemAsync("refreshToken");
-
-        navigation.reset({
-            index: 0,
-            routes: [{ name: "Login" }]
-        });
+        
+        await logout();
         setLoading(false);
     };
-
-    const SettingItem = ({
-        icon,
-        title,
-        subtitle,
-        color = "#64748b",
-        bg = "rgba(255,255,255,0.05)",
-        borderBottom = true
-    }) => (
-        <TouchableOpacity
-            style={[
-                styles.settingItem,
-                borderBottom && styles.settingBorder
-            ]}
-            activeOpacity={0.7}
-        >
-
-            <View style={[styles.settingIcon, { backgroundColor: bg }]}>
-                <MaterialIcons
-                    name={icon}
-                    size={20}
-                    color={color}
-                />
-            </View>
-
-            <View style={styles.settingContent}>
-                <Text style={styles.settingTitle}>
-                    {title}
-                </Text>
-
-                {subtitle && (
-                    <Text style={styles.settingSubtitle}>
-                        {subtitle}
-                    </Text>
-                )}
-            </View>
-
-            <MaterialIcons
-                name="chevron-right"
-                size={20}
-                color="#64748b"
-            />
-
-        </TouchableOpacity>
-    );
-
 
     return (
         <View style={styles.container}>
@@ -111,7 +67,7 @@ export default function ProfileScreen() {
                 </Text>
 
                 {/* PROFILE CARD */}
-                <View style={styles.profileCard}>
+                <TouchableOpacity style={styles.profileCard} onPress={()=>navigation.navigate("ThongTinCaNhan", { maNd: user?.maNd })}>
 
                     <View style={styles.avatarContainer}>
                         <Image
@@ -135,14 +91,14 @@ export default function ProfileScreen() {
                     <View style={{ flex: 1, marginLeft: 14 }}>
 
                         <Text style={styles.name}>
-                            {user?.hoTen || "Nguyễn Văn A"}
+                            {user?.hoTen}
                         </Text>
 
                         <View style={styles.roleRow}>
 
                             <View style={styles.roleBadge}>
                                 <Text style={styles.roleText}>
-                                    {getTenRole(user?.maVaiTro)}
+                                    {getTenRoleByValue(user?.maVaiTro)}
                                 </Text>
                             </View>
 
@@ -163,7 +119,7 @@ export default function ProfileScreen() {
                         />
                     </TouchableOpacity>
 
-                </View>
+                </TouchableOpacity>
 
 
                 {/* MANAGEMENT */}
@@ -179,14 +135,16 @@ export default function ProfileScreen() {
                         subtitle="Thiết lập đơn giá theo khu vực"
                         color={PRIMARY}
                         bg="rgba(19,200,236,0.15)"
+                        onHandle={() => navigation.navigate("CauHinhGiaDienNuoc")}
                     />
 
                     <SettingItem
                         icon="handyman"
-                        title="Nhà cung cấp dịch vụ"
-                        subtitle="Internet, Vệ sinh, Bảo vệ"
+                        title="Cấu hình loại phòng"
+                        subtitle="Thiết lập loại phòng"
                         color="#f97316"
                         bg="rgba(249,115,22,0.15)"
+                        onHandle={() => navigation.navigate("CauHinhLoaiPhong")}
                     />
 
                     <SettingItem
@@ -226,7 +184,11 @@ export default function ProfileScreen() {
                         title="Bảo mật & Đăng nhập"
                         borderBottom={false}
                     />
-
+                    <SettingItem
+                        icon="settings"
+                        title="Cài đặt chung"
+                        borderBottom={false}
+                    />
                 </View>
 
 
@@ -364,44 +326,6 @@ const styles = StyleSheet.create({
         borderColor: BORDER,
         marginBottom: 20
     },
-
-
-    settingItem: {
-        flexDirection: "row",
-        alignItems: "center",
-        padding: 14
-    },
-
-    settingBorder: {
-        borderBottomWidth: 1,
-        borderBottomColor: BORDER
-    },
-
-    settingIcon: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
-        justifyContent: "center",
-        alignItems: "center"
-    },
-
-    settingContent: {
-        flex: 1,
-        marginLeft: 12
-    },
-
-    settingTitle: {
-        color: "#fff",
-        fontSize: 15,
-        fontWeight: "500"
-    },
-
-    settingSubtitle: {
-        color: "#94a3b8",
-        fontSize: 12,
-        marginTop: 2
-    },
-
 
     logoutBtn: {
         flexDirection: "row",

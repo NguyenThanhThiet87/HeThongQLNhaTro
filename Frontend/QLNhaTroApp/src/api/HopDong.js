@@ -111,3 +111,30 @@ export const addThanhVienHopDongApi = async (thanhVienData) => {
     };
   }
 };
+
+export const deleteThanhVienHopDongApi = async (maHopDong, maNt) => {
+  try {
+    console.log("Deleting member with MaHopDong:", maHopDong, "MaNt:", maNt);
+    const token = await getAccessToken(); 
+    const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HopDong/xoa-thanh-vien`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        MaHopDong: maHopDong,
+        maNt: maNt
+      })
+    });
+    const text = await res.text();
+    console.log("Raw response text:", text);
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      success: false,
+      message: "Lỗi kết nối: " + error.message,
+      data: null
+    };
+  }
+};

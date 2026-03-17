@@ -1,14 +1,10 @@
 import React, { useState } from "react";
 import styles, { colors } from "../styles/LoginScreen_Styles";
 import { useNavigation } from "@react-navigation/native";
-import { loginApi } from "../../../api/auth";
-import toast from '../../../utils/toast';
-import { ROLES } from "../../../constants/roles";
-import {jwtDecode} from "jwt-decode";
-import formatPhoneNumber from "../../../utils/formatPhoneNumber";
 
 import { ActivityIndicator } from "react-native";
 import * as SecureStore from "expo-secure-store";
+
 import {
     View,
     Text,
@@ -23,60 +19,23 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 
+import { useAuth } from "../../../context/AuthContext";
+import { useLogin } from "../../../hooks/auth/useLogin";
+
 export default function LoginScreen() {
     const navigation = useNavigation();
+    
+    const { login } = useAuth();
 
+    const { loginUser, loading } = useLogin(login);
     const [passwordVisible, setPasswordVisible] = useState(false);
+
     const [phoneNumber, setPhoneNumber] = useState("");
     const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
 
     const handleLogin = async () => {
-        // Xử lý đăng nhập ở đây
-        setLoading(true);
-        try {
-            if(!phoneNumber || !password) {
-                throw new Error('Vui lòng nhập đầy đủ thông tin');
-            }
-            if(!/^\d{10,11}$/.test(phoneNumber)) {
-                throw new Error('Số điện thoại không hợp lệ');
-            }
-            if(password.length < 8) {
-                throw new Error('Mật khẩu phải có ít nhất 8 ký tự');
-            }
-
-            const result = await loginApi(
-                formatPhoneNumber(phoneNumber),
-                password
-            );
-            if (!result.success) {
-                throw new Error(result.message || 'Đăng nhập thất bại');
-            }
-
-            const data = result.data;
-            const decoded = jwtDecode(data.accessToken);
-            const vaiTro = decoded.VaiTro;
-
-            await SecureStore.setItemAsync("accessToken", data.accessToken);
-            await SecureStore.setItemAsync("refreshToken", data.refreshToken);
-
-            toast.success('Đăng nhập thành công');
-
-            if(vaiTro === ROLES.ADMIN) {
-                    navigation.replace("Main");
-            } else if (vaiTro === ROLES.CHU_TRO) {
-                navigation.replace("Main");
-            } else if (vaiTro === ROLES.NGUOI_THUE) {
-                navigation.replace("Main");
-            } else if (vaiTro === ROLES.NHA_CUNG_CAP) {
-                navigation.replace("Main");
-            }
-
-        } catch (error) {
-            toast.error(error?.message || 'Đăng nhập thất bại');
-        }
-        setLoading(false);
-    }
+        await loginUser(phoneNumber, password);
+    };
 
     return (
         <SafeAreaView style={styles.container}>

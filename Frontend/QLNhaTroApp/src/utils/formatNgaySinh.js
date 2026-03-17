@@ -30,3 +30,18 @@ export function formatDate(dateStr) {
     const pad = n => n.toString().padStart(2, "0");
     return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
 }
+
+// Định dạng ngày hạn: đưa vào ngày lập, cộng thêm 5 ngày, trả về "dd/MM/yyyy"
+export function getDeadlineDate(dateStr) {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return "";
+    date.setDate(date.getDate() + 5);
+    const pad = n => n.toString().padStart(2, "0");
+    return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+}
+export function getMonthFromDate(dateStr) {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  return date.getMonth() + 1;
+}

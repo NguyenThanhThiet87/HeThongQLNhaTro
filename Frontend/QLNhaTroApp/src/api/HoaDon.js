@@ -51,10 +51,35 @@ export const getHoaDonsApi = async (maDayNt, month, year, trangThai) => {
 
 export const getHoaDonApi = async (maHd) => {
   try {
-    console.log("Calling getHoaDonApi with params:", { maHd });
     const token = await getAccessToken();
 
     const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/hoa-don?maHd=${maHd}`;
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    const text = await res.text();
+
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      success: false,
+      message: "Lỗi kết nối: " + error.message,
+      data: null
+    };
+  }
+};
+
+
+export const getHoaDonNewApi = async (maNd) => {
+  try {
+    console.log("Calling getHoaDonNewApi with params:", { maNd });
+    const token = await getAccessToken();
+
+    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/hoa-don-moi?maNd=${maNd}`;
 
     const res = await fetch(url, {
       method: "GET",
@@ -126,4 +151,101 @@ export const saveDienNuocMoiApi = async (maPhong, month, year, soDienMoi, soNuoc
             data: null
         };
     }
+};
+
+
+export const getDoanhThuApi = async (maNd) => {
+    try {
+        const token = await getAccessToken();
+        const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/doanh-thu?maNd=${maNd}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        const result = await res.json();
+        return result; // Trả về ApiResponse từ Backend
+
+    } catch (error) {
+        return {
+            success: false,
+            message: "Lỗi kết nối: " + error.message,
+            data: null
+        };
+    }
+};
+
+
+export const getLichSuThanhToanGanApi = async (maNd) => {
+  try {
+    const token = await getAccessToken();
+
+    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/lich-su-thanh-toan-gan?maNd=${maNd}`;
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    const text = await res.text();
+
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      success: false,
+      message: "Lỗi kết nối: " + error.message,
+      data: null
+    };
+  }
+};
+
+export const getThongKeChiTieuApi = async (maNd) => {
+  try {
+    const token = await getAccessToken();
+
+    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/thong-ke-chi-tieu?maNd=${maNd}`;
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    const text = await res.text();
+
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      success: false,
+      message: "Lỗi kết nối: " + error.message,
+      data: null
+    };
+  }
+};
+
+export const getChiTietGiaoDichApi = async (maLstt) => {
+  try {
+    const token = await getAccessToken();
+
+    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/chi-tiet-giao-dich?maLstt=${maLstt}`;
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    const text = await res.text();
+
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      success: false,
+      message: "Lỗi kết nối: " + error.message,
+      data: null
+    };
+  }
 };

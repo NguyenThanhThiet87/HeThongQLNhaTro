@@ -1,4 +1,4 @@
-import axiosClient from "./axiosClient";
+import api from "./axiosClient";
 
 export const loginApi = async (phone, password) => {
   try {
@@ -28,7 +28,7 @@ export const loginApi = async (phone, password) => {
 
 
 export const registerApi = (data) => {
-  return axiosClient.post("/auth/register", data);
+  return api.post("/auth/register", data);
 };
 
 export const resetPasswordApi = async (phone, newPassword, idToken) => {
@@ -46,40 +46,48 @@ export const resetPasswordApi = async (phone, newPassword, idToken) => {
 }
 
 export const isExistAccount = (sdt) => {
-  return axiosClient.post("/NguoiDung/is-exist-account", sdt);
+  return api.post("/NguoiDung/is-exist-account", sdt);
 }
 
-export const createAccount = async (name, phone, password, role, idToken) => {
-  try {
-    const res = await fetch(
-      "https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/register/account",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`
-        },
-        body: JSON.stringify({
-          HoTen: name,
-          SoDt: phone,
-          MatKhau: password,
-          MaVaiTro: role
-        })
+
+export const createAccount = (name, phone, password, role, idToken) => {
+  return api.post(
+    "/NguoiDung/register/account",
+    {
+      HoTen: name,
+      SoDt: phone,
+      MatKhau: password,
+      MaVaiTro: role
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${idToken}`
       }
-    );
+    }
+  );
+};
 
+export const updateSoDt = async (maNd, soDt, idToken) => {
+  try {
+    const res = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/cap-nhat-sdt", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${idToken}`
+      },
+      body: JSON.stringify({
+        MaNd: maNd,
+        SoDt: soDt
+      })
+    });
     const text = await res.text();
-
-    return {
-      success: res.ok,
-      message: text
-    };
-
+    console.log("Raw response text:", text);
+    return JSON.parse(text);
   } catch (error) {
     return {
       success: false,
-      message: error.message
+      message: "Lỗi kết nối: " + error.message,
+      data: null
     };
   }
 };
-

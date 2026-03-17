@@ -11,11 +11,16 @@ import {
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { getHopDongApi } from "../../../api/HopDong";
-import {formatCurrency} from "../../../utils/formatCurrency";
+import { formatCurrency } from "../../../utils/formatCurrency";
 import { getMonthDiff } from "../../../utils/formatNgaySinh";
 
 import { InfoCard } from "../../../components/InfoCard";
 import { InfoRow } from "../../../components/InfoRow";
+import ActionConfirmModal from "../../../components/ActionConfirmModal";
+import LoadingOverlay from "../../../components/LoadingOverlay";
+import toast from "../../../utils/toast";
+
+import { deleteThanhVienHopDongApi } from "../../../api/HopDong.js";
 
 const PRIMARY = "#13c8ec";
 const BG = "#101f22";
@@ -29,19 +34,43 @@ export default function ChiTietHopDongScreen({ route }) {
     const [hopDong, setHopDong] = useState(null); // Nhận đối tượng hopDong từ navigation params
     console.log("Mã hợp đồng nhận được:", maHopDong);
 
+    const fetchData = async () => {
+        const response = await getHopDongApi(maHopDong);
+        if (response.success) {
+            setHopDong(response.data);
+            console.log("Chi tiết hợp đồng:", response.data);
+        } else {
+            console.error("Lỗi từ API:", response.message);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            const response = await getHopDongApi(maHopDong);
-            if (response.success) {
-                setHopDong(response.data);
-                console.log("Chi tiết hợp đồng:", response.data);
-            } else {
-                console.error("Lỗi từ API:", response.message);
-            }
-        };
         fetchData();
     }, []);
-    
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedMaNt, setSelectedMaNt] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const handleDelete = (maNt) => {
+        setSelectedMaNt(maNt);
+        setShowDeleteModal(true);
+    }
+
+    const handleConfirmDelete = async (maNt) => {
+        // Gọi API xóa loại phòng ở đây
+        setLoading(true);
+        const result = await deleteThanhVienHopDongApi(maHopDong, maNt);
+        if (result.success) {
+            toast.success("Xóa thành viên hợp đồng thành công");
+            fetchData(); // Tải lại dữ liệu hợp đồng sau khi xóa thành viên
+        } else {
+            toast.error("Xóa thành viên hợp đồng thất bại");
+        }
+        setShowDeleteModal(false);
+        setLoading(false);
+    }
+
     return (
 
         <View style={styles.container}>
@@ -208,7 +237,7 @@ export default function ChiTietHopDongScreen({ route }) {
 
                                         </View>
 
-                                        <TouchableOpacity>
+                                        <TouchableOpacity onPress={() => handleDelete(m.maNt)}>
                                             <MaterialIcons name="delete-outline" size={20} color="#64748b" />
                                         </TouchableOpacity>
 
@@ -244,7 +273,20 @@ export default function ChiTietHopDongScreen({ route }) {
                 </View>
 
             </ScrollView>
-
+            <ActionConfirmModal
+                visible={showDeleteModal}
+                type="delete"
+                title="Xóa thành viên này?"
+                message="Hành động này không thể hoàn tác."
+                requiredText="detroy"
+                yesText="Xóa"
+                noText="Hủy"
+                onNo={() => setShowDeleteModal(false)}
+                onYes={async () => {
+                    handleConfirmDelete(selectedMaNt);
+                }}
+            />
+            <LoadingOverlay visible={loading} />
         </View>
 
     );

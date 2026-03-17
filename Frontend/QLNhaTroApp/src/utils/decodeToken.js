@@ -10,7 +10,7 @@ const decodeToken = (token) => {
             maNd: decoded.maNd,    
             hoTen: decoded.hoTen, 
             soDt: decoded.soDt, 
-            maVaiTro: decoded.role,
+            maVaiTro: decoded.VaiTro,
             exp: decoded.exp
         };
     } catch (error) {
@@ -24,11 +24,12 @@ const decodeToken = (token) => {
 const refreshAccessToken = async () => {
     try {
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
+        console.log("Refresh Token hiện tại:", refreshToken);
         const accessToken = await SecureStore.getItemAsync("accessToken");
 
         if (!refreshToken) return null;
 
-        const response = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/refresh-token", {
+        const response = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/refresh", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
@@ -37,14 +38,14 @@ const refreshAccessToken = async () => {
             })
         });
 
-        const result = await response.json();
+        // const result = await response.json();
 
-        if (result.success) {
-            // Lưu lại bộ Token mới vào SecureStore
-            await SecureStore.setItemAsync("accessToken", result.data.accessToken);
-            await SecureStore.setItemAsync("refreshToken", result.data.refreshToken);
-            return result.data.accessToken;
-        }
+        // if (result.success) {
+        //     // Lưu lại bộ Token mới vào SecureStore
+        //     await SecureStore.setItemAsync("accessToken", result.data.accessToken);
+        //     await SecureStore.setItemAsync("refreshToken", result.data.refreshToken);
+        //     return result.data.accessToken;
+        // }
         
         // Nếu refresh thất bại (thường do RefreshToken cũng hết hạn)
         return null;

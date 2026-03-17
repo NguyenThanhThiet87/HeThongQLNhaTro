@@ -53,8 +53,6 @@ const HoSo = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" />
-
             {/* HEADER */}
             <View style={styles.header}>
 
@@ -90,7 +88,7 @@ const HoSo = ({ route }) => {
 
                 {/* Quick Actions */}
                 <View style={styles.actionGrid}>
-                    <ActionButton icon="chat-bubble" label="Nhắn tin" onHandle={()=> navigation.navigate("TinNhan")} />
+                    <ActionButton icon="chat-bubble" label="Nhắn tin" onHandle={() => navigation.navigate("TinNhan")} />
                     <ActionButton icon="call" label="Gọi điện" />
                     <ActionButton icon="notifications" label="Thông báo" />
                 </View>

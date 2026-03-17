@@ -15,13 +15,17 @@ import styles from "../Styles/OTPVerificationScreen_Styles";
 import { verifyOTP } from "../../../services/phoneAuthService";
 import { ActivityIndicator } from "react-native";
 import { addThanhVienHopDongApi } from "../../../api/HopDong";
+import LoadingOverlay from "../../../components/LoadingOverlay";
+import toast from "../../../utils/toast";
+import formatPhoneNumber from "../../../utils/formatPhoneNumber";
 
 export default function OTPVerificationScreen_ThemThanhVien({ route }) {
     const navigation = useNavigation();
     const { data } = route.params;
     console.log("Received data in OTPVerificationScreen_ThemThanhVien:", data.nguoiDung);
-    const phone  = data.nguoiDung.soDt;
-    
+    const phone = data.nguoiDung.soDt;
+    const [loading, setLoading] = useState(false);
+
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [seconds, setSeconds] = useState(119);
 
@@ -61,20 +65,26 @@ export default function OTPVerificationScreen_ThemThanhVien({ route }) {
     };
 
     const handleVerify = async () => {
-        const code = otp.join("");
-        console.log("Verify OTP:", code);
-        const result = await verifyOTP(phone, code);
-        console.log("OTP verification result:", result);
+        setLoading(true);
+        try {
+            const code = otp.join("");
+            const result = await verifyOTP(formatPhoneNumber(phone), code);
 
-        if (result.success) {
-            const apiResult = await addThanhVienHopDongApi(data);
-            console.log("Add member API result:", apiResult);
-            if (apiResult.success) {
-                toast.success("Thành viên đã được thêm vào hợp đồng thành công!");
-                navigation.navigate("ChiTietHopDong", { maHopDong: data.maHopDong });
+            if (result.success) {
+                const apiResult = await addThanhVienHopDongApi(data);
+                if (apiResult.success) {
+                    toast.success("Thành viên đã được thêm vào hợp đồng thành công!");
+                    navigation.navigate("ChiTietHopDong", { maHopDong: data.maHopDong });
+                } else {
+                    toast.error(apiResult.message || "Thêm thành viên thất bại");
+                }
+            } else {
+                toast.error(result.message || "OTP không hợp lệ");
             }
-        } else {
-            console.log("Lỗi", result.message);
+        } catch (error) {
+            toast.error("Đã có lỗi xảy ra: " + error.message);
+        } finally {
+            setLoading(false);  // ← luôn chạy dù có lỗi hay không
         }
     };
 
@@ -155,6 +165,7 @@ export default function OTPVerificationScreen_ThemThanhVien({ route }) {
 
                 </View>
             </ScrollView>
+            <LoadingOverlay visible={loading} />
         </KeyboardAvoidingView>
     );
 }

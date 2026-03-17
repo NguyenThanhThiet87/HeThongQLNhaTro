@@ -36,6 +36,7 @@
           "barcodeScannerEnabled": true
         }
       ]
-    ]
+    ],
+    "scheme": "myapp"
   }
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
     View,
@@ -13,6 +13,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle } from "react-native-svg";
 import legend from "../../../components/Legend";
 import PropertyCard from "../../../components/PropertyCard";
+import { getCurrentUser } from "../../../utils/decodeToken";
+import { getDayNhaTrosApi, getThongKePhongApi } from "../../../api/PhongTro";
+import { getDoanhThuApi } from "../../../api/HoaDon";
+import { formatCurrency} from "../../../utils/formatCurrency";
 
 const PRIMARY = "#13c8ec";
 const BG_DARK = "#101f22";
@@ -20,6 +24,59 @@ const SURFACE = "#1a2c30";
 
 export default function DashboardScreen() {
     const navigation = useNavigation();
+    const [user, setUser] = useState(null);
+    const [dayNhaTros, setDayNhaTros] = useState([]);
+    const [doanhThu, setDoanhThu] = useState();
+    const [thongKePhong, setThongKePhong] = useState();
+    
+    useEffect(() => {
+        const fetchUser = async () => {
+            const currentUser = await getCurrentUser();
+            setUser(currentUser);
+        };
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        const fetchDayNhaTros = async () => {
+            if (user) {
+                const result = await getDayNhaTrosApi(user.maNd);
+                if (result.success) {
+                    setDayNhaTros(result.data);
+                    console.log("Dãy nhà trọ:", result);
+                } else {
+                    console.error("Lỗi khi lấy dãy nhà trọ:", result.message);
+                }
+            }
+        };
+        fetchDayNhaTros();
+    }, [user]);
+
+    useEffect(() => {
+        const fetchDoanhThu = async () => {
+            const result = await getDoanhThuApi(user.maNd);
+            if (result.success) {
+                setDoanhThu(result.data);
+                console.log("Doanh thu:", result);
+            } else {
+                console.error("Lỗi khi lấy doanh thu:", result.message);
+            }
+        };
+        fetchDoanhThu();
+    }, [user]);
+
+    useEffect(() => {
+        const fetchThongKePhong = async () => {
+            const result = await getThongKePhongApi(user.maNd);
+            if (result.success) {
+                setThongKePhong(result.data);
+                console.log("Thống kê phòng:", result);
+            } else {
+                console.error("Lỗi khi lấy thống kê phòng:", result.message);
+            }
+        };
+        fetchThongKePhong();
+    }, [user]);
 
     return (
         <View style={styles.container}>
@@ -27,7 +84,7 @@ export default function DashboardScreen() {
             <View style={styles.header}>
                 <View>
                     <Text style={styles.greeting}>Chào buổi sáng 👋</Text>
-                    <Text style={styles.name}>Nguyễn Văn A</Text>
+                    <Text style={styles.name}>{user?.hoTen}</Text>
                 </View>
 
                 <TouchableOpacity style={styles.notificationBtn}>
@@ -43,16 +100,16 @@ export default function DashboardScreen() {
                     colors={["rgba(19,200,236,0.2)", "#1a2c30"]}
                     style={styles.revenueCard}
                 >
-                    <Text style={styles.cardLabel}>Doanh thu tháng 10</Text>
+                    <Text style={styles.cardLabel}>Doanh thu tháng {new Date().getMonth() + 1}</Text>
 
                     <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-                        <Text style={styles.revenue}>35.000.000</Text>
+                        <Text style={styles.revenue}>{formatCurrency(doanhThu?.tongTien || 0)}</Text>
                         <Text style={styles.currency}>đ</Text>
                     </View>
 
                     <View style={styles.trend}>
                         <MaterialIcons name="trending-up" size={14} color="#4ade80" />
-                        <Text style={styles.trendText}> +12% so với tháng trước</Text>
+                        <Text style={styles.trendText}> +{doanhThu?.tyLeTangTruong || 0}% so với tháng trước</Text>
                     </View>
                 </LinearGradient>
 
@@ -69,7 +126,6 @@ export default function DashboardScreen() {
                         <View style={{ width: 100, height: 100 }}>
 
                             <Svg width="100" height="100" viewBox="0 0 36 36">
-
                                 <Circle
                                     cx="18"
                                     cy="18"
@@ -114,7 +170,7 @@ export default function DashboardScreen() {
                             </Svg>
 
                             <View style={styles.chartCenter}>
-                                <Text style={styles.chartNumber}>50</Text>
+                                <Text style={styles.chartNumber}>{thongKePhong?.tongSoPhong || 0}</Text>
                                 <Text style={styles.chartLabel}>PHÒNG</Text>
                             </View>
 
@@ -122,14 +178,12 @@ export default function DashboardScreen() {
 
                         {/* LEGEND */}
                         <View style={{ marginLeft: 20, flex: 1 }}>
-
-                            {legend("Đã đóng tiền", "38", "#10b981")}
-                            {legend("Nợ tiền", "04", "#ef4444", true)}
-                            {legend("Hết hạn/BT", "06", "#f59e0b")}
-                            {legend("Phòng trống", "02", "#64748b")}
-
+                            {
+                                thongKePhong?.thongKeTrangThai.map((item, index) => ( 
+                                    legend( item, item.tenTrangThai, item.soLuong, item.mauSac)
+                                ))
+                            }
                         </View>
-
                     </View>
 
                 </View>
@@ -172,18 +226,17 @@ export default function DashboardScreen() {
                 </View>
 
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    {[1, 2, 3].map((item) => (
+                    {dayNhaTros.map((item) => (
 
                         <PropertyCard
-                            key={item}
-                            name={`Nhà trọ Xanh ${item}`}
-                            address="123 Đường Láng, HN"
-                            image="https://images.unsplash.com/photo-1568605114967-8130f3a36994"
-                            fillPercent={90}
-                            roomCount={12}
-                            onPress={() => console.log("Open property", item)}
+                            key={item?.maDayNt}
+                            name={`Nhà trọ Xanh ${item?.tenDayNt}`}
+                            address={item?.diaChi}
+                            image={item?.urlAnh}
+                            fillPercent={item?.tyLeLapDay}
+                            roomCount={item?.slphong}
+                            onPress={() => navigation.navigate("ChiTietDayTro", { id: item?.maDayNt })}
                         />
-
                     ))}
 
                 </ScrollView>
@@ -209,6 +262,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        marginBottom: 10,
     },
 
     greeting: {

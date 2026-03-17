@@ -6,7 +6,7 @@ const COLORS = {
     backgroundDark: '#101f22',
     surfaceDark: '#1a2e32',
     danger: '#ff4d4f',
-    textLight: '#f1f5f9',
+    textLight: '#808487',
     textMuted: '#94a3b8',
 };
 const BORDER = "rgba(19,200,236,0.1)";

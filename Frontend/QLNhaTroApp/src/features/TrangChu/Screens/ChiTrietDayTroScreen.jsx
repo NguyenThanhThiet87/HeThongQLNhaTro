@@ -7,12 +7,14 @@ import {
     ScrollView,
     TouchableOpacity,
     Image,
+    Dimensions
 } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { getDayNhaTroApi } from "../../../api/PhongTro";
 
 import { TEN_TRANG_THAI_PHONG, TRANG_THAI_PHONG } from "../../../constants/TRANG_THAI_PHONG";
+import LottieView from 'lottie-react-native';
 
 const PRIMARY = "#13c8ec";
 const BG = "#101f22";
@@ -37,6 +39,8 @@ const RoomCard = ({ name, status, meta, icon, color, onPress }) => {
 export default function PropertyDetailScreen({ route }) {
     const navigation = useNavigation();
     const maDayNt = route.params.id;
+    const { width, height } = Dimensions.get("window");
+
     const [dayNhaTro, setDayNhaTro] = React.useState(null);
     const [phongs, setPhongs] = React.useState([]);
     const [filteredPhongs, setFilteredPhongs] = React.useState([]);
@@ -67,7 +71,6 @@ export default function PropertyDetailScreen({ route }) {
 
     return (
         <View style={styles.container}>
-
             {/* HEADER */}
             <View style={styles.header}>
                 {/* Back */}
@@ -98,8 +101,8 @@ export default function PropertyDetailScreen({ route }) {
 
                     <View style={{ flex: 1 }}>
                         <Text style={styles.roomCount}>
-                                {dayNhaTro?.tenDayNt}
-                            </Text>
+                            {dayNhaTro?.tenDayNt}
+                        </Text>
 
                         <View style={styles.row}>
                             <MaterialIcons name="location-on" size={16} color={PRIMARY} />
@@ -194,39 +197,51 @@ export default function PropertyDetailScreen({ route }) {
 
                 {/* ROOM GRID */}
                 <View style={styles.grid}>
-                    {filteredPhongs?.map((phong, idx) => {
-                        let icon = "person";
-                        let color = "#22c55e";
+                    {filteredPhongs.length != 0 ? (
+                        filteredPhongs?.map((phong, idx) => {
+                            let icon = "person";
+                            let color = "#22c55e";
 
-                        // Tùy chỉnh icon và màu theo trạng thái phòng
-                        switch (phong.tenTrangThaiPhong) {
-                            case "Trống":
-                                icon = "no-accounts";
-                                color = PRIMARY;
-                                break;
-                            case "Nợ tiền":
-                                icon = "error-outline";
-                                color = "#ef4444";
-                                break;
-                            case "Bảo trì":
-                                icon = "construction";
-                                color = "#f59e0b";
-                                break;
-                            case "Đang thuê":
-                            default:
-                                icon = "person";
-                                color = "#22c55e";
-                        }
-                        return (<RoomCard
-                            key={phong.id || phong.soPhong || idx}
-                            name={phong.soPhong}
-                            status={phong.tenTrangThaiPhong}
-                            meta={phong.tenLoaiPhong}
-                            icon={icon}
-                            color={color}
-                            onPress={() => navigation.navigate("ChiTietPhong", { id: phong.maPhong })}
-                        />)
-                    })}
+                            // Tùy chỉnh icon và màu theo trạng thái phòng
+                            switch (phong.tenTrangThaiPhong) {
+                                case "Trống":
+                                    icon = "no-accounts";
+                                    color = PRIMARY;
+                                    break;
+                                case "Nợ tiền":
+                                    icon = "error-outline";
+                                    color = "#ef4444";
+                                    break;
+                                case "Bảo trì":
+                                    icon = "construction";
+                                    color = "#f59e0b";
+                                    break;
+                                case "Đang thuê":
+                                default:
+                                    icon = "person";
+                                    color = "#22c55e";
+                            }
+                            return (<RoomCard
+                                key={phong.id || phong.soPhong || idx}
+                                name={phong.soPhong}
+                                status={phong.tenTrangThaiPhong}
+                                meta={phong.tenLoaiPhong}
+                                icon={icon}
+                                color={color}
+                                onPress={() => navigation.navigate("ChiTietPhong", { id: phong.maPhong })}
+                            />)
+                        })) : (
+                        <View style={{ marginTop: 0, alignItems: "center", gap: 0 }}>
+                            <LottieView
+                                source={require("../../../../assets/animations/empty.json")}
+                                autoPlay
+                                loop
+                                style={{ width: width * 0.9, height: height * 0.3}}
+                            />
+                            <Text style={{color: "#fff"}}>Không có phòng nào</Text>
+                        </View>
+                        
+                    )}
                 </View>
 
             </ScrollView>

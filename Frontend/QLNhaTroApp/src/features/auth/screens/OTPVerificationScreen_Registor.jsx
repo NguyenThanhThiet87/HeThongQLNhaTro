@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useVerifyOTPRegister } from "../../../hooks/auth/useVerifyOTPRegister";
+
 import {
     View,
     Text,
@@ -11,17 +13,14 @@ import {
 
 import { MaterialIcons } from "@expo/vector-icons";
 import styles from "../styles/OTPVerificationScreen_Styles";
-import { verifyOTP } from "../../../services/phoneAuthService";
 import { ActivityIndicator } from "react-native";
-import { createAccount } from "../../../api/auth";
-import formatPhoneNumber from '../../../utils/formatPhoneNumber';
+import { LoadingOverlay } from "../../../components/LoadingOverlay";
 
 export default function OTPVerificationScreen_Registor({ navigation, route }) {
     const { phone, name, password, role } = route.params;
-
+    const { verifyRegister, loading } = useVerifyOTPRegister(navigation);
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [seconds, setSeconds] = useState(119);
-    const [loading, setLoading] = useState(false);
 
     const inputs = useRef([]);
 
@@ -59,32 +58,13 @@ export default function OTPVerificationScreen_Registor({ navigation, route }) {
     };
 
     const handleVerify = async () => {
-        setLoading(true);
-        const code = otp.join("");
-
-        const result = await verifyOTP(phone, code);
-        console.log("OTP verification result:", result);
-        if (!result.success) {
-            console.log("Lỗi", result.message);
-            setLoading(false);
-            return;
-        }
-
-        const res = await createAccount(
+        await verifyRegister(
+            phone,
+            otp,
             name,
-            formatPhoneNumber(phone),
             password,
-            role,
-            result.idToken
+            role
         );
-
-        if (res.success) {
-            console.log("Thành công", "Tài khoản đã được tạo");
-            navigation.navigate("Login");
-        } else {
-            console.log("Lỗi", res.message);
-        }
-        setLoading(false);
     };
 
     const handleResend = () => {
@@ -98,12 +78,11 @@ export default function OTPVerificationScreen_Registor({ navigation, route }) {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
         >
-            <ScrollView
+                <View style={styles.container}>
+                    <ScrollView
                 contentContainerStyle={{ flexGrow: 1 }}
                 keyboardShouldPersistTaps="handled"
-            >
-                <View style={styles.container}>
-
+            ></ScrollView>
                     {/* Back Button */}
                     <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
                         <MaterialIcons name="arrow-back" size={22} color="#aaa" />
@@ -159,21 +138,11 @@ export default function OTPVerificationScreen_Registor({ navigation, route }) {
 
                     {/* Verify Button */}
                     <TouchableOpacity
-                        style={[
-                            styles.verifyBtn,
-                            loading && { opacity: 0.7 }
-                        ]}
-                        onPress={handleVerify}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <ActivityIndicator size="small" color="#000" />
-                        ) : (
-                            <Text style={styles.buttonText}>Xác nhận OTP</Text>
-                        )}
+                        style={styles.verifyBtn} onPress={handleVerify}>
+                        <Text style={styles.buttonText}>Xác nhận OTP</Text>
                     </TouchableOpacity>
                 </View>
-            </ScrollView>
+                <LoadingOverlay visible={loading} />
         </KeyboardAvoidingView>
     );
 }

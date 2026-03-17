@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useTheme } from "../theme/useTheme";
 
 const PRIMARY = "#13c8ec";
 const PRIMARY_HOVER = "#0fb3d4";
@@ -25,6 +26,9 @@ export default function Input({
   inputStyle,
   ...props
 }) {
+  const { COLORS } = useTheme();
+  const styles = createStyles(COLORS);
+
   return (
     <View style={[{ marginBottom: 22 }, width && { width }]}>
       <Text style={styles.label}>{label}</Text>
@@ -52,7 +56,7 @@ export default function Input({
           />
         ) : (
           <View style={[styles.input, inputStyle, height && { height }]}>
-            <Text style={{ color: "#fff", fontSize: 15 }}>{props.value}</Text>
+            <Text style={{ color: COLORS.inputText, fontSize: 15 }}>{props.value}</Text>
           </View>
         )}
         {secure && (
@@ -60,7 +64,7 @@ export default function Input({
             <MaterialIcons
               name={secureValue ? "visibility-off" : "visibility"}
               size={20}
-              color="#6b8a8f"
+              color={COLORS.textMuted}
             />
           </TouchableOpacity>
         )}
@@ -72,19 +76,19 @@ export default function Input({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
   label: {
     fontSize: 14,
-    color: "#9fb4b8",
+    color: COLORS.textMain,
     marginBottom: 5,
     marginLeft: 4,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: SURFACE,
+    backgroundColor: COLORS.card,
     borderWidth: 2,
-    borderColor: BORDER,
+    borderColor: COLORS.border,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -92,9 +96,9 @@ const styles = StyleSheet.create({
   inputContainerDisabled: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ffffff10",
+    backgroundColor: COLORS.inputBgDisabled,
     borderWidth: 2,
-    borderColor: BORDER,
+    borderColor: COLORS.border,
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -102,13 +106,13 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
-    color: "#fff",
+    color: COLORS.inputText,
     fontSize: 15,
     justifyContent: "center",
   },
 
   errorText: {
-    color: "red",
+    color: COLORS.danger,
     fontSize: 11,
     marginTop: 4,
     marginLeft: 4,

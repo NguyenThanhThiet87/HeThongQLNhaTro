@@ -3,8 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const COLORS = {
     primary: '#13c8ec',
-    backgroundDark: '#101f22',
-    surfaceDark: '#1a2e32',
+    backgroundDark: '#ffffff',
+    surfaceDark: '#ffffff',
     danger: '#ff4d4f',
     textLight: '#f1f5f9',
     textMuted: '#94a3b8',

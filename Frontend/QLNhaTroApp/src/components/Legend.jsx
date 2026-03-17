@@ -2,9 +2,9 @@ import { View, Text, TouchableOpacity } from "react-native";
 import styles from "./Legend.styles";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function legend(label, value, color, highlight = false) {
+export default function legend( key, label, value, color, highlight = false) {
     return (
-        <TouchableOpacity style={styles.legendRow}>
+        <TouchableOpacity key={key} style={styles.legendRow}>
 
             <View style={styles.leftContainer}>
                 <View style={[styles.legendDot, { backgroundColor: color }]} />

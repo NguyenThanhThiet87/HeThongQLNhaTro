@@ -1,13 +1,12 @@
 import React, { useState, useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../styles/RegisterAccountScreen_Styles";
-import { isExistAccount } from "../../../api/auth";
-import { sendOTP } from "../../../services/phoneAuthService";
 import { ActivityIndicator } from "react-native";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import { app } from "../../../services/firebaseConfig";
 import PasswordRule from "../../../components/PasswordRule";
-
+import { useRegisterAccount } from "../../../hooks/auth/useRegisterAccount";
+import LoadingOverlay from "../../../components/LoadingOverlay";
 import {
   View,
   Text,
@@ -25,11 +24,13 @@ export default function RegisterAccountScreen({ navigation, route }) {
   navigation = useNavigation();
   const role = route.params.role;
 
+  const { sendOTPRegister, loading } = useRegisterAccount(navigation);
+
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+
   const recaptchaVerifier = useRef(null);
 
   const passwordRules = {
@@ -45,36 +46,18 @@ export default function RegisterAccountScreen({ navigation, route }) {
     passwordRules.hasNumber &&
     passwordRules.hasSpecialChar;
 
+  const handleSendOTP = () => {
 
-  const handleSendOTP = async () => {
-    if (!name || !phoneNumber || !password) {
-      return toast.error("Vui lòng điền đầy đủ thông tin.");
-    }
-    if(!isPasswordValid)
-      return toast.error("Mật khẩu không hợp lệ. Vui lòng kiểm tra lại các yêu cầu.");
+    if (!isPasswordValid)
+      return toast.error("Mật khẩu không hợp lệ.");
 
-    setLoading(true);
-    const exists = await isExistAccount(phoneNumber);
-    if (exists) {
-      toast.info("Số điện thoại đã được đăng ký.");
-      setLoading(false);
-      return;
-    }
-    const result = await sendOTP(phoneNumber, recaptchaVerifier);
-    console.log("Send OTP result:", result);
-    if (result.success) {
-      navigation.navigate("OTPVerificationRegistor", {
-        phone: phoneNumber,
-        name: name,
-        password: password,
-        role: role
-      });
-      toast.success("OTP sent to: " + result.phone);
-    } else {
-      toast.error("Failed to send OTP: " + result.message);
-    }
-
-    setLoading(false);
+    sendOTPRegister(
+      name,
+      phoneNumber,
+      password,
+      role,
+      recaptchaVerifier
+    );
   };
 
   return (
@@ -83,27 +66,26 @@ export default function RegisterAccountScreen({ navigation, route }) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
     >
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-              <MaterialIcons name="arrow-back" size={22} color="#fff" />
-              <Text style={styles.backText}>Quay lại</Text>
-            </TouchableOpacity>
-          </View>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+            <MaterialIcons name="arrow-back" size={22} color="#fff" />
+            <Text style={styles.backText}>Quay lại</Text>
+          </TouchableOpacity>
+        </View>
 
-          {/* Title */}
-          <View style={{ marginTop: 20, marginBottom: 30 }}>
-            <Text style={styles.title}>Tạo tài khoản</Text>
-            <Text style={styles.subtitle}>
-              Chỉ mất 30 giây để bắt đầu.
-            </Text>
-          </View>
-
+        {/* Title */}
+        <View style={{ marginTop: 20, marginBottom: 30 }}>
+          <Text style={styles.title}>Tạo tài khoản</Text>
+          <Text style={styles.subtitle}>
+            Chỉ mất 30 giây để bắt đầu.
+          </Text>
+        </View>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
           {/* Form */}
           <View style={styles.form}>
             {/* name */}
@@ -219,12 +201,10 @@ export default function RegisterAccountScreen({ navigation, route }) {
               </Text>
             </View>
           </View>
-          <FirebaseRecaptchaVerifierModal
-            ref={recaptchaVerifier}
-            firebaseConfig={app.options}
-          />
-        </View>
-      </ScrollView>
+          <FirebaseRecaptchaVerifierModal ref={recaptchaVerifier} firebaseConfig={app.options} />
+        </ScrollView>
+      </View>
+      <LoadingOverlay visible={loading} />
     </KeyboardAvoidingView>
   );
 }
