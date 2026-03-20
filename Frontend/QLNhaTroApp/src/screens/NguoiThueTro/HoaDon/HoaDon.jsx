@@ -270,7 +270,6 @@ const HistoryItem = ({ month, date, amount, onPress }) => {
   )
 };
 
-
 // --- Styles ---
 const createStyles = (COLORS) => StyleSheet.create({
   container: { flex: 1 },

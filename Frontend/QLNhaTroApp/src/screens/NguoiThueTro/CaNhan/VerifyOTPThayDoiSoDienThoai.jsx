@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTheme } from "../../../theme/useTheme";
 import {
     View,
     Text,
@@ -19,6 +20,10 @@ import { getCurrentUser } from "../../../utils/decodeToken";
 
 export default function VerifyOTPThayDoiSoDienThoai({ navigation, route }) {
     const { phone } = route.params;
+
+    const { COLORS } = useTheme();
+    const styles = createStyles(COLORS);
+
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [seconds, setSeconds] = useState(119);
     const [loading, setLoading] = useState(false);
@@ -100,13 +105,13 @@ export default function VerifyOTPThayDoiSoDienThoai({ navigation, route }) {
 
                     {/* Back Button */}
                     <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-                        <MaterialIcons name="arrow-back" size={22} color="#aaa" />
+                        <MaterialIcons name="arrow-back" size={22} color={COLORS.textMain} />
                         <Text style={styles.backText}>Quay lại</Text>
                     </TouchableOpacity>
 
                     {/* Icon */}
                     <View style={styles.iconWrapper}>
-                        <MaterialIcons name="lock-reset" size={40} color="#13c8ec" />
+                        <MaterialIcons name="lock-reset" size={40} color={COLORS.primary} />
                     </View>
 
                     {/* Title */}
@@ -162,96 +167,96 @@ export default function VerifyOTPThayDoiSoDienThoai({ navigation, route }) {
         </KeyboardAvoidingView>
     );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f8fafc",
-    alignItems: "center",
-    paddingTop: 80,
-    paddingHorizontal: 20
-  },
-  back: {
-    position: "absolute",
-    top: 60,
-    left: 20,
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  backText: {
-    color: "#aaa",
-    marginLeft: 5
-  },
-  iconWrapper: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: "#182b2f",
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-    marginBottom: 20
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#101f22"
-  },
-  subtitle: {
-    color: "#aaa",
-    marginTop: 5
-  },
-  phone: {
-    color: "#101f22",
-    fontWeight: "600",
-    marginBottom: 30
-  },
-  otpContainer: {
-    flexDirection: "row",
-    gap: 12
-  },
-  otpInput: {
-    width: 40,
-    height: 45,
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    textAlign: "center",
-    fontSize: 22,
-    color: "#101f22",
-    borderWidth: 1,
-    borderColor: "#e2e8f0"
-  },
-  activeInput: {
-    borderColor: "#13c8ec",
-    shadowColor: "#13c8ec",
-    shadowOpacity: 0.6,
-    shadowRadius: 10
-  },
-  expire: {
-    marginTop: 30,
-    color: "#aaa"
-  },
-  time: {
-    color: "#13c8ec",
-    fontWeight: "600"
-  },
-  resendText: {
-    color: "#888"
-  },
-  resendBtn: {
-    color: "#ccc",
-    textDecorationLine: "underline"
-  },
-  verifyBtn: {
-    marginTop: 40,
-    backgroundColor: "#13c8ec",
-    paddingVertical: 15,
-    borderRadius: 14,
-    width: "100%",
-    alignItems: "center"
-  },
-  verifyText: {
-    fontWeight: "bold",
-    color: "#101f22"
-  }
+const createStyles = (COLORS) => StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.bgLight,
+        alignItems: "center",
+        paddingTop: 80,
+        paddingHorizontal: 20
+    },
+    back: {
+        position: "absolute",
+        top: 60,
+        left: 20,
+        flexDirection: "row",
+        alignItems: "center"
+    },
+    backText: {
+        color: COLORS.textMuted,
+        marginLeft: 5
+    },
+    iconWrapper: {
+        width: 80,
+        height: 80,
+        borderRadius: 20,
+        backgroundColor: COLORS.card,
+        alignItems: "center",
+        justifyContent: "center",
+        alignSelf: "center",
+        marginBottom: 20
+    },
+    title: {
+        fontSize: 26,
+        fontWeight: "bold",
+        color: COLORS.textMain
+    },
+    subtitle: {
+        color: COLORS.textMuted,
+        marginTop: 5
+    },
+    phone: {
+        color: COLORS.textMain,
+        fontWeight: "600",
+        marginBottom: 30
+    },
+    otpContainer: {
+        flexDirection: "row",
+        gap: 12
+    },
+    otpInput: {
+        width: 40,
+        height: 45,
+        backgroundColor: COLORS.card,
+        borderRadius: 15,
+        textAlign: "center",
+        fontSize: 22,
+        color: COLORS.textMain,
+        borderWidth: 1,
+        borderColor: COLORS.border
+    },
+    activeInput: {
+        borderColor: COLORS.primary,
+        shadowColor: COLORS.primary,
+        shadowOpacity: 0.6,
+        shadowRadius: 10
+    },
+    expire: {
+        marginTop: 30,
+        color: COLORS.textMuted
+    },
+    time: {
+        color: COLORS.primary,
+        fontWeight: "600"
+    },
+    resendText: {
+        color: COLORS.textMuted
+    },
+    resendBtn: {
+        color: COLORS.primary,
+        textDecorationLine: "underline"
+    },
+    verifyBtn: {
+        marginTop: 40,
+        backgroundColor: COLORS.buttonBg,
+        paddingVertical: 15,
+        borderRadius: 14,
+        width: "100%",
+        alignItems: "center"
+    },
+    verifyText: {
+        fontWeight: "bold",
+        color: COLORS.buttonText
+    }
 });
+

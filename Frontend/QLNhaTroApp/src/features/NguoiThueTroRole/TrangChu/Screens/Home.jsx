@@ -149,10 +149,10 @@ export default function TenantDashboard() {
           {/* Quick Actions Grid */}
           <Text style={[styles.sectionTitle, { color: COLORS.textMain }]}>Tiện ích nhanh</Text>
           <View style={styles.grid}>
-            <QuickAction icon="opacity" label="Đặt nước/gas" color="#3b82f6" />
-            <QuickAction icon="report-problem" label="Báo sự cố" color="#ef4444" />
-            <QuickAction icon="history" label="Lịch sử trả tiền" color="#22c55e" />
-            <QuickAction icon="chat" label="Chat chủ trọ" color="#f59e0b" />
+            <QuickAction icon="opacity" label="Đặt nước/gas" color="#3b82f6" onPress={() => navigation.navigate('DatNuocGasScreen')} />
+            <QuickAction icon="report-problem" label="Báo sự cố" color="#ef4444" onPress={() => navigation.navigate('LapBaoCaoSuCoScreen')} />
+            <QuickAction icon="history" label="Lịch sử trả tiền" color="#22c55e" onPress={() => navigation.navigate('LichSuTraTienScreen')} />
+            <QuickAction icon="chat" label="Chat chủ trọ" color="#f59e0b" onPress={() => navigation.navigate('ChatChuNhaTroScreen')} />
           </View>
 
           {/* Recent Activity */}
@@ -172,12 +172,12 @@ export default function TenantDashboard() {
 }
 
 // Sub-components
-const QuickAction = ({ icon, label, color }) => {
+const QuickAction = ({ icon, label, color, onPress }) => {
   const { COLORS } = useTheme();
   const styles = createStyles(COLORS);
 
   return (
-    <TouchableOpacity style={[styles.gridItem, { backgroundColor: COLORS.card, borderColor: COLORS.border }]}>
+    <TouchableOpacity style={[styles.gridItem, { backgroundColor: COLORS.card, borderColor: COLORS.border }]} onPress={onPress}>
       <View style={[styles.actionIconBg, { backgroundColor: color + '15' }]}>
         <MaterialIcons name={icon} size={24} color={color} />
       </View>

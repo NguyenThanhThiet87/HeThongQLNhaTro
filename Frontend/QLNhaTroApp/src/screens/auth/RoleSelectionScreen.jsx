@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import styles from "../styles/RoleSelectionScreen_Styles";
 import { useNavigation } from "@react-navigation/native";
+import { useTheme } from "../../theme/useTheme";
+
 import {
     View,
     Text,
@@ -9,11 +10,14 @@ import {
     ScrollView
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import RoleCard from "../../../components/RoleCard";
-import { ROLES } from "../../../constants/roles";
+import RoleCard from "../../components/RoleCard";
+import { ROLES } from "../../constants/roles";
 
 export default function RoleSelectionScreen() {
     const navigation = useNavigation();
+
+    const { COLORS } = useTheme();
+    const styles = createStyles(COLORS);
 
     const [role, setRole] = useState(ROLES.CHU_TRO);
 
@@ -33,7 +37,7 @@ export default function RoleSelectionScreen() {
             <View style={styles.header}>
                 {/* Back */}
                 <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-                    <MaterialIcons name="arrow-back" size={22} color="#aaa" />
+                    <MaterialIcons name="arrow-back" size={22} color={COLORS.textMain} />
                     <Text style={styles.backText}>Quay lại</Text>
                 </TouchableOpacity>
 
@@ -85,7 +89,7 @@ export default function RoleSelectionScreen() {
                     <MaterialIcons
                         name="arrow-forward"
                         size={18}
-                        color="#101f22"
+                        color={COLORS.buttonText}
                     />
                 </TouchableOpacity>
             </View>
@@ -93,3 +97,81 @@ export default function RoleSelectionScreen() {
         </View>
     );
 }
+
+const createStyles = (COLORS) => StyleSheet.create({
+
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.bgLight,
+    },
+
+    header: {
+        paddingTop: 55,
+        paddingHorizontal: 20,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+
+    back: {
+        position: "absolute",
+        top: 60,
+        left: 20,
+        flexDirection: "row",
+        alignItems: "center"
+    },
+
+    backText: {
+        color: COLORS.textMuted,
+        marginLeft: 5
+    },
+
+    content: {
+        paddingHorizontal: 20,
+        paddingTop: 30,
+        paddingBottom: 120
+    },
+
+    title: {
+        fontSize: 26,
+        fontWeight: "bold",
+        color: COLORS.textMain,
+        marginTop: 20,
+    },
+
+    subtitle: {
+        color: COLORS.textMuted,
+        marginTop: 6
+    },
+
+    bottom: {
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        padding: 20,
+        backgroundColor: COLORS.bgLight
+    },
+
+    continueBtn: {
+        backgroundColor: COLORS.buttonBg,
+        paddingVertical: 16,
+        borderRadius: 14,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 8
+    },
+
+    continueText: {
+        fontWeight: "bold",
+        color: COLORS.buttonText
+    },
+
+    note: {
+        textAlign: "center",
+        fontSize: 12,
+        color: COLORS.textMuted,
+        marginTop: 12
+    }
+
+});

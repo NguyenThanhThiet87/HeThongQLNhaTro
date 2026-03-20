@@ -1,21 +1,20 @@
-export const verifyOtpRegisterService = async ( phone, code, name, password, role) => {
-    const result = await verifyOTP(phone, code);
+import verifyOtpRegisterService from "../../services/authService";
+import { useState } from "react";
 
-    if (!result.success) {
-        throw new Error(result.message || "OTP không hợp lệ");
+export function useVerifyOTPRegister() {
+  const [loading, setLoading] = useState(false);
+
+  const verifyRegister = async (phone, otp, name, password, role) => {
+    setLoading(true);
+    try {
+      const res = await verifyOtpRegisterService(phone, otp, name, password, role);
+      setLoading(false);
+      return res;
+    } catch (err) {
+      setLoading(false);
+      throw err;
     }
+  };
 
-    const res = await createAccount(
-        name,
-        phone,
-        password,
-        role,
-        result.idToken
-    );
-
-    if (!res.success) {
-        throw new Error(res.message || "Tạo tài khoản thất bại");
-    }
-
-    return res;
-};
+  return { verifyRegister, loading };
+}

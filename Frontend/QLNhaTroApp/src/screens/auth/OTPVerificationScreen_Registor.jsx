@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useVerifyOTPRegister } from "../../hooks/auth/useVerifyOTPRegister";
+import { useTheme } from "../../theme/useTheme";
+
 import {
     View,
     Text,
@@ -6,15 +9,19 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
     Platform,
-    ScrollView
+    ScrollView,
+    StyleSheet
 } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import styles from "../styles/OTPVerificationScreen_Styles";
-import { verifyOTP } from "../../../services/phoneAuthService";
+import LoadingOverlay from "../../components/LoadingOverlay";
 
-export default function OTPVerificationScreen({ navigation, route }) {
-    const { phone } = route.params;
+export default function OTPVerificationScreen_Registor({ navigation, route }) {
+    const { COLORS } = useTheme();
+    const styles = createStyles(COLORS);
+
+    const { phone, name, password, role } = route.params;
+    const { verifyRegister, loading } = useVerifyOTPRegister(navigation);
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [seconds, setSeconds] = useState(119);
 
@@ -54,16 +61,13 @@ export default function OTPVerificationScreen({ navigation, route }) {
     };
 
     const handleVerify = async () => {
-        const code = otp.join("");
-        console.log("Verify OTP:", code);
-        const result = await verifyOTP(phone, code);
-        console.log("OTP verification result:", result);
-
-        if (result.success) {
-            navigation.navigate("ResetPassword", { phone, idToken: result.idToken });
-        } else {
-            Alert.alert("Lỗi", result.message);
-        }
+        await verifyRegister(
+            phone,
+            otp,
+            name,
+            password,
+            role
+        );
     };
 
     const handleResend = () => {
@@ -95,9 +99,9 @@ export default function OTPVerificationScreen({ navigation, route }) {
                     </View>
 
                     {/* Title */}
-                    <Text style={styles.title}>Xác nhận</Text>
+                    <Text style={styles.title}>Xác nhận OTP</Text>
                     <Text style={styles.subtitle}>
-                        Chúng tôi đã gửi mã 4 chữ số đến số điện thoại của bạn
+                        Chúng tôi đã gửi mã 6 chữ số đến số điện thoại của bạn
                     </Text>
                     <Text style={styles.phone}>{phone}</Text>
 
@@ -140,9 +144,103 @@ export default function OTPVerificationScreen({ navigation, route }) {
                     <TouchableOpacity style={styles.verifyBtn} onPress={handleVerify}>
                         <Text style={styles.verifyText}>Xác nhận OTP</Text>
                     </TouchableOpacity>
-
                 </View>
             </ScrollView>
+            <LoadingOverlay visible={loading} />
+
         </KeyboardAvoidingView>
     );
 }
+
+const createStyles = (COLORS) => StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.bgLight,
+        alignItems: "center",
+        paddingTop: 80,
+        paddingHorizontal: 20
+    },
+    back: {
+        position: "absolute",
+        top: 60,
+        left: 20,
+        flexDirection: "row",
+        alignItems: "center"
+    },
+    backText: {
+        color: COLORS.textMuted,
+        marginLeft: 5
+    },
+    iconWrapper: {
+        width: 80,
+        height: 80,
+        borderRadius: 20,
+        backgroundColor: COLORS.card,
+        alignItems: "center",
+        justifyContent: "center",
+        alignSelf: "center",
+        marginBottom: 20
+    },
+    title: {
+        fontSize: 26,
+        fontWeight: "bold",
+        color: COLORS.textMain
+    },
+    subtitle: {
+        color: COLORS.textMuted,
+        marginTop: 5
+    },
+    phone: {
+        color: COLORS.textMain,
+        fontWeight: "600",
+        marginBottom: 30
+    },
+    otpContainer: {
+        flexDirection: "row",
+        gap: 12
+    },
+    otpInput: {
+        width: 40,
+        height: 45,
+        backgroundColor: COLORS.card,
+        borderRadius: 15,
+        textAlign: "center",
+        fontSize: 22,
+        color: COLORS.textMain,
+        borderWidth: 1,
+        borderColor: COLORS.border
+    },
+    activeInput: {
+        borderColor: COLORS.primary,
+        shadowColor: COLORS.primary,
+        shadowOpacity: 0.6,
+        shadowRadius: 10
+    },
+    expire: {
+        marginTop: 30,
+        color: COLORS.textMuted
+    },
+    time: {
+        color: COLORS.primary,
+        fontWeight: "600"
+    },
+    resendText: {
+        color: COLORS.textMuted
+    },
+    resendBtn: {
+        color: COLORS.primary,
+        textDecorationLine: "underline"
+    },
+    verifyBtn: {
+        marginTop: 40,
+        backgroundColor: COLORS.buttonBg,
+        paddingVertical: 15,
+        borderRadius: 14,
+        width: "100%",
+        alignItems: "center"
+    },
+    verifyText: {
+        fontWeight: "bold",
+        color: COLORS.buttonText
+    }
+});

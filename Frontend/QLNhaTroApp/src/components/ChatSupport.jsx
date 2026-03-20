@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   // Chat History
   chatHistory: {
     backgroundColor: '#f8fafc', // Màu slate-50/50 nhẹ
-    height: 200, // Chiều cao cố định hoặc linh hoạt
+    height: 250, // Chiều cao cố định hoặc linh hoạt
   },
   historyContent: {
     padding: 5,
@@ -302,6 +302,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#334155',
     lineHeight: 20,
+    maxWidth: '85%',
   },
   boldText: {
     fontWeight: '700',

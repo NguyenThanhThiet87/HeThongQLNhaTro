@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import styles from "../styles/ResetPasswordScreen_Styles";
+import styles from "../../features/auth/styles/ResetPasswordScreen_Styles";
 import { useNavigation } from "@react-navigation/native";
-import {resetPasswordApi} from "../../../api/auth";
+import {resetPasswordApi} from "../../api/auth";
 
 import {
     View,

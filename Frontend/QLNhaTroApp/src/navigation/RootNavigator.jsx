@@ -6,13 +6,13 @@ import { ROLES } from "../constants/roles";
 import BottomTabNavigatorOwner from "./BottomTabNavigatorOwner";
 import BottomTabNavigatorTenant from "../features/NguoiThueTroRole/Navigation/BottomTabNavigatorTenant";
 
-import LoginScreen from "../features/auth/screens/LoginScreen";
+import LoginScreen from "../screens/auth/LoginScreen";
 import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
-import OTPVerificationScreen from "../features/auth/screens/OTPVerificationScreen";
-import ResetPasswordScreen from "../features/auth/screens/ResetPasswordScreen";
-import RoleSelectionScreen from "../features/auth/screens/RoleSelectionScreen";
-import RegisterAccountScreen from "../features/auth/screens/RegisterAccountScreen";
-import OTPVerificationScreenRegistor from "../features/auth/screens/OTPVerificationScreen_Registor";
+import OTPVerificationScreen from "../screens/auth/OTPVerificationScreen";
+import ResetPasswordScreen from "../screens/auth/ResetPasswordScreen";
+import RoleSelectionScreen from "../screens/auth/RoleSelectionScreen";
+import RegisterAccountScreen from "../screens/auth/RegisterAccountScreen";
+import OTPVerificationScreenRegistor from "../screens/auth/OTPVerificationScreen_Registor";
 
 const Stack = createNativeStackNavigator();
 

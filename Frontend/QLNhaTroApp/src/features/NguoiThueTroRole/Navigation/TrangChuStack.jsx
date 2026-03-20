@@ -5,7 +5,8 @@ const Stack = createNativeStackNavigator();
 import Home from "../TrangChu/Screens/Home";
 import ThanhToanHoaDonScreen from "../HoaDon/Screens/ThanhToanHoaDonScreen";
 import ThanhToanVNPayScreen from "../HoaDon/Screens/ThanhToanVNPayScreen";
-import ChatScreen from "../ChatBox/ChatScreen";
+import ChatChuNhaTroScreen from "../../../screens/Chat/ChatChuNhaTroScreen";
+import LapBaoCaoSuCoScreen from "../../../screens/NguoiThueTro/BaoCaoSuCo/LapBaoCaoSuCoScreen";
 
 export default function HomeStack() {
   return (
@@ -23,8 +24,12 @@ export default function HomeStack() {
             component={ThanhToanVNPayScreen}
         />
         <Stack.Screen
-            name="ChatScreen"
-            component={ChatScreen}
+            name="ChatChuNhaTroScreen"
+            component={ChatChuNhaTroScreen}
+        />
+        <Stack.Screen
+            name="LapBaoCaoSuCoScreen"
+            component={LapBaoCaoSuCoScreen}
         />
       </Stack.Navigator>
   );

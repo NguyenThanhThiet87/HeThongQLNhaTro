@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles, { colors } from "../styles/LoginScreen_Styles";
+import styles, { colors } from "../../features/auth/styles/LoginScreen_Styles";
 import { useNavigation } from "@react-navigation/native";
 
 import { ActivityIndicator } from "react-native";
@@ -19,8 +19,8 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { useAuth } from "../../../context/AuthContext";
-import { useLogin } from "../../../hooks/auth/useLogin";
+import { useAuth } from "../../context/AuthContext";
+import { useLogin } from "../../hooks/auth/useLogin";
 
 export default function LoginScreen() {
     const navigation = useNavigation();
@@ -39,10 +39,6 @@ export default function LoginScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <LinearGradient
-                colors={["#101f22", "#0e2a2f"]}
-                style={StyleSheet.absoluteFill}
-            />
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
