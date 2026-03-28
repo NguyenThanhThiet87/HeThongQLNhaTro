@@ -1,0 +1,6 @@
+@ServerQLNhaTro_HostAddress = http://localhost:5036
+
+GET {{ServerQLNhaTro_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
