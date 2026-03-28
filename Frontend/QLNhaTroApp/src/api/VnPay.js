@@ -47,13 +47,14 @@ export const paymentCallbackVnpay = async (callbackUrl) => {
             }
         );
 
-        const data = await res.json(); // ✅ Đọc body dù 200 hay 400
-
-        if (res.ok) {
-            return { success: true, data };
-        } else {
-            // Backend trả 400 với { success: false, message: "..." }
+        const text = await res.text();
+        console.log("Raw result:", text);
+        try {
+            const data = JSON.parse(text);
+            if (res.ok) return { success: true, data };
             return { success: false, message: data.message || "Thanh toán thất bại" };
+        } catch (e) {
+            return { success: false, message: "Lỗi Server (S): " + text.substring(0, 50) };
         }
     } catch (error) {
         return { success: false, message: error.message };

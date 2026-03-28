@@ -37,6 +37,10 @@
         }
       ]
     ],
-    "scheme": "myapp"
+    "scheme": "myapp",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.thiet.hethongqlnhatro"
+    }
   }
 }

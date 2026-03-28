@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import styles from "../../features/auth/styles/ForgotPasswordScreen_Styles";
+
 import { useNavigation } from "@react-navigation/native";
 import { useForgotPassword } from "../../hooks/auth/useForgotPassword";
 import { useTheme } from "../../theme/useTheme";

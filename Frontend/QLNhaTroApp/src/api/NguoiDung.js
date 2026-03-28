@@ -25,26 +25,14 @@ export const getNguoiDungApi = async (maNd) => {
 export const getNguoiThueApi = (maNd) => {
   return api.get(`/NguoiDung/chi-tiet-nguoi-thue?maNd=${maNd}`);
 };
-// export const getNguoiThueApi = async (maNd) => {
-//   try {
-//     const token = await getAccessToken();
-//     const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/chi-tiet-nguoi-thue?maNd=${maNd}`, {
-//       method: "GET",
-//       headers: {
-//         "Authorization": `Bearer ${token}`
-//       }
-//     });
-//     const text = await res.text();
-//     console.log("Raw response text:", text);
-//     return JSON.parse(text);
-//   } catch (error) {
-//     return {
-//       success: false,
-//       message: "Lỗi kết nối: " + error.message,
-//       data: null
-//     };
-//   }
-// };
+
+export const getChuNhaTroApi = (maNd) => {
+  return api.get(`/NguoiDung/chi-tiet-chu-tro?maNd=${maNd}`);
+};
+
+export const getNhaCungCapApi = (maNd) => {
+  return api.get(`/NguoiDung/chi-tiet-nha-cung-cap?maNd=${maNd}`);
+};
 
 export const getChuTroApi = async (maNd) => {
   try {
@@ -69,6 +57,22 @@ export const getChuTroApi = async (maNd) => {
 
 export const updateNguoiThueApi = (formData) => {
   return api.put("/NguoiDung/cap-nhat-nguoi-thue", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
+};
+
+export const updateChuNhaTroApi = (formData) => {
+  return api.put("/NguoiDung/cap-nhat-chu-tro", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
+};
+
+export const updateNhaCungCapApi = (formData) => {
+  return api.put("/NguoiDung/cap-nhat-nha-cung-cap", formData, {
     headers: {
       "Content-Type": "multipart/form-data"
     }

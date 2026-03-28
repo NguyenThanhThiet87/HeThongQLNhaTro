@@ -11,25 +11,32 @@ import {
     Image,
     SafeAreaView,
     StyleSheet,
-    StatusBar,
-    Platform
+    Platform,
+    Share,
+    Alert
 } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import AppHeader from '../../../components/AppHeader';
+import { formatCurrency } from '../../../utils/formatCurrency';
+import { getMonthFromDate, getYearFromDate } from '../../../utils/formatNgaySinh';
+import { getTenPhuongThucThanhToan, getIconPhuongThucThanhToan } from '../../../constants/PHUONG_THUC_THANH_TOAN';
 
 export default function ChiTietGiaoDichScreen({ route }) {
-    const { maLstt } = route.params.maLstt;
-    console.log("Received transactionId:", maLstt);
+    const { maLstt } = route.params;
+    const [transactionDetails, setTransactionDetails] = React.useState(null);
+
     useEffect(() => {
         const fetchTransactionDetails = async () => {
             try {
                 const response = await getChiTietGiaoDichApi(maLstt);
                 if (response.success) {
                     console.log("Chi tiết giao dịch:", response.data);
+                    setTransactionDetails(response.data);
                 } else {
                     console.error("Lỗi khi lấy chi tiết giao dịch:", response.message);
                 }
             } catch (error) {
+                console.error("Lỗi khi gọi API:", error);
             }
         };
         fetchTransactionDetails();
@@ -38,6 +45,36 @@ export default function ChiTietGiaoDichScreen({ route }) {
     const navigation = useNavigation();
     const { COLORS } = useTheme();
     const styles = createStyles(COLORS);
+
+    const handleDownloadReceipt = async () => {
+        if (!transactionDetails) return;
+
+        const receiptMessage = `
+--- BIÊN LAI THANH TOÁN ---
+Mã giao dịch: ${transactionDetails.maGiaoDich}
+Số tiền: ${formatCurrency(transactionDetails.soTien)}
+Kỳ thanh toán: Tháng ${getMonthFromDate(transactionDetails.ngayThanhToan)}/${getYearFromDate(transactionDetails.ngayThanhToan)}
+Phòng: ${transactionDetails.soPhong}
+Dãy nhà: ${transactionDetails.tenDayNhaTro}
+Phương thức: ${transactionDetails.phuongThuc}
+Thời gian: ${transactionDetails.ngayThanhToan}
+---
+Cảm ơn quý khách!
+        `.trim();
+
+        try {
+            await Share.share({
+                message: receiptMessage,
+                title: 'Biên lai giao dịch',
+            });
+        } catch (error) {
+            Alert.alert('Lỗi', 'Không thể tải biên lai.');
+        }
+    };
+
+    const handleShareTransaction = async () => {
+        handleDownloadReceipt();
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -71,33 +108,33 @@ export default function ChiTietGiaoDichScreen({ route }) {
 
                 {/* Amount */}
                 <View style={styles.amountContainer}>
-                    <Text style={styles.amountValue}>3.950.000đ</Text>
+                    <Text style={styles.amountValue}>{transactionDetails ? formatCurrency(transactionDetails.soTien) : '0'}đ</Text>
                 </View>
 
                 {/* Sections */}
                 <View style={styles.detailsWrapper}>
                     <InfoSection title="THÔNG TIN HÓA ĐƠN">
-                        <DetailRow label="Kỳ thanh toán" value="Tháng 09/2023" />
-                        <DetailRow label="Phòng" value="302" />
-                        <DetailRow label="Dãy nhà" value="Modern Life" />
+                        <DetailRow label="Kỳ thanh toán" value={transactionDetails ? `Tháng ${getMonthFromDate(transactionDetails.ngayThanhToan)}/${getYearFromDate(transactionDetails.ngayThanhToan)}` : 'N/A'} />
+                        <DetailRow label="Phòng" value={transactionDetails ? transactionDetails.soPhong : 'N/A'} />
+                        <DetailRow label="Dãy nhà" value={transactionDetails ? transactionDetails.tenDayNhaTro : 'N/A'} />
                     </InfoSection>
 
                     <InfoSection title="CHI TIẾT THANH TOÁN">
-                        <DetailRow label="Phương thức" value="Chuyển khoản" />
+                        <DetailRow label="Phương thức" value={transactionDetails ? getTenPhuongThucThanhToan(transactionDetails.maPhuongThuc) : 'N/A'} />
                         <DetailRow label="Ngân hàng" value="Vietcombank" />
-                        <DetailRow label="Mã giao dịch" value="XT7890BC12" isHighlight />
-                        <DetailRow label="Thời gian" value="10:30 - 02/10/2023" />
+                        <DetailRow label="Mã giao dịch" value={transactionDetails ? transactionDetails.maGiaoDich : 'N/A'} isHighlight />
+                        <DetailRow label="Thời gian" value={transactionDetails ? `${transactionDetails.ngayThanhToan}` : 'N/A'} />
                     </InfoSection>
                 </View>
 
                 {/* Buttons */}
                 <View style={styles.buttonFooter}>
-                    <TouchableOpacity style={styles.primaryButton}>
+                    <TouchableOpacity style={styles.primaryButton} onPress={handleDownloadReceipt}>
                         <MaterialCommunityIcons name="download" size={20} color="white" />
                         <Text style={styles.primaryButtonText}>Tải xuống biên lai</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.secondaryButton}>
+                    <TouchableOpacity style={styles.secondaryButton} onPress={handleShareTransaction}>
                         <Text style={styles.secondaryButtonText}>Chia sẻ giao dịch</Text>
                     </TouchableOpacity>
                 </View>
@@ -133,8 +170,8 @@ const DetailRow = ({ label, value, isHighlight }) => {
 
 // --- TÁCH RIÊNG STYLE TẠI ĐÂY ---
 const createStyles = (COLORS) => StyleSheet.create({
-    container: { flex: 1 },
-    headerTitle: { fontSize: 22, fontWeight: '700' },
+    container: { flex: 1, backgroundColor: COLORS.bgLight },
+    headerTitle: { fontSize: 22, fontWeight: '700', color: COLORS.textMain },
     iconCircle: { padding: 8, borderRadius: 20 },
 
     content: {
@@ -149,7 +186,7 @@ const createStyles = (COLORS) => StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#ecfdf5',
+        backgroundColor: COLORS.success + '15',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 16,
@@ -157,12 +194,12 @@ const createStyles = (COLORS) => StyleSheet.create({
     statusText: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#0f172a',
+        color: COLORS.textMain,
         marginBottom: 4,
     },
     subStatusText: {
         fontSize: 14,
-        color: '#64748b',
+        color: COLORS.textMuted,
         textAlign: 'center',
     },
     amountContainer: {
@@ -172,7 +209,7 @@ const createStyles = (COLORS) => StyleSheet.create({
     amountValue: {
         fontSize: 40,
         fontWeight: '800',
-        color: '#0f172a',
+        color: COLORS.textMain,
         letterSpacing: -1,
     },
     detailsWrapper: {
@@ -184,58 +221,42 @@ const createStyles = (COLORS) => StyleSheet.create({
     sectionTitle: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#94a3b8',
+        color: COLORS.textMuted,
         letterSpacing: 1.5,
         marginBottom: 12,
     },
     card: {
-        backgroundColor: '#f8fafc',
+        backgroundColor: COLORS.card,
         borderWidth: 1,
-        borderColor: '#f1f5f9',
+        borderColor: COLORS.border,
         borderRadius: 16,
         padding: 16,
     },
     row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingVertical: 6,
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: COLORS.border + '50',
     },
     rowLabel: {
         fontSize: 14,
-        color: '#64748b',
+        color: COLORS.textMuted,
     },
     rowValue: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#0f172a',
+        color: COLORS.textMain,
     },
     textPrimary: {
-        color: '#13c8ec',
-    },
-    evidenceCard: {
-        position: 'relative',
-        borderRadius: 16,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
-    },
-    evidenceImage: {
-        width: '100%',
-        height: 200,
-        backgroundColor: '#f1f5f9',
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        alignItems: 'center',
-        justifyContent: 'center',
+        color: COLORS.primary,
     },
     buttonFooter: {
         padding: 16,
         paddingBottom: Platform.OS === 'ios' ? 40 : 24,
     },
     primaryButton: {
-        backgroundColor: '#13c8ec',
+        backgroundColor: COLORS.primary,
         height: 56,
         borderRadius: 16,
         flexDirection: 'row',
@@ -244,7 +265,7 @@ const createStyles = (COLORS) => StyleSheet.create({
         marginBottom: 12,
         ...Platform.select({
             ios: {
-                shadowColor: '#13c8ec',
+                shadowColor: COLORS.primary,
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.3,
                 shadowRadius: 8,
@@ -261,16 +282,16 @@ const createStyles = (COLORS) => StyleSheet.create({
         marginLeft: 8,
     },
     secondaryButton: {
-        backgroundColor: 'white',
+        backgroundColor: 'transparent',
         height: 56,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#e2e8f0',
+        borderColor: COLORS.border,
         alignItems: 'center',
         justifyContent: 'center',
     },
     secondaryButtonText: {
-        color: '#475569',
+        color: COLORS.textMain,
         fontWeight: '600',
         fontSize: 16,
     },

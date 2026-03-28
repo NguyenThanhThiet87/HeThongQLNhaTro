@@ -9,11 +9,12 @@ import {
     Platform,
     ScrollView,
     StyleSheet,
+    Alert,
 } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { verifyOTP } from "../../../services/phoneAuthService";
-import {updateSoDt} from "../../../api/auth";
+import { updateSoDt } from "../../../api/auth";
 import toast from "../../../utils/toast";
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import { getCurrentUser } from "../../../utils/decodeToken";
@@ -74,14 +75,15 @@ export default function VerifyOTPThayDoiSoDienThoai({ navigation, route }) {
             const user = await getCurrentUser();
             const updateResult = await updateSoDt(user.maNd, phone, result.idToken);
             if (updateResult.success) {
-                toast.success("Số điện thoại đã được cập nhật!");
-                navigation.popToTop();
+                Alert.alert("Thành công", "Số điện thoại đã được cập nhật!", [
+                    { text: "OK", onPress: () => navigation.popToTop() }
+                ]);
             } else {
-                toast.info(updateResult.message);
+                Alert.alert("Thông báo", updateResult.message || "Không thể cập nhật số điện thoại");
                 navigation.goBack();
             }
         } else {
-            toast.error("Lỗi: " + result.message);
+            Alert.alert("Lỗi", "Mã OTP không chính xác hoặc đã hết hạn: " + result.message);
         }
         setLoading(false);
     };

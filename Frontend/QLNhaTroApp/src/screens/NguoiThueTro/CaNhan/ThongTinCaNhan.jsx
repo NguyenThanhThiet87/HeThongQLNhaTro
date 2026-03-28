@@ -21,7 +21,7 @@ export default function ThongTinCaNhan() {
 
   const { user, loading } = useUserNtProfile();
 
-  const {COLORS, isDark, toggleTheme} = useTheme();
+  const { COLORS, isDark, toggleTheme } = useTheme();
   const styles = createStyles(COLORS);
 
   return (
@@ -161,7 +161,7 @@ export default function ThongTinCaNhan() {
             </View>
             <Text style={[styles.reportTitle, { color: COLORS.textMain }]}>Báo cáo thiết bị hư hỏng</Text>
             <Text style={styles.reportDesc}>Thông báo ngay cho ban quản lý nếu thiết bị trong phòng gặp vấn đề.</Text>
-            <TouchableOpacity style={styles.createReportBtn}>
+            <TouchableOpacity style={styles.createReportBtn} onPress={() => navigation.navigate("Dashboard", { screen: "LapBaoCaoSuCoScreen", params: { maPhong: user?.maPhong } })}>
               <MaterialIcons name="add-circle" size={20} color="white" />
               <Text style={styles.createReportText}>Tạo báo cáo mới</Text>
             </TouchableOpacity>

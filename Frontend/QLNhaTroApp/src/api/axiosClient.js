@@ -9,20 +9,21 @@ const api = axios.create({
   }
 });
 
+import { getAccessToken } from "../utils/decodeToken";
+
 api.interceptors.request.use(
   async (config) => {
-
-    const token = await SecureStore.getItemAsync("accessToken");
+    const token = await getAccessToken();
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
-
   },
   (error) => Promise.reject(error)
 );
+
 
 api.interceptors.response.use(
   (response) => response.data,

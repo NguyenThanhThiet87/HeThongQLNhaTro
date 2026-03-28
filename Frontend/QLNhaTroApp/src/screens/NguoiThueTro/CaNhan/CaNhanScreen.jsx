@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {useNavigation, useFocusEffect} from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../../theme/useTheme";
 
 import {
@@ -24,8 +24,9 @@ export default function CaNhanScreen() {
     const styles = createStyles(COLORS);
 
     const navigation = useNavigation();
-    const { user, loading } = useUserNtProfile();
-    const { handleLogout } = useLogout();
+
+    const { user, loading: profileLoading } = useUserNtProfile();
+    const { handleLogout, loading: logoutLoading } = useLogout();
 
     return (
         <View style={styles.container}>
@@ -40,7 +41,7 @@ export default function CaNhanScreen() {
                 </Text>
 
                 {/* PROFILE CARD */}
-                <TouchableOpacity style={styles.profileCard} onPress={()=>navigation.navigate("ThongTinCaNhan", { maNd: user?.maNd })}>
+                <TouchableOpacity style={styles.profileCard} onPress={() => navigation.navigate("ThongTinCaNhan", { maNd: user?.maNd })}>
 
                     <View style={styles.avatarContainer}>
                         <Image
@@ -95,6 +96,29 @@ export default function CaNhanScreen() {
                 </TouchableOpacity>
 
 
+                {/* GIAO DỊCH */}
+                <Text style={styles.groupTitle}>
+                    GIAO DỊCH
+                </Text>
+
+                <View style={styles.groupCard}>
+                    <SettingItem
+                        icon="history"
+                        title="Lịch sử giao dịch"
+                        colorTitle={COLORS.textMain}
+                        colorBorder={COLORS.border}
+                        onHandle={() => navigation.navigate("Bill", { screen: "LichSuGiaoDich" })}
+                    />
+                    <SettingItem
+                        icon="description"
+                        title="Hợp đồng của tôi"
+                        borderBottom={false}
+                        colorTitle={COLORS.textMain}
+                        colorBorder={COLORS.border}
+                        onHandle={() => navigation.navigate("XemChiTietHopDong", { maHopDong: user?.maHopDong })}
+                    />
+                </View>
+
                 {/* APP SETTINGS */}
                 <Text style={styles.groupTitle}>
                     ỨNG DỤNG
@@ -105,14 +129,14 @@ export default function CaNhanScreen() {
                     <SettingItem
                         icon="notifications"
                         title="Thông báo"
-                        colorTitle= {COLORS.textMain}
+                        colorTitle={COLORS.textMain}
                         colorBorder={COLORS.border}
                     />
 
                     <SettingItem
                         icon="lock"
                         title="Bảo mật & Đăng nhập"
-                        colorTitle= {COLORS.textMain}
+                        colorTitle={COLORS.textMain}
                         colorBorder={COLORS.border}
                         onHandle={() => navigation.navigate("CaiDatBaoMatScreen")}
                     />
@@ -120,7 +144,7 @@ export default function CaNhanScreen() {
                         icon="settings"
                         title="Cài đặt chung"
                         borderBottom={false}
-                        colorTitle= {COLORS.textMain}
+                        colorTitle={COLORS.textMain}
                         colorBorder={COLORS.border}
                         onHandle={() => navigation.navigate("CaiDatChungScreen")}
                     />
@@ -131,11 +155,11 @@ export default function CaNhanScreen() {
                     <MaterialIcons
                         name="logout"
                         size={20}
-                        color= {COLORS.danger}
+                        color={COLORS.danger}
                     />
-                        <Text style={styles.logoutText}>
-                            Đăng xuất
-                        </Text>
+                    <Text style={styles.logoutText}>
+                        Đăng xuất
+                    </Text>
                 </TouchableOpacity>
 
                 <Text style={styles.version}>
@@ -143,7 +167,7 @@ export default function CaNhanScreen() {
                 </Text>
 
             </ScrollView>
-            <LoadingOverlay visible={loading} />
+            <LoadingOverlay visible={profileLoading || logoutLoading} />
         </View>
     );
 }

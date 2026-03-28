@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal, View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { useTheme } from "../theme/useTheme";
 
 export default function SelectModal({
     visible,
@@ -13,6 +14,9 @@ export default function SelectModal({
     selectedItemStyle,
     title = "Chọn mục"
 }) {
+    const { COLORS } = useTheme();
+    const styles = createStyles(COLORS);
+
     return (
         <Modal visible={visible} transparent animationType="fade">
             <View style={[styles.overlay, style]}>
@@ -46,7 +50,7 @@ export default function SelectModal({
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
     overlay: {
         flex: 1,
         justifyContent: "center",
@@ -54,7 +58,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#0008"
     },
     modalBox: {
-        backgroundColor: "#fff",
+        backgroundColor: COLORS.bgLight,
         padding: 20,
         borderRadius: 12,
         minWidth: 220
@@ -63,7 +67,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         fontWeight: "bold",
         fontSize: 16,
-        color: "#222"
+        color: COLORS.textMain
     },
     scroll: {
         maxHeight: 220
@@ -72,13 +76,13 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 6,
         marginBottom: 4,
-        backgroundColor: "#fff"
+        backgroundColor: COLORS.bgLight
     },
     selectedItem: {
-        backgroundColor: "#13c8ec20"
+        backgroundColor: COLORS.cardSelectedBg,
     },
     itemText: {
-        color: "#222",
+        color: COLORS.inputText,
         fontSize: 15
     },
     closeText: {

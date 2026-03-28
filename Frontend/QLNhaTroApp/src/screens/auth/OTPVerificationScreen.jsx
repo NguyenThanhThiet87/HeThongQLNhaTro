@@ -9,11 +9,13 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
     Platform,
-    ScrollView
+    ScrollView,
+    StyleSheet,
 } from "react-native";
+import LoadingOverlay from "../../components/LoadingOverlay";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import styles from "../../features/auth/styles/OTPVerificationScreen_Styles";
+
 import { verifyOTP } from "../../services/phoneAuthService";
 
 export default function OTPVerificationScreen({ navigation, route }) {
@@ -22,6 +24,7 @@ export default function OTPVerificationScreen({ navigation, route }) {
     const { COLORS } = useTheme();
     const styles = createStyles(COLORS);
 
+    const [loading, setLoading] = useState(false);
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [seconds, setSeconds] = useState(119);
 

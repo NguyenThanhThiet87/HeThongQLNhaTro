@@ -9,6 +9,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import AppHeader from '../../../components/AppHeader';
 
 import { useSecuritySettings } from '../../../hooks/settings/useSettings';
+import { getCurrentUser } from '../../../utils/decodeToken';
 
 export default function CaiDatBaoMatScreen() {
   const navigation = useNavigation();

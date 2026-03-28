@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../../theme/useTheme';
+import { useFocusEffect } from '@react-navigation/native';
 
 import {
   StyleSheet, View, Text, ScrollView, TouchableOpacity,
@@ -29,13 +30,15 @@ export default function InvoiceManagement() {
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [expenseSummary, setExpenseSummary] = useState(null);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
-    };
-    fetchUser();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchUser = async () => {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      };
+      fetchUser();
+    }, [])
+  );
 
   useEffect(() => {
     const fetchHoaDon = async () => {
@@ -55,6 +58,7 @@ export default function InvoiceManagement() {
       const res = await getLichSuThanhToanGanApi(user.maNd);
       if (res.success) {
         setPaymentHistory(res.data);
+        console.log("Payment history:", res.data);
       } else {
         console.error("Failed to fetch payment history:", res.message);
       }
@@ -82,10 +86,7 @@ export default function InvoiceManagement() {
     <SafeAreaView style={[styles.container, { backgroundColor: COLORS.bgLight }]}>
       {/* Header */}
       <AppHeader
-        left={
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigation.goBack()}>
-            <MaterialIcons name="arrow-back" size={24} color={COLORS.textMain} />
-          </TouchableOpacity>
+        left={<></>
         }
         center={
           <Text style={[styles.headerTitle, { color: COLORS.textMain }]}>Hóa đơn</Text>
@@ -97,26 +98,6 @@ export default function InvoiceManagement() {
         }
         isDark={false}
       />
-
-      {/* Tabs Navigation */}
-      <View style={[styles.tabContainer, { borderBottomColor: COLORS.border }]}>
-        <TouchableOpacity
-          onPress={() => setActiveTab('current')}
-          style={[styles.tab, activeTab === 'current' && styles.activeTab]}
-        >
-          <Text style={[styles.tabText, activeTab === 'current' ? styles.activeTabText : { color: COLORS.textMuted }]}>
-            Hóa đơn hiện tại
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setActiveTab('history')}
-          style={[styles.tab, activeTab === 'history' && styles.activeTab]}
-        >
-          <Text style={[styles.tabText, activeTab === 'history' ? styles.activeTabText : { color: COLORS.textMuted }]}>
-            Lịch sử thanh toán
-          </Text>
-        </TouchableOpacity>
-      </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
@@ -146,7 +127,7 @@ export default function InvoiceManagement() {
                     />
                   );
                 })
-                
+
               }
             </View>
           </View>
@@ -169,8 +150,8 @@ export default function InvoiceManagement() {
 
             <View style={styles.invoiceBody}>
               <InvoiceRow icon="home" label="Tiền phòng" value={formatCurrency(latestBill?.tienPhong) + "đ"} />
-              <InvoiceRow icon="bolt" label={`Tiền điện (${latestBill ? latestBill?.chiSoDienNuoc.csdienMoi - latestBill?.chiSoDienNuoc.csdienCu : 0} kWh)`} value={formatCurrency(latestBill?.tienDien) + "đ"} />
-              <InvoiceRow icon="water-drop" label={`Tiền nước (${latestBill ? latestBill?.chiSoDienNuoc.csnuocMoi - latestBill?.chiSoDienNuoc.csnuocCu : 0} m³)`} value={formatCurrency(latestBill?.tienNuoc) + "đ"} />
+              <InvoiceRow icon="bolt" label={`Tiền điện (${latestBill ? latestBill?.chiSoDienNuoc?.csdienMoi - latestBill?.chiSoDienNuoc?.csdienCu : 0} kWh)`} value={formatCurrency(latestBill?.tienDien) + "đ"} />
+              <InvoiceRow icon="water-drop" label={`Tiền nước (${latestBill ? latestBill?.chiSoDienNuoc?.csnuocMoi - latestBill?.chiSoDienNuoc?.csnuocCu : 0} m³)`} value={formatCurrency(latestBill?.tienNuoc) + "đ"} />
 
               <View style={[styles.totalRow, { borderTopColor: COLORS.border }]}>
                 <Text style={[styles.totalLabel, { color: COLORS.text }]}>Tổng cộng</Text>
@@ -198,7 +179,9 @@ export default function InvoiceManagement() {
         <View style={styles.section}>
           <View style={styles.historyHeadingRow}>
             <Text style={[styles.sectionHeading, { color: COLORS.textMain, marginBottom: 0 }]}>Lịch sử gần đây</Text>
-            <TouchableOpacity><Text style={{ color: COLORS.primary, fontWeight: '700' }}>Xem tất cả</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('LichSuGiaoDich')}>
+              <Text style={{ color: COLORS.primary, fontWeight: '700' }}>Xem tất cả</Text>
+            </TouchableOpacity>
           </View>
           {
             paymentHistory.map(item => (

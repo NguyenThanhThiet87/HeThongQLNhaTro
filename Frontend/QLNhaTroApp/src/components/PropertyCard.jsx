@@ -1,4 +1,6 @@
 import React from "react";
+import { useTheme } from "../theme/useTheme";
+
 import {
     View,
     Text,
@@ -8,8 +10,6 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const PRIMARY = "#13c8ec";
-const SURFACE = "#1a2c30";
 
 export default function PropertyCard({
     name,
@@ -19,6 +19,8 @@ export default function PropertyCard({
     roomCount,
     onPress
 }) {
+    const { COLORS } = useTheme();
+    const styles = createStyles(COLORS);
 
     return (
         <TouchableOpacity style={styles.propertyCard} onPress={onPress}>
@@ -74,15 +76,17 @@ export default function PropertyCard({
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
 
     propertyCard: {
         marginTop: 20,
         width: 280,
-        backgroundColor: SURFACE,
+        backgroundColor: COLORS.card,
         borderRadius: 12,
         overflow: "hidden",
         marginRight: 15,
+        borderColor: COLORS.border,
+        borderWidth: 1
     },
 
     propertyImage: {
@@ -95,7 +99,7 @@ const styles = StyleSheet.create({
     },
 
     propertyName: {
-        color: "#fff",
+        color: COLORS.textMain,
         fontWeight: "bold",
         fontSize: 15
     },
@@ -107,28 +111,28 @@ const styles = StyleSheet.create({
     },
 
     locationText: {
-        color: "#aaa",
+        color: COLORS.textMuted,
         marginLeft: 5,
         fontSize: 12,
         flex: 1
     },
 
     fillText: {
-        color: PRIMARY,
+        color: COLORS.primary,
         marginTop: 10,
         fontSize: 12
     },
 
     progress: {
         height: 6,
-        backgroundColor: "#333",
+        backgroundColor: COLORS.border,
         borderRadius: 3,
         marginTop: 5,
     },
 
     progressFill: {
         height: "100%",
-        backgroundColor: PRIMARY,
+        backgroundColor: COLORS.primary,
         borderRadius: 3
     },
 
@@ -136,14 +140,14 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 8,
         right: 8,
-        backgroundColor: "rgba(0,0,0,0.6)",
+        backgroundColor: COLORS.buttonBg,
         paddingHorizontal: 8,
         paddingVertical: 3,
         borderRadius: 6
     },
 
     roomBadgeText: {
-        color: "#fff",
+        color: COLORS.buttonText,
         fontSize: 11
     }
 

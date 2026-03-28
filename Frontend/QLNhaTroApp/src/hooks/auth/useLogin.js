@@ -11,7 +11,7 @@ export function useLogin(loginContext) {
         try {
             setLoading(true);
 
-            const user = await loginService(formatPhoneNumber(phone), password);
+            const user = await loginService(phone, password);
 
             toast.success("Đăng nhập thành công");
 

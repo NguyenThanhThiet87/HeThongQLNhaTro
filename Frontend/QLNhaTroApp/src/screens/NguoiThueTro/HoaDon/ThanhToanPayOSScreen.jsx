@@ -13,7 +13,7 @@ export default function ThanhToanPayOSScreen({ route }) {
       // paymentCallbackVnpay(request.url).then((result) => {
       //   if (result.success) {
       //     toast.success("Thanh toán thành công!");
-      //     navigation.navigate("Home"); // Đã cập nhật DB thành công
+      //     navigation.navigate("HoaDon"); // Đã cập nhật DB thành công
       //   } else {
       //     // Hiện thông báo lỗi nếu cần: result.message
       //     toast.error(result.message);

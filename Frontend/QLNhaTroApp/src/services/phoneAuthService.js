@@ -62,6 +62,7 @@ export const verifyOTP = async (phoneNumber, otp) => {
     if (firebaseUser.phoneNumber !== formatPhoneNumber(phoneNumber)) {
       throw new Error("Số điện thoại không khớp");
     }
+    
     const idToken = await result.user.getIdToken();
 
     return {

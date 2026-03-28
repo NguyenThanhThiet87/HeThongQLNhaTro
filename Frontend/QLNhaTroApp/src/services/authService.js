@@ -1,12 +1,13 @@
 import { loginApi, isExistAccount, } from "../api/auth";
 import { sendOTP } from "./phoneAuthService";
-
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
 
+import formatPhoneNumber from "../utils/formatPhoneNumber";
+
 export const loginService = async (phoneNumber, password) => {
 
-    const result = await loginApi(phoneNumber, password);
+    const result = await loginApi(formatPhoneNumber(phoneNumber), password);
 
     if (!result.success) {
         throw new Error(result.message || "Đăng nhập thất bại");
@@ -24,13 +25,13 @@ export const loginService = async (phoneNumber, password) => {
 
 export const sendOtpService = async (phone, recaptchaVerifier) => {
 
-    const exist = await isExistAccount(phone);
+    const exist = await isExistAccount(formatPhoneNumber(phone));
 
-    if (!exist) {
+    if (!exist.data.isExist) {
         throw new Error("Số điện thoại chưa đăng ký tài khoản: " + phone);
     }
 
-    const result = await sendOTP(phone, recaptchaVerifier);
+    const result = await sendOTP(formatPhoneNumber(phone), recaptchaVerifier);
 
     if (!result.success) {
         throw new Error(result.message || "Gửi OTP thất bại");
@@ -43,7 +44,9 @@ import { verifyOTP } from "./phoneAuthService";
 import { createAccount } from "../api/auth";
 
 export const verifyOtpRegisterService = async ( phone, code, name, password, role) => {
-    const result = await verifyOTP(phone, code);
+    const result = await verifyOTP(formatPhoneNumber(phone), code);
+
+    console.log("OTP verification result:", result);
 
     if (!result.success) {
         throw new Error(result.message || "OTP không hợp lệ");
@@ -51,12 +54,12 @@ export const verifyOtpRegisterService = async ( phone, code, name, password, rol
 
     const res = await createAccount(
         name,
-        phone,
+        formatPhoneNumber(phone),
         password,
         role,
         result.idToken
     );
-
+    console.log("Res: ", res)
     if (!res.success) {
         throw new Error(res.message || "Tạo tài khoản thất bại");
     }
@@ -66,13 +69,13 @@ export const verifyOtpRegisterService = async ( phone, code, name, password, rol
 
 export const sendRegisterOTPService = async (phone, recaptchaVerifier) => {
 
-  const exists = await isExistAccount(phone);
+  const exists = await isExistAccount(formatPhoneNumber(phone));
 
-  if (exists) {
+  if (exists.data.isExist) {
     throw new Error("Số điện thoại đã được đăng ký.");
   }
 
-  const result = await sendOTP(phone, recaptchaVerifier);
+  const result = await sendOTP(formatPhoneNumber(phone), recaptchaVerifier);
 
   if (!result.success) {
     throw new Error(result.message || "Không thể gửi OTP");

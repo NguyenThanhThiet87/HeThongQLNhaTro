@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useVerifyOTPRegister } from "../../hooks/auth/useVerifyOTPRegister";
 import { useTheme } from "../../theme/useTheme";
-
+import { useNavigation } from "@react-navigation/native";
 import {
     View,
     Text,
@@ -16,12 +16,13 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import LoadingOverlay from "../../components/LoadingOverlay";
 
-export default function OTPVerificationScreen_Registor({ navigation, route }) {
+export default function OTPVerificationScreen_Registor({ route }) {
+    const navigation = useNavigation();
     const { COLORS } = useTheme();
     const styles = createStyles(COLORS);
 
     const { phone, name, password, role } = route.params;
-    const { verifyRegister, loading } = useVerifyOTPRegister(navigation);
+    const { verifyRegister, loading } = useVerifyOTPRegister();
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [seconds, setSeconds] = useState(119);
 
@@ -61,13 +62,16 @@ export default function OTPVerificationScreen_Registor({ navigation, route }) {
     };
 
     const handleVerify = async () => {
-        await verifyRegister(
+        console.log("Verifying OTP:", otp.join(""));
+        const result = await verifyRegister(
             phone,
-            otp,
+            otp.join(""),
             name,
             password,
             role
         );
+        console.log("Verification loading:", loading);
+        console.log("Verify result:", result);
     };
 
     const handleResend = () => {

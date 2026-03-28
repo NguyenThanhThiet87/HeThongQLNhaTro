@@ -1,291 +1,293 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  SafeAreaView,
-  StyleSheet,
-  StatusBar,
-  FlatList,
-  Platform,
+    View,
+    Text,
+    TouchableOpacity,
+    SafeAreaView,
+    StyleSheet,
+    StatusBar,
+    FlatList,
+    Platform,
+    ActivityIndicator,
+    RefreshControl,
+    Image,
 } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useTheme } from '../../../theme/useTheme';
+import { getLichSuThanhToanGanApi } from '../../../api/HoaDon';
+import { getCurrentUser } from '../../../utils/decodeToken';
+import { formatDate } from '../../../utils/formatNgaySinh';
+import { formatCurrency } from '../../../utils/formatCurrency';
 
-const DATA = [
-  { id: '1', month: '09/2023', date: '02/10/2023', amount: '3.950.000đ', status: 'Thành công' },
-  { id: '2', month: '08/2023', date: '04/09/2023', amount: '4.020.000đ', status: 'Thành công' },
-  { id: '3', month: '07/2023', date: '01/08/2023', amount: '3.850.000đ', status: 'Thành công' },
-  { id: '4', month: '06/2023', date: '05/07/2023', amount: '4.100.000đ', status: 'Thành công' },
-];
+const LichSuGiaoDichScreen = () => {
+    const { COLORS } = useTheme();
+    const navigation = useNavigation();
+    const styles = createStyles(COLORS);
 
-const PaymentHistory = () => {
-  const renderItem = ({ item }) => (
-    <View style={styles.historyCard}>
-      <View style={styles.cardLeft}>
-        <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name="check-circle" size={24} color="#22c55e" />
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [transactions, setTransactions] = useState([]);
+    const [user, setUser] = useState(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const currentUser = await getCurrentUser();
+            setUser(currentUser);
+            if (currentUser) {
+                const res = await getLichSuThanhToanGanApi(currentUser.maNd);
+                if (res.success) {
+                    console.log(res.data)
+                    setTransactions(res.data);
+                }
+            }
+        } catch (error) {
+            console.error("Lỗi lấy lịch sử giao dịch:", error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+        }, [])
+    );
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchData();
+    };
+
+    const getStatusInfo = (status) => {
+        switch (status?.toLowerCase()) {
+            case 'thành công':
+            case 'success':
+                return { color: '#10b981', bg: '#ecfdf5', icon: 'check-circle' };
+            case 'chờ thanh toán':
+            case 'pending':
+                return { color: '#f59e0b', bg: '#fffbeb', icon: 'clock-outline' };
+            case 'thất bại':
+            case 'failed':
+                return { color: '#ef4444', bg: '#fef2f2', icon: 'close-circle' };
+            default:
+                return { color: '#64748b', bg: '#f1f5f9', icon: 'help-circle' };
+        }
+    };
+
+    const renderItem = ({ item }) => {
+        const statusInfo = getStatusInfo(item.trangThai || 'Thành công');
+        return (
+            <TouchableOpacity
+                style={[styles.historyCard, { backgroundColor: COLORS.card, borderColor: COLORS.border }]}
+                onPress={() => navigation.navigate('ChiTietGiaoDich', { maLstt: item.maLstt })}
+            >
+                <View style={styles.cardLeft}>
+                    <View style={[styles.iconContainer, { backgroundColor: statusInfo.bg }]}>
+                        <MaterialCommunityIcons name={statusInfo.icon} size={24} color={statusInfo.color} />
+                    </View>
+                    <View style={{ flex: 1, marginLeft: 12 }}>
+                        <Text style={[styles.transactionTitle, { color: COLORS.textMain }]}>Thanh toán hóa đơn</Text>
+                        <Text style={styles.dateText}>{formatDate(item.ngayThanhToan)}</Text>
+                        {item.ghiChu && <Text style={styles.noteText} numberOfLines={1}>{item.ghiChu}</Text>}
+                    </View>
+                </View>
+                <View style={styles.cardRight}>
+                    <Text style={[styles.amountText, { color: COLORS.textMain }]}>-{formatCurrency(item.soTien)}đ</Text>
+                    <View style={[styles.statusBadge, { backgroundColor: statusInfo.bg }]}>
+                        <Text style={[styles.statusBadgeText, { color: statusInfo.color }]}>{(item.trangThai || 'Thành công').toUpperCase()}</Text>
+                    </View>
+                </View>
+            </TouchableOpacity>
+        );
+    };
+
+    const EmptyComponent = () => (
+        <View style={styles.emptyContainer}>
+            <Image
+                source={{ uri: 'https://cdn-icons-png.flaticon.com/512/6598/6598519.png' }}
+                style={styles.emptyImage}
+            />
+            <Text style={[styles.emptyText, { color: COLORS.textMuted }]}>Bạn chưa có giao dịch nào</Text>
+            <TouchableOpacity
+                style={[styles.refreshBtn, { backgroundColor: COLORS.primary }]}
+                onPress={fetchData}
+            >
+                <Text style={styles.refreshBtnText}>Tải lại</Text>
+            </TouchableOpacity>
         </View>
-        <View>
-          <Text style={styles.monthText}>Tháng {item.month}</Text>
-          <Text style={styles.dateText}>Đã thanh toán: {item.date}</Text>
-        </View>
-      </View>
-      <View style={styles.cardRight}>
-        <Text style={styles.amountText}>{item.amount}</Text>
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusBadgeText}>{item.status.toUpperCase()}</Text>
-        </View>
-      </View>
-    </View>
-  );
+    );
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity style={styles.headerIcon}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#f97316" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Hóa đơn & Thanh toán</Text>
-          <TouchableOpacity style={styles.headerIcon}>
-            <MaterialCommunityIcons name="bell-outline" size={24} color="#f97316" />
-            <View style={styles.notificationDot} />
-          </TouchableOpacity>
-        </View>
+    return (
+        <SafeAreaView style={[styles.container, { backgroundColor: COLORS.bgLight }]}>
+            <StatusBar barStyle={COLORS.isDark ? 'light-content' : 'dark-content'} />
 
-        {/* Tabs */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity style={styles.tabItem}>
-            <Text style={styles.tabTextInactive}>Hóa đơn hiện tại</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tabItemActive}>
-            <Text style={styles.tabTextActive}>Lịch sử thanh toán</Text>
-            <View style={styles.activeIndicator} />
-          </TouchableOpacity>
-        </View>
-      </View>
+            {/* Header */}
+            <View style={[styles.header, { backgroundColor: COLORS.bgLight, borderBottomColor: COLORS.border }]}>
+                <View style={styles.headerTop}>
+                    <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.goBack()}>
+                        <MaterialIcons name="arrow-back-ios" size={20} color={COLORS.primary} />
+                    </TouchableOpacity>
+                    <Text style={[styles.headerTitle, { color: COLORS.textMain }]}>Lịch sử giao dịch</Text>
+                    <View style={styles.headerIcon} />
+                </View>
+            </View>
 
-      {/* Filter Bar */}
-      <View style={styles.filterSection}>
-        <TouchableOpacity style={styles.filterBar}>
-          <View style={styles.filterLeft}>
-            <MaterialCommunityIcons name="calendar-range" size={20} color="#f97316" />
-            <Text style={styles.filterText}>Năm 2023</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-down" size={18} color="#94a3b8" />
-        </TouchableOpacity>
-      </View>
-
-      {/* History List */}
-      <FlatList
-        data={DATA}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
-
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <NavItem icon="home-variant-outline" label="Trang chủ" color="#94a3b8" />
-        <NavItem icon="receipt" label="Hóa đơn" color="#f97316" active />
-        <NavItem icon="comment-text-multiple-outline" label="Tin nhắn" color="#94a3b8" />
-        <NavItem icon="account-outline" label="Cá nhân" color="#94a3b8" />
-      </View>
-    </SafeAreaView>
-  );
+            {loading && !refreshing ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={COLORS.primary} />
+                    <Text style={[styles.loadingText, { color: COLORS.textMuted }]}>Đang tải giao dịch...</Text>
+                </View>
+            ) : (
+                <FlatList
+                    data={transactions}
+                    renderItem={renderItem}
+                    keyExtractor={item => item.maLstt?.toString() || Math.random().toString()}
+                    contentContainerStyle={styles.listContent}
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
+                    }
+                    ListEmptyComponent={EmptyComponent}
+                />
+            )}
+        </SafeAreaView>
+    );
 };
 
-// Sub-component cho Navigation Item
-const NavItem = ({ icon, label, color, active }) => (
-  <TouchableOpacity style={styles.navItem}>
-    <MaterialCommunityIcons name={icon} size={24} color={color} />
-    <Text style={[styles.navLabel, { color: color, fontWeight: active ? '700' : '400' }]}>
-      {label}
-    </Text>
-  </TouchableOpacity>
-);
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
-  },
-  headerTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  headerIcon: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  notificationDot: {
-    position: 'absolute',
-    top: 10,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#ef4444',
-    borderWidth: 1.5,
-    borderColor: 'white',
-  },
-  tabContainer: {
-    flexDirection: 'row',
-  },
-  tabItem: {
-    flex: 1,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  tabItemActive: {
-    flex: 1,
-    paddingVertical: 14,
-    alignItems: 'center',
-    position: 'relative',
-  },
-  tabTextActive: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#f97316',
-  },
-  tabTextInactive: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#64748b',
-  },
-  activeIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: '#f97316',
-  },
-  filterSection: {
-    padding: 16,
-  },
-  filterBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    ...Platform.select({
-      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
-      android: { elevation: 2 },
-    }),
-  },
-  filterLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  filterText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#334155',
-  },
-  listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 100,
-  },
-  historyCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
-  },
-  cardLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#f0fdf4',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  monthText: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  dateText: {
-    fontSize: 12,
-    color: '#64748b',
-    marginTop: 2,
-  },
-  cardRight: {
-    alignItems: 'flex-end',
-  },
-  amountText: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  statusBadge: {
-    marginTop: 6,
-    backgroundColor: '#f0fdf4',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  statusBadgeText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#16a34a',
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: Platform.OS === 'ios' ? 88 : 65,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-  },
-  navItem: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  navLabel: {
-    fontSize: 10,
-  },
+const createStyles = (COLORS) => StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    header: {
+        paddingTop: Platform.OS === 'ios' ? 0 : 40,
+        borderBottomWidth: 1,
+    },
+    headerTop: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+    },
+    headerIcon: {
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+    },
+    listContent: {
+        paddingHorizontal: 16,
+        paddingBottom: 40,
+        paddingTop: 16,
+    },
+    historyCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 16,
+        borderRadius: 20,
+        marginBottom: 16,
+        borderWidth: 1,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 4,
+            },
+        }),
+    },
+    cardLeft: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    iconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    transactionTitle: {
+        fontSize: 15,
+        fontWeight: '700',
+    },
+    dateText: {
+        fontSize: 12,
+        color: '#94a3b8',
+        marginTop: 2,
+    },
+    noteText: {
+        fontSize: 11,
+        color: '#64748b',
+        fontStyle: 'italic',
+        marginTop: 2,
+    },
+    cardRight: {
+        alignItems: 'flex-end',
+        marginLeft: 12,
+    },
+    amountText: {
+        fontSize: 16,
+        fontWeight: '800',
+    },
+    statusBadge: {
+        marginTop: 6,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 8,
+    },
+    statusBadgeText: {
+        fontSize: 10,
+        fontWeight: '800',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 12,
+        fontSize: 14,
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 100,
+    },
+    emptyImage: {
+        width: 120,
+        height: 120,
+        opacity: 0.5,
+    },
+    emptyText: {
+        marginTop: 16,
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    refreshBtn: {
+        marginTop: 24,
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        borderRadius: 25,
+    },
+    refreshBtnText: {
+        color: 'white',
+        fontWeight: '700',
+        fontSize: 14,
+    },
 });
 
-export default PaymentHistory;
+export default LichSuGiaoDichScreen;

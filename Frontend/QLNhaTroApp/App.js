@@ -1,10 +1,11 @@
 import React from "react";
+import { useState } from "react";
+
 import { NavigationContainer } from "@react-navigation/native";
 import ToastManager from "toastify-react-native";
 import { AuthProvider } from "./src/context/AuthContext";
-import RootNavigator from "./src/navigation/RootNavigator";
+import RootNavigator from "./src/navigation/ChuNhaTro/RootNavigator";
 import { ThemeProvider } from "./src/theme/themeContext";
-
 export default function App() {
   return (
     <ThemeProvider>

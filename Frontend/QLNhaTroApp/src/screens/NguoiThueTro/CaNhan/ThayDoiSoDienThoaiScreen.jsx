@@ -20,6 +20,7 @@ import toast from '../../../utils/toast';
 import LoadingOverlay from "../../../components/LoadingOverlay";
 
 import InputGroup from "../../../components/InputGroup";
+import formatPhoneNumber from "../../../utils/formatPhoneNumber";
 
 export default function ThayDoiSoDienThoaiScreen() {
   const navigation = useNavigation();
@@ -32,10 +33,11 @@ export default function ThayDoiSoDienThoaiScreen() {
   const handleSendOTP = async () => {
     setLoading(true);
 
-    const exist = await isExistAccount(phone);
-    if (!exist) {
+    const formattedPhone = formatPhoneNumber(phone);
+    const exist = await isExistAccount(formattedPhone);
+    if (!exist.data.isExist) {
       toast.info("Số điện chưa đăng ký tài khoản:" + phone);
-      setLoading(false)
+      setLoading(false);
       return;
     }
     const result = await sendOTP(phone, recaptchaVerifier);
@@ -77,9 +79,9 @@ export default function ThayDoiSoDienThoaiScreen() {
               inputWidth={320}
               inputHeight={50}
             />
-            
-            <TouchableOpacity  style={[styles.button, loading && { opacity: 0.7 }  ]}  onPress={handleSendOTP} >
-                <Text style={styles.buttonText}>Gửi mã OTP</Text>
+
+            <TouchableOpacity style={[styles.button, loading && { opacity: 0.7 }]} onPress={handleSendOTP} >
+              <Text style={styles.buttonText}>Gửi mã OTP</Text>
             </TouchableOpacity>
 
             <FirebaseRecaptchaVerifierModal
@@ -89,7 +91,7 @@ export default function ThayDoiSoDienThoaiScreen() {
           </View>
         </View>
       </ScrollView>
-        <LoadingOverlay visible={loading} />
+      <LoadingOverlay visible={loading} />
     </KeyboardAvoidingView>
   );
 }
@@ -116,7 +118,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 10
   },
-  
+
   button: {
     backgroundColor: "#13c8ec",
     padding: 15,

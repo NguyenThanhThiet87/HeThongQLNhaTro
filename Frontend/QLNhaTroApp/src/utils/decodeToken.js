@@ -24,10 +24,12 @@ const decodeToken = (token) => {
 const refreshAccessToken = async () => {
     try {
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
-        console.log("Refresh Token hiện tại:", refreshToken);
         const accessToken = await SecureStore.getItemAsync("accessToken");
 
-        if (!refreshToken) return null;
+        if (!refreshToken) {
+            console.log("No refresh token found.");
+            return null;
+        }
 
         const response = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/refresh", {
             method: "POST",
@@ -38,22 +40,48 @@ const refreshAccessToken = async () => {
             })
         });
 
-        // const result = await response.json();
+        // Kiểm tra xem backend có trả về mã lỗi không
+        if (!response.ok) {
+            console.log("Refresh API returned error status:", response.status);
+            await clearTokens(); // Xóa sạch token nếu lỗi
+            return null;
+        }
 
-        // if (result.success) {
-        //     // Lưu lại bộ Token mới vào SecureStore
-        //     await SecureStore.setItemAsync("accessToken", result.data.accessToken);
-        //     await SecureStore.setItemAsync("refreshToken", result.data.refreshToken);
-        //     return result.data.accessToken;
-        // }
+        // Kiểm tra Content-Type để tránh lỗi parse khi nhận về Chuỗi (không phải JSON)
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const errorText = await response.text();
+            console.error("Refresh API returned non-JSON response:", errorText);
+            await clearTokens();
+            return null;
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+            await SecureStore.setItemAsync("accessToken", result.data.accessToken);
+            await SecureStore.setItemAsync("refreshToken", result.data.refreshToken);
+            return result.data.accessToken;
+        }
         
-        // Nếu refresh thất bại (thường do RefreshToken cũng hết hạn)
+        console.log("Refresh token failed (business logic):", result.message);
+        await clearTokens();
         return null;
     } catch (error) {
         console.error("Lỗi khi gọi Refresh API:", error);
+        await clearTokens();
         return null;
     }
 };
+
+/**
+ * Hàm xóa Tokens khi session hết hạn hoặc refresh thất bại
+ */
+const clearTokens = async () => {
+    await SecureStore.deleteItemAsync("accessToken");
+    await SecureStore.deleteItemAsync("refreshToken");
+};
+
 
 /**
  * Hàm lấy AccessToken - Tự động kiểm tra thời hạn

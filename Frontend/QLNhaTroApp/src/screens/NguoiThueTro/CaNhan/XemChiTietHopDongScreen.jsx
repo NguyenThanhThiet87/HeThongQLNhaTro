@@ -122,7 +122,7 @@ export default function XemChiTietHopDongScreen({ route }) {
                                 Người đại diện ký
                             </Text>
 
-                            <TouchableOpacity style={styles.row} onPress={() => navigation.navigate("HoSo", { maNd: hopDong?.hopDongNguoiThues?.[0]?.maNt })}>
+                            <TouchableOpacity style={styles.row}>
                                 <Image
                                     source={{
                                         uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuDYDCAkAa6waKneRhyWrugXwVu-y5ZhEdqoPimHHXiXcZZvagi3UqAYz5Y2q2PHbKOzGFluzxve0v_xxTWQZHZn77bU6kHjrCney7MEEocvn0Aa8ojW0S9LzttiGGkpBksy0o436EaJQ3OQ7pn8x9eehySehQZf8oYWFq-WoOMaewVvJch3LNJl1X9-9AuiMIsec2McDsMUFDtq6LCBQfftGjjvaEo57KTVH5ed5Kdoq1fjZGjG2mLfJH-dR_2ayXolUbGQrEgke9E"
@@ -196,7 +196,7 @@ export default function XemChiTietHopDongScreen({ route }) {
                             hopDong?.hopDongNguoiThues?.map((m, i) => {
                                 if (i === 0) return null; // Bỏ qua người đại diện ký hợp đồng
                                 return (
-                                    <TouchableOpacity key={i} style={styles.member} onPress={() => navigation.navigate("HoSo", { maNd: m.maNt })}>
+                                    <TouchableOpacity key={i} style={styles.member}>
 
                                         <View style={styles.row}>
                                             <Image
@@ -211,10 +211,6 @@ export default function XemChiTietHopDongScreen({ route }) {
 
                                         </View>
 
-                                        <TouchableOpacity onPress={() => handleDelete(m.maNt)}>
-                                            <MaterialIcons name="delete-outline" size={20} color="#64748b" />
-                                        </TouchableOpacity>
-
                                     </TouchableOpacity>
                                 );
                             })) :
@@ -225,26 +221,6 @@ export default function XemChiTietHopDongScreen({ route }) {
                             )
                     }
                 </InfoCard>
-
-                {/* BUTTONS */}
-                <View style={styles.buttonGrid}>
-
-                    {/* <TouchableOpacity style={styles.btn}>
-                        <MaterialIcons name="edit-note" size={18} color="#cbd5e1" />
-                        <Text style={styles.btnText}>Sửa hợp đồng</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.btn}>
-                        <MaterialIcons name="image" size={18} color="#cbd5e1" />
-                        <Text style={styles.btnText}>Ảnh hợp đồng</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.btnDelete}>
-                        <MaterialIcons name="delete-forever" size={18} color="#ef4444" />
-                        <Text style={styles.deleteText}>Xóa hợp đồng</Text>
-                    </TouchableOpacity> */}
-
-                </View>
 
             </ScrollView>
         </View>

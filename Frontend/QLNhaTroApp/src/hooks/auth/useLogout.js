@@ -8,8 +8,10 @@ export const useLogout = () => {
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
-
     setLoading(true);
+
+    // Giả lập một khoảng trễ ngắn để tạo hiệu ứng load mượt mà
+    await new Promise(resolve => setTimeout(resolve, 800));
 
     await logoutService();
 

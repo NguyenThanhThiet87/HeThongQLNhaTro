@@ -1,57 +1,59 @@
 import axiosClient from "./axiosClient";
 import getAccessToken, { getCurrentUser } from "../utils/decodeToken";
 export const getDayNhaTrosApi = async (maCnt) => {
-  try {
-    const token = await getAccessToken();
+    try {
+        const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/day-nha-tros?maChuNt=${maCnt}`;
+        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/day-nha-tros?maChuNt=${maCnt}`;
 
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+        const res = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
 
-    const text = await res.text();
-    return JSON.parse(text);
+        const text = await res.text();
+        return JSON.parse(text);
 
-  } catch (error) {
-    return {
-      success: false,
-      message: "Lỗi kết nối: " + error.message,
-      data: null
-    };
-  }
+    } catch (error) {
+        return {
+            success: false,
+            message: "Lỗi kết nối: " + error.message,
+            data: null
+        };
+    }
 };
 
 export const getDayNhaTroApi = async (maDayNt) => {
-  try {
-    const token = await getAccessToken();
+    try {
+        const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/day-nha-tro?maDayNt=${maDayNt}`;
+        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/day-nha-tro?maDayNt=${maDayNt}`;
 
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
-    const text = await res.text();
+        const res = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        const text = await res.text();
 
-    return JSON.parse(text);
+        return JSON.parse(text);
 
-  } catch (error) {
-    return {
-      success: false,
-      message: "Lỗi kết nối: " + error.message,
-      data: null
-    };
-  }
+    } catch (error) {
+        return {
+            success: false,
+            message: "Lỗi kết nối: " + error.message,
+            data: null
+        };
+    }
 };
 // Hàm tạo dãy trọ gọi từ React Native
 export const taoDayNhaTroApi = async (dayNhaTroData, danhSachPhong) => {
     try {
+        console.log("Dữ liệu DayNhaTro nhận vào API:", danhSachPhong);
+
         const user = await getCurrentUser();
         const token = await getAccessToken();
         const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/tao-day-tro`;
@@ -67,6 +69,8 @@ export const taoDayNhaTroApi = async (dayNhaTroData, danhSachPhong) => {
         formData.append("DiaChi", dayNhaTroData.DiaChi);
         formData.append("SlPhong", dayNhaTroData.SlPhong);
         formData.append("TrangThaiHd", dayNhaTroData.TrangThaiHd);
+        if (dayNhaTroData.KinhDo) formData.append("KinhDo", dayNhaTroData.KinhDo);
+        if (dayNhaTroData.ViDo) formData.append("ViDo", dayNhaTroData.ViDo);
 
         // ==========================================
         // 2. Xử lý ảnh bìa (NẾU CÓ)
@@ -111,63 +115,152 @@ export const taoDayNhaTroApi = async (dayNhaTroData, danhSachPhong) => {
         });
 
         const result = await res.json();
-        return result; 
+        return result;
 
     } catch (error) {
         console.error("Lỗi Network/Fetch taoDayNhaTroApi:", error);
         return { success: false, message: "Lỗi kết nối mạng: " + error.message };
     }
 };
+
+export const suaDayNhaTroApi = async (maDayNt, dayNhaTroData) => {
+    try {
+        const token = await getAccessToken();
+        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/sua-day-tro?maDayNt=${maDayNt}`;
+
+        const formData = new FormData();
+        formData.append("TenDayNt", dayNhaTroData.TenDayNt || "");
+        formData.append("DiaChi", dayNhaTroData.DiaChi || "");
+        formData.append("TrangThaiHd", String(dayNhaTroData.TrangThaiHd));
+
+        if (dayNhaTroData.KinhDo !== undefined && dayNhaTroData.KinhDo !== null) {
+            formData.append("KinhDo", dayNhaTroData.KinhDo.toString());
+        }
+        if (dayNhaTroData.ViDo !== undefined && dayNhaTroData.ViDo !== null) {
+            formData.append("ViDo", dayNhaTroData.ViDo.toString());
+        }
+
+        if (dayNhaTroData.ImageUri && !dayNhaTroData.ImageUri.startsWith('http')) {
+            const filename = dayNhaTroData.ImageUri.split('/').pop();
+            const match = /\.(\w+)$/.exec(filename);
+            const type = match ? `image/${match[1]}` : `image/jpeg`;
+
+            formData.append("AnhBia", {
+                uri: dayNhaTroData.ImageUri,
+                name: filename,
+                type: type,
+            });
+        }
+
+        console.log("SuaDayNhaTro API URL:", url);
+        console.log("SuaDayNhaTro API Data:", dayNhaTroData);
+
+        const res = await fetch(url, {
+            method: "PUT",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        if (!res.ok) {
+            const errText = await res.text();
+            console.error("API Error Response:", errText);
+            return { success: false, message: `Lỗi Server (${res.status}): ${errText}` };
+        }
+
+        const result = await res.json();
+        return result;
+    } catch (error) {
+        console.error("suaDayNhaTroApi Exception:", error);
+        return { success: false, message: "Lỗi kết nối mạng: " + error.message };
+    }
+};
 // --- PHONG ---
 export const getPhongTrosApi = async (maDayNt) => {
-  try {
-    const token = await getAccessToken();
+    try {
+        const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/phongs?maDayNt=${maDayNt}`;
+        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/phongs?maDayNt=${maDayNt}`;
 
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
-    const text = await res.text();
+        const res = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        const text = await res.text();
 
-    return JSON.parse(text);
+        return JSON.parse(text);
 
-  } catch (error) {
-    return {
-      success: false,
-      message: "Lỗi kết nối: " + error.message,
-      data: null
-    };
-  }
+    } catch (error) {
+        return {
+            success: false,
+            message: "Lỗi kết nối: " + error.message,
+            data: null
+        };
+    }
 };
 
 export const getPhongTroApi = async (maPhong) => {
-  try {
-    const token = await getAccessToken();
+    try {
+        const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/phong?maPhong=${maPhong}`;
+        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/phong?maPhong=${maPhong}`;
 
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
-    const text = await res.text();
+        const res = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        const text = await res.text();
 
-    return JSON.parse(text);
+        return JSON.parse(text);
 
-  } catch (error) {
-    return {
-      success: false,
-      message: "Lỗi kết nối: " + error.message,
-      data: null
-    };
-  }
+    } catch (error) {
+        return {
+            success: false,
+            message: "Lỗi kết nối: " + error.message,
+            data: null
+        };
+    }
 };
+
+export const taoPhongApi = async (newRoomData) => {
+    try {
+        console.log("Dữ liệu Phòng nhận vào API:", newRoomData);
+        const token = await getAccessToken();
+        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/phong`;
+
+        const formData = new FormData();
+
+        // Đúng key theo backend: MaChuNt
+        formData.append("MaDayNt", newRoomData.MaDayNt);
+        formData.append("SoPhong", newRoomData.SoPhong);
+        formData.append("MaLoaiP", newRoomData.MaLoaiP);
+        formData.append("GiaThucTe", newRoomData.GiaThucTe);
+        formData.append("MaTtphong", newRoomData.MaTtphong);
+        formData.append("MaTtrPhong", newRoomData.MaTtrPhong);
+
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData
+        });
+        const result = await res.json();
+        return result;
+    } catch (error) {
+        return {
+            success: false,
+            message: "Lỗi kết nối: " + error.message,
+            data: null
+        };
+    }
+};
+
 // --- LOẠI PHÒNG ---
 export const getLoaiPhongApi = async (maCnt) => {
     try {
@@ -176,7 +269,7 @@ export const getLoaiPhongApi = async (maCnt) => {
         const res = await fetch(url, {
             method: "GET",
             headers: {
-                "Content-Type": "application/json", 
+                "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
         });
@@ -192,13 +285,13 @@ export const getLoaiPhongApi = async (maCnt) => {
 };
 export const getLoaiPApi = async (maLoaiP) => {
     try {
-      console.log("Fetching details for MaLoaiP:", maLoaiP); // Debug log
+        console.log("Fetching details for MaLoaiP:", maLoaiP); // Debug log
         const token = await getAccessToken();
         const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/loai-phong?maLoaiP=${maLoaiP}`;
         const res = await fetch(url, {
             method: "GET",
             headers: {
-                "Content-Type": "application/json", 
+                "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
         });
@@ -258,7 +351,7 @@ export const taoLoaiPhongApi = async (newRoomTypeData) => {
 
 export const capNhatLoaiPhongApi = async (newRoomTypeData) => {
     try {
-      console.log("Updating LoaiPhong with data:", newRoomTypeData); // Debug log
+        console.log("Updating LoaiPhong with data:", newRoomTypeData); // Debug log
         const token = await getAccessToken();
         const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/sua-loai-phong`;
 
@@ -327,6 +420,30 @@ export const getThongKePhongApi = async (maNd) => {
         const token = await getAccessToken();
         const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/thong-ke?maNd=${maNd}`, {
             method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        const result = await res.json();
+        return result; // Trả về ApiResponse từ Backend
+
+    } catch (error) {
+        return {
+            success: false,
+            message: "Lỗi kết nối: " + error.message,
+            data: null
+        };
+    }
+};
+
+export const deletePhongApi = async (maPhong) => {
+    try {
+        console.log("Attempting to delete Phong with MaPhong:", maPhong); // Debug log
+        const token = await getAccessToken();
+        const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/xoa-phong?maPhong=${maPhong}`, {
+            method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`

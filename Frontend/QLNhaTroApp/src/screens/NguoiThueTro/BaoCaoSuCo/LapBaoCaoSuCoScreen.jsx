@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import * as ImagePicker from 'expo-image-picker';
+
 import AppHeader from '../../../components/AppHeader';
 import { useTheme } from '../../../theme/useTheme';
 
@@ -15,23 +17,122 @@ import {
   Platform
 } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { getPhongThietBiApi, guiBaoCaoSuCoApi } from "../../../api/SuCo";
+import { useAuth } from '../../../context/AuthContext';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+
 
 const { width } = Dimensions.get('window');
 
-const LapBaoCaoSuCoScreen = () => {
+const LapBaoCaoSuCoScreen = ({ route, navigation }) => {
+  const { maPhong } = route.params || {}; // Lấy mã phòng từ params nếu có
+  console.log("maPhong", maPhong)
+
+  const { user } = useAuth();
 
   const { COLORS } = useTheme();
   const styles = createStyles(COLORS);
 
-  const [selectedDevice, setSelectedDevice] = useState('air-con');
-  const [urgency, setUrgency] = useState('low');
+  const [selectedDevices, setSelectedDevices] = useState([]);
+  const [devices, setDevices] = useState([]);
 
-  const devices = [
-    { id: 'air-con', name: 'Máy lạnh', icon: 'air-conditioner', color: '#3b82f6', bg: '#eff6ff' },
-    { id: 'fridge', name: 'Tủ lạnh', icon: 'fridge-outline', color: '#f97316', bg: '#fff7ed' },
-    { id: 'water', name: 'Vòi nước', icon: 'water-pump', color: '#14b8a6', bg: '#f0fdfa' },
-    { id: 'light', name: 'Đèn trần', icon: 'lightbulb-on-outline', color: '#eab308', bg: '#fefce8' },
-  ];
+  const toggleDevice = (device) => {
+    const isSelected = selectedDevices.some(d => d.maThBi === device.maThBi);
+    if (isSelected) {
+      setSelectedDevices(selectedDevices.filter(d => d.maThBi !== device.maThBi));
+    } else {
+      setSelectedDevices([...selectedDevices, { ...device, description: '', media: [] }]);
+    }
+  };
+
+  const updateDeviceDescription = (maThBi, text) => {
+    setSelectedDevices(selectedDevices.map(d =>
+      d.maThBi === maThBi ? { ...d, description: text } : d
+    ));
+  };
+
+  const pickMedia = async (maThBi) => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Bạn cần cấp quyền truy cập thư viện ảnh/video để tải lên!");
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      const asset = result.assets[0];
+      setSelectedDevices(selectedDevices.map(d =>
+        d.maThBi === maThBi ? { ...d, media: [...d.media, { uri: asset.uri, type: asset.type }] } : d
+      ));
+    }
+  };
+
+  const removeMedia = (maThBi, mediaIndex) => {
+    setSelectedDevices(selectedDevices.map(d => {
+      if (d.maThBi === maThBi) {
+        const newMedia = [...d.media];
+        newMedia.splice(mediaIndex, 1);
+        return { ...d, media: newMedia };
+      }
+      return d;
+    }));
+  };
+
+  useEffect(() => {
+    const fetchThietBis = async () => {
+      const res = await getPhongThietBiApi(maPhong);
+      if (res.success) {
+        console.log(res.data)
+        setDevices(res.data);
+      }
+    };
+    fetchThietBis();
+  }, [maPhong]);
+
+  const [loading, setLoading] = useState(false);
+
+  const handleSendReport = async () => {
+    console.log("=== Gửi báo cáo ===");
+    console.log("User ID:", user?.maNd);
+    console.log("Mã phòng:", maPhong);
+    console.log("Danh sách thiết bị:", selectedDevices.length);
+
+    if (selectedDevices.length === 0) {
+      alert("Vui lòng chọn ít nhất một thiết bị để báo cáo!");
+      return;
+    }
+
+    const hasEmptyDescription = selectedDevices.some(d => !d.description.trim());
+    if (hasEmptyDescription) {
+      alert("Vui lòng nhập mô tả cho tất cả các thiết bị đang báo cáo!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await guiBaoCaoSuCoApi(user.maNd, maPhong, selectedDevices);
+
+      console.log("API Response:", res);
+
+      if (res.success) {
+        alert("Gửi báo cáo sự cố thành công!");
+        navigation.goBack();
+      } else {
+        alert("Lỗi khi gửi báo cáo: " + res.message);
+      }
+    } catch (error) {
+      console.error("Handle send report error:", error);
+      alert("Có lỗi xảy ra khi kết nối máy chủ! " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -56,119 +157,115 @@ const LapBaoCaoSuCoScreen = () => {
 
         {/* Device Selection */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>CHỌN THIẾT BỊ HƯ HỎNG</Text>
+          <Text style={styles.sectionTitle}>CHỌN CÁC THIẾT BỊ HƯ HỎNG ({selectedDevices.length})</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.deviceList}>
-            {devices.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                onPress={() => setSelectedDevice(item.id)}
-                style={[
-                  styles.deviceCard,
-                  selectedDevice === item.id && styles.deviceCardActive
-                ]}
-              >
-                <View style={[styles.iconCircle, { backgroundColor: item.bg }]}>
-                  <MaterialCommunityIcons name={item.icon} size={28} color={item.color} />
-                </View>
-                <Text style={styles.deviceName}>{item.name}</Text>
-              </TouchableOpacity>
-            ))}
+            {devices?.map((item) => {
+              const isActive = selectedDevices.some(d => d.maPhongThietBi === item.maPhongThietBi);
+              return (
+                <TouchableOpacity
+                  key={item.maPhongThietBi}
+                  onPress={() => toggleDevice(item)}
+                  style={[
+                    styles.deviceCard,
+                    isActive && styles.deviceCardActive
+                  ]}
+                >
+                  <View style={[styles.iconCircle, { backgroundColor: item.bg || '#F5F5F5' }]}>
+                    <Image source={{ uri: item.anhThietBi }} style={styles.deviceImage} />
+                  </View>
+                  <Text style={styles.deviceName}>{item.tenThietBi}</Text>
+                  {isActive && (
+                    <View style={styles.activeBadge}>
+                      <MaterialIcons name="check-circle" size={16} color="#F05223" />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
 
-        {/* Description */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>MÔ TẢ CHI TIẾT</Text>
-          <TextInput
-            style={styles.textArea}
-            placeholder="Vui lòng mô tả tình trạng hư hỏng của thiết bị..."
-            placeholderTextColor={COLORS.inputTextDisabled}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </View>
+        {/* Dynamic Detail Sections for each selected device */}
+        {selectedDevices.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <MaterialCommunityIcons name="information-outline" size={48} color={COLORS.inputTextDisabled} />
+            <Text style={styles.emptyText}>Vui lòng chọn ít nhất một thiết bị để báo cáo</Text>
+          </View>
+        ) : (
+          selectedDevices.map((device, devIdx) => (
+            <View key={device.maPhongThietBi} style={styles.deviceReportCard}>
+              <View style={styles.deviceHeader}>
+                <View style={[styles.miniIcon, { backgroundColor: device.bg || '#F5F5F5' }]}>
+                  <Image source={{ uri: device.anhThietBi }} style={{ width: '100%', height: '100%' }} />
+                </View>
+                <Text style={styles.deviceReportTitle}>{device.tenThietBi}</Text>
+                <TouchableOpacity onPress={() => toggleDevice(device)}>
+                  <MaterialIcons name="close" size={20} color={COLORS.danger} />
+                </TouchableOpacity>
+              </View>
 
-        {/* Evidence Upload */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>HÌNH ẢNH/VIDEO MINH CHỨNG</Text>
-          <View style={styles.evidenceGrid}>
-            <TouchableOpacity style={styles.addButton}>
-              <MaterialCommunityIcons name="plus" size={32} color={COLORS.inputTextDisabled} />
-              <Text style={styles.addButtonText}>Thêm ảnh</Text>
-            </TouchableOpacity>
+              {/* Description for this specific device */}
+              <View style={styles.subSection}>
+                <Text style={styles.subTitle}>MÔ TẢ CHI TIẾT</Text>
+                <TextInput
+                  style={styles.textArea}
+                  placeholder={`Mô tả tình trạng của ${device.tenThBi}...`}
+                  placeholderTextColor={COLORS.inputTextDisabled}
+                  multiline
+                  numberOfLines={3}
+                  value={device.description}
+                  onChangeText={(text) => updateDeviceDescription(device.maThBi, text)}
+                  textAlignVertical="top"
+                />
+              </View>
 
-            <View style={styles.imageWrapper}>
-              <Image
-                source={{ uri: 'https://via.placeholder.com/150' }}
-                style={styles.evidenceImage}
-              />
-              <TouchableOpacity style={styles.deleteImageBtn}>
-                <MaterialCommunityIcons name="close" size={14} color="white" />
-              </TouchableOpacity>
+              {/* Evidence for this specific device */}
+              <View style={styles.subSection}>
+                <Text style={styles.subTitle}>HÌNH ẢNH/VIDEO MINH CHỨNG</Text>
+                <View style={styles.evidenceGrid}>
+                  <TouchableOpacity style={styles.addButton} onPress={() => pickMedia(device.maThBi)}>
+                    <MaterialCommunityIcons name="video-plus" size={24} color={COLORS.inputTextDisabled} />
+                    <Text style={[styles.addButtonText, { fontSize: 8 }]}>Thêm</Text>
+                  </TouchableOpacity>
+
+                  {device.media.map((m, mIdx) => (
+                    <View key={mIdx} style={styles.imageWrapper}>
+                      {m.type === 'video' ? (
+                        <View style={styles.videoThumbnailPlaceholder}>
+                          <MaterialCommunityIcons name="play-circle" size={32} color="#F05223" />
+                        </View>
+                      ) : (
+                        <Image source={{ uri: m.uri }} style={styles.evidenceImage} />
+                      )}
+                      <TouchableOpacity
+                        style={styles.deleteImageBtn}
+                        onPress={() => removeMedia(device.maThBi, mIdx)}
+                      >
+                        <MaterialCommunityIcons name="close" size={14} color="white" />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
+          ))
+        )}
 
-        {/* Urgency Level */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>MỨC ĐỘ KHẨN CẤP</Text>
-          <View style={styles.urgencyContainer}>
-            <UrgencyOption
-              label="Thấp"
-              type="low"
-              activeColor="#dcfce7"
-              textColor="#15803d"
-              current={urgency}
-              onSelect={setUrgency}
-            />
-            <UrgencyOption
-              label="Trung bình"
-              type="medium"
-              activeColor="#fef9c3"
-              textColor="#a16207"
-              current={urgency}
-              onSelect={setUrgency}
-            />
-            <UrgencyOption
-              label="Cao"
-              type="high"
-              activeColor="#fee2e2"
-              textColor="#b91c1c"
-              current={urgency}
-              onSelect={setUrgency}
-            />
-          </View>
-        </View>
       </ScrollView>
 
       {/* Bottom Action */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.submitButton}>
+        <TouchableOpacity
+          style={[styles.submitButton, loading && { opacity: 0.7 }]}
+          onPress={handleSendReport}
+          disabled={loading}
+        >
+
           <Text style={styles.submitButtonText}>Gửi báo cáo</Text>
         </TouchableOpacity>
       </View>
+      <LoadingOverlay visible={loading} />
     </SafeAreaView>
-  );
-};
-
-// Component con cho lựa chọn mức độ khẩn cấp
-const UrgencyOption = ({ label, type, activeColor, textColor, current, onSelect }) => {
-  const { COLORS } = useTheme();
-  const styles = createStyles(COLORS);
-  const isActive = current === type;
-  return (
-    <TouchableOpacity
-      onPress={() => onSelect(type)}
-      style={[
-        styles.urgencyBtn,
-        isActive && { backgroundColor: activeColor, borderColor: activeColor }
-      ]}
-    >
-      <Text style={[styles.urgencyText, isActive && { color: textColor }]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
   );
 };
 
@@ -220,6 +317,12 @@ const createStyles = (COLORS) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
+    overflow: 'hidden', // Để ảnh không bị tràn ra ngoài vệt bo tròn
+  },
+  deviceImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   deviceName: {
     fontSize: 12,
@@ -243,6 +346,7 @@ const createStyles = (COLORS) => StyleSheet.create({
   },
   addButton: {
     width: (width - 32 - 24) / 3,
+    height: "100%",
     aspectRatio: 1,
     backgroundColor: COLORS.card,
     borderRadius: 16,
@@ -268,6 +372,13 @@ const createStyles = (COLORS) => StyleSheet.create({
   evidenceImage: {
     width: '100%',
     height: '100%',
+  },
+  videoThumbnailPlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   deleteImageBtn: {
     position: 'absolute',
@@ -324,6 +435,64 @@ const createStyles = (COLORS) => StyleSheet.create({
     color: COLORS.textMain,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  activeBadge: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+  },
+  deviceReportCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...Platform.select({
+      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8 },
+      android: { elevation: 3 },
+    }),
+  },
+  deviceHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  miniIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 12,
+    overflow: 'hidden',
+  },
+  deviceReportTitle: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  subSection: {
+    marginBottom: 16,
+  },
+  subTitle: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: COLORS.textMuted,
+    marginBottom: 8,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  emptyText: {
+    marginTop: 12,
+    color: COLORS.textMuted,
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
 

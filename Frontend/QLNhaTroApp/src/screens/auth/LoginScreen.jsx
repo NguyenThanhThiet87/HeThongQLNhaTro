@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import styles, { colors } from "../../features/auth/styles/LoginScreen_Styles";
 import { useNavigation } from "@react-navigation/native";
+import { useTheme } from "../../theme/useTheme";
+
 
 import { ActivityIndicator } from "react-native";
 import * as SecureStore from "expo-secure-store";
@@ -16,7 +17,6 @@ import {
     Platform,
     ScrollView,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { useAuth } from "../../context/AuthContext";
@@ -24,7 +24,9 @@ import { useLogin } from "../../hooks/auth/useLogin";
 
 export default function LoginScreen() {
     const navigation = useNavigation();
-    
+    const { COLORS } = useTheme();
+    const styles = createStyles(COLORS);
+
     const { login } = useAuth();
 
     const { loginUser, loading } = useLogin(login);
@@ -52,7 +54,7 @@ export default function LoginScreen() {
                         {/* Header */}
                         <View style={styles.header}>
                             <View style={styles.iconWrapper}>
-                                <MaterialIcons name="home" size={40} color={colors.primary} />
+                                <MaterialIcons name="home" size={40} color={COLORS.buttonText} />
                             </View>
 
                             <Text style={styles.title}>Chào mừng quay trở lại</Text>
@@ -82,7 +84,7 @@ export default function LoginScreen() {
                             </View>
 
                             {/* Password */}
-                            <Text style={[styles.label, { marginTop: 20 }]}>MẬT KHẨU</Text>
+                            <Text style={[styles.label, { marginTop: 0 }]}>MẬT KHẨU</Text>
                             <View style={styles.inputContainer}>
                                 <MaterialIcons
                                     name="lock"
@@ -146,3 +148,104 @@ export default function LoginScreen() {
     );
 }
 
+const createStyles = (COLORS) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bgLight,
+  },
+  wrapper: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 40,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: 30,
+    marginTop: 20,
+  },
+  iconWrapper: {
+    width: 80,
+    height: 80,
+    backgroundColor: COLORS.buttonBg,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: COLORS.textMain,
+    marginTop: 20,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: COLORS.textMuted,
+    marginTop: 6,
+  },
+  form: {
+    marginTop: 10,
+  },
+  label: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    marginBottom: 8,
+    marginLeft: 4,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.card,
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    height: 60,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 16,
+  },
+  leftIcon: {
+    marginRight: 8,
+  },
+  input: {
+    flex: 1,
+    color: COLORS.textMain,
+    fontSize: 16,
+  },
+  forgotWrapper: {
+    alignItems: "flex-end",
+    marginBottom: 12,
+  },
+  forgotText: {
+    color: COLORS.primary,
+    fontWeight: "600",
+    textDecorationLine: "underline",
+  },
+  button: {
+    marginTop: 24,
+    backgroundColor: COLORS.buttonBg,
+    height: 60,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  buttonText: {
+    color: COLORS.buttonText,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  footer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  footerText: {
+    color: COLORS.textMuted,
+    fontSize: 14,
+  },
+  signUp: {
+    color: COLORS.primary,
+    fontWeight: "600",
+  },
+});

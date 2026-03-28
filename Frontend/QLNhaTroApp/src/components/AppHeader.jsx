@@ -4,12 +4,14 @@ import { StatusBar } from "expo-status-bar";
 import { useTheme } from "../theme/useTheme";
 
 export default function AppHeader({ left, center, right, style}) {
-    const { COLORS, isDark, toggleTheme } = useTheme();
-    const styles = createStyles(COLORS);
+    const { COLORS, isDark } = useTheme();
+    
+    // Prevent style objects from being recreated every render cycle
+    const styles = React.useMemo(() => createStyles(COLORS), [COLORS]);
 
     return (
         <>
-            <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
+            <StatusBar style={isDark ? "light" : "dark"} />
             <View style={[styles.header, style]}>
                 <View style={styles.left}>{left}</View>
                 <View style={styles.center}>{center}</View>

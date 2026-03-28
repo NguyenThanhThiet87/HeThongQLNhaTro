@@ -1,6 +1,7 @@
 import React from "react";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useTheme } from "../theme/useTheme";
 
 export default function SelectBox({
     value,
@@ -10,6 +11,9 @@ export default function SelectBox({
     textStyle,
     iconColor = "#aaa"
 }) {
+    const { COLORS } = useTheme();
+    const styles = createStyles(COLORS);
+
     return (
         <TouchableOpacity style={[styles.box, style]} onPress={onPress}>
             <View style={styles.row}>
@@ -22,21 +26,23 @@ export default function SelectBox({
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
     box: {
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 8,
-        backgroundColor: "#1a2e32",
+        backgroundColor: COLORS.card,
+        borderWidth: 1,
+        borderColor: COLORS.border,
     },
     row: {
         flexDirection: "row",
         alignItems: "center",
     },
     text: {
-        color: "#fff",
+        color: COLORS.inputText,
         fontWeight: "600",
         fontSize: 18,
         marginRight: 6,

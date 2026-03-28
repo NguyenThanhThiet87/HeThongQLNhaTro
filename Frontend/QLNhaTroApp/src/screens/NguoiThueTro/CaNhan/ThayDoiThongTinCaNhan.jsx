@@ -16,7 +16,6 @@ import AppHeader from '../../../components/AppHeader';
 import RadioButton from '../../../components/RadioButton';
 import InputCalendar from '../../../components/InputCalendar';
 import * as ImagePicker from 'expo-image-picker';
-import toast from '../../../utils/toast';
 import LoadingOverlay from '../../../components/LoadingOverlay';
 
 const ThayDoiThongTinCaNhan = ({ route }) => {
@@ -241,7 +240,7 @@ const ThayDoiThongTinCaNhan = ({ route }) => {
 
 const createStyles = (COLORS) => StyleSheet.create({
     container: { flex: 1 },
-    headerTitle: { fontSize: 22, fontWeight: '700' },
+    headerTitle: { fontSize: 22, fontWeight: '700', color: COLORS.textMain },
     iconCircle: { padding: 8, borderRadius: 20 },
 
     scrollContent: { paddingBottom: 120 },
