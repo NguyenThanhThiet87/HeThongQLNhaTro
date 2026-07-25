@@ -1,0 +1,36 @@
+## Môi trường cấu hình nhạy cảm (Đã thêm trước đó)
+.env
+qlnhatro-cc8e1-firebase-adminsdk-fbsvc-1ee6f4d6c4.json
+
+## .NET Core / ASP.NET Core
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.docstates
+
+## Cấu hình IDE (Visual Studio, VS Code, Rider)
+.vs/
+.vscode/
+.idea/
+*.suo
+*.userprefs
+
+## Tệp Build / Restore / Logs
+*.log
+*.log.*
+*.err
+TestResults/
+*.cache
+
+## User-specific files
+appsettings.Development.json
+appsettings.*.json
+
+## MAC OS
+.DS_Store
+
+## Thư mục tạm nghiệm và publish
+Publish/
+pub/
+out/

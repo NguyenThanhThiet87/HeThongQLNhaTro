@@ -11,7 +11,9 @@ using ServerQLNhaTro.Services;
 using ServerQLNhaTro.Services.VNPay;
 using ServerQLNhaTro.Hubs;
 
+DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
