@@ -1,0 +1,70 @@
+name: Deploy microservices to Google Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REGION: ${{ vars.GCP_REGION }}
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REPOSITORY: microservices
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: IdentityService
+            db_secret: identity-db-connection
+          - service: PropertyService
+            db_secret: property-db-connection
+          - service: ContractService
+            db_secret: contract-db-connection
+          - service: UtilityService
+            db_secret: utility-db-connection
+          - service: BillingService
+            db_secret: billing-db-connection
+          - service: MaintenanceService
+            db_secret: maintenance-db-connection
+          - service: CommunicationService
+            db_secret: communication-db-connection
+    defaults:
+      run:
+        working-directory: Microservices
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - run: dotnet restore HeThongQLNhaTroMicroservices.sln
+      - run: dotnet build HeThongQLNhaTroMicroservices.sln --no-restore --configuration Release
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+      - name: Build and publish image
+        run: |
+          IMAGE=${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${{ matrix.service }}:${GITHUB_SHA}
+          docker build --build-arg SERVICE=${{ matrix.service }} -t "$IMAGE" .
+          docker push "$IMAGE"
+      - name: Deploy Cloud Run service
+        run: |
+          SERVICE_NAME=$(echo '${{ matrix.service }}' | tr '[:upper:]' '[:lower:]')
+          IMAGE=${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${{ matrix.service }}:${GITHUB_SHA}
+          gcloud run deploy "$SERVICE_NAME" \
+            --image "$IMAGE" --region "$REGION" --platform managed \
+            --service-account "${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}" \
+            --add-cloudsql-instances "${{ vars.CLOUD_SQL_INSTANCE }}" \
+            --vpc-connector "${{ vars.VPC_CONNECTOR }}" \
+            --vpc-egress private-ranges-only \
+            --port 8080 --ingress internal-and-cloud-load-balancing \
+            --no-allow-unauthenticated \
+            --set-env-vars ASPNETCORE_ENVIRONMENT=Production \
+            --update-secrets "ConnectionStrings__DefaultConnection=${{ matrix.db_secret }}:1,RabbitMq__Host=rabbitmq-host:1,RabbitMq__Username=rabbitmq-username:1,RabbitMq__Password=rabbitmq-password:1,RabbitMq__VirtualHost=rabbitmq-virtualhost:1"

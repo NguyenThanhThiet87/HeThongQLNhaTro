@@ -1,0 +1,19 @@
+﻿# .NET build and IDE output
+[Bb]in/
+[Oo]bj/
+**/[Bb]in/
+**/[Oo]bj/
+.vs/
+*.user
+*.suo
+
+# Local environment settings and credentials
+appsettings.Development.json
+*.pem
+*.key
+*.pfx
+*.json
+
+# OS files
+.DS_Store
+Thumbs.db
