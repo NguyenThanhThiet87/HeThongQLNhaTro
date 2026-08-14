@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option csharp_namespace = "Shared.Integration.Protos";
+
+package identity;
+
+service UserService {
+  // Get User Profile by ID
+  rpc GetUserInfo (UserInfoRequest) returns (UserInfoResponse);
+  
+  // Create or Get User by Phone
+  rpc GetOrCreateUser (GetOrCreateUserRequest) returns (GetOrCreateUserResponse);
+}
+
+message UserInfoRequest {
+  int32 user_id = 1;
+}
+
+message UserInfoResponse {
+  int32 id = 1;
+  string ho_ten = 2;
+  string email = 3;
+  string so_dien_thoai = 4;
+}
+
+message GetOrCreateUserRequest {
+  string ho_ten = 1;
+  string so_cccd = 2;
+  string so_dien_thoai = 3;
+  string dia_chi = 4;
+  int32 gioi_tinh = 5; // 0: Nu, 1: Nam
+  string ngay_sinh = 6; // yyyy-MM-dd
+  string nghe_nghiep = 7;
+}
+
+message GetOrCreateUserResponse {
+  int32 user_id = 1;
+  string message = 2;
+  bool success = 3;
+}

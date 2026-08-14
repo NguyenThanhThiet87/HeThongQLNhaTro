@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option csharp_namespace = "Shared.Integration.Protos";
+
+package contract;
+
+service ContractQueryService {
+  rpc GetActiveContract (ActiveContractRequest) returns (ActiveContractResponse);
+}
+
+message ActiveContractRequest {
+  int32 room_id = 1;
+}
+
+message ActiveContractResponse {
+  bool has_contract = 1;
+  int32 contract_id = 2;
+  int32 tenant_id = 3;
+  double deposit = 4;
+  double rent_price = 5;
+  double electricity_price = 6;
+  double water_price = 7;
+  int32 representative_id = 8;
+}

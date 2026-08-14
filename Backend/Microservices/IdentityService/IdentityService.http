@@ -1,0 +1,12 @@
+@IdentityService_HostAddress = http://localhost:5001
+
+### Test API Đăng nhập
+POST {{IdentityService_HostAddress}}/api/users/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "123"
+}
+
+###
