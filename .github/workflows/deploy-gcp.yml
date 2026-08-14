@@ -3,6 +3,10 @@ name: Deploy microservices to Google Cloud Run
 on:
   push:
     branches: [main]
+    paths:
+      - 'Backend/**'
+      - '.github/workflows/deploy-gcp.yml'
+  
   workflow_dispatch:
 
 permissions:
@@ -36,7 +40,7 @@ jobs:
             db_secret: communication-db-connection
     defaults:
       run:
-        working-directory: Microservices
+        working-directory: Backend/Microservices
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
