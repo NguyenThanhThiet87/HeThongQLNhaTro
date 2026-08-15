@@ -21,6 +21,10 @@ proxy:
 admin:
   enabled: false
 
+# Kong Manager depends on the Admin API; do not create an unused NodePort.
+manager:
+  enabled: false
+
 podDisruptionBudget:
   enabled: true
   minAvailable: 1
