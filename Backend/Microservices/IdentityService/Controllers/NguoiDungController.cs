@@ -17,13 +17,19 @@ public class NguoiDungController : ControllerBase
     private readonly IdentityDbContext _context;
     private readonly JwtTokenService _jwtService;
     private readonly IConfiguration _config;
+    private readonly ILogger<NguoiDungController> _logger;
     // IPhotoService should be added later or we use Cloudinary directly here
 
-    public NguoiDungController(IdentityDbContext context, JwtTokenService jwtService, IConfiguration config)
+    public NguoiDungController(
+        IdentityDbContext context,
+        JwtTokenService jwtService,
+        IConfiguration config,
+        ILogger<NguoiDungController> logger)
     {
         _context = context;
         _jwtService = jwtService;
         _config = config;
+        _logger = logger;
     }
 
     [HttpPost("register/account")]
@@ -92,28 +98,37 @@ public class NguoiDungController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto model)
     {
-        var user = await _context.NguoiDung.FirstOrDefaultAsync(u => u.SoDt == model.SoDt);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(model.MatKhau, user.MatKhau))
-            return Unauthorized(new ApiResponse<object>(false, "Sai thông tin đăng nhập", null));
-
-        if (user.KichHoat == false)
-            return Unauthorized(new ApiResponse<object>(false, "Tài khoản không có quyền truy cập", null));
-
-        var accessToken = _jwtService.GenerateToken(user.MaNd, user.HoTen, user.SoDt, user.MaVaiTro.ToString());
-        var refreshTokenString = _jwtService.GenerateRefreshToken();
-
-        var refreshToken = new RefreshToken
+        try
         {
-            MaNd = user.MaNd,
-            Token = refreshTokenString,
-            HetHanLuc = DateTime.UtcNow.AddDays(7),
-            NgayTao = DateTime.UtcNow
-        };
+            var user = await _context.NguoiDung.FirstOrDefaultAsync(u => u.SoDt == model.SoDt);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.MatKhau, user.MatKhau))
+                return Unauthorized(new ApiResponse<object>(false, "Sai thông tin đăng nhập", null));
 
-        _context.RefreshTokens.Add(refreshToken);
-        await _context.SaveChangesAsync();
+            if (user.KichHoat == false)
+                return Unauthorized(new ApiResponse<object>(false, "Tài khoản không có quyền truy cập", null));
 
-        return Ok(new ApiResponse<object>(true, "Đăng nhập thành công", new { accessToken, refreshToken = refreshTokenString }));
+            var accessToken = _jwtService.GenerateToken(user.MaNd, user.HoTen, user.SoDt, user.MaVaiTro.ToString());
+            var refreshTokenString = _jwtService.GenerateRefreshToken();
+
+            var refreshToken = new RefreshToken
+            {
+                MaNd = user.MaNd,
+                Token = refreshTokenString,
+                HetHanLuc = DateTime.UtcNow.AddDays(7),
+                NgayTao = DateTime.UtcNow
+            };
+
+            _context.RefreshTokens.Add(refreshToken);
+            await _context.SaveChangesAsync();
+
+            return Ok(new ApiResponse<object>(true, "Đăng nhập thành công", new { accessToken, refreshToken = refreshTokenString }));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Login failed while accessing the Identity database.");
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new ApiResponse<object>(false, "Không thể xử lý đăng nhập. Vui lòng thử lại sau.", null));
+        }
     }
 
     [HttpPost("refresh")]

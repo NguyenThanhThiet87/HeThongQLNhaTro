@@ -1,4 +1,4 @@
-﻿name: Deploy microservices to Google Cloud Run
+name: Deploy microservices to Google Cloud Run
 
 on:
   push:
@@ -72,6 +72,6 @@ jobs:
             --vpc-egress private-ranges-only \
             --port 8080 --ingress internal \
             --allow-unauthenticated \
-            --set-env-vars ASPNETCORE_ENVIRONMENT=Production \
-            --update-secrets "ConnectionStrings__DefaultConnection=${{ matrix.db_secret }}:3,RabbitMq__Host=rabbitmq-host:1,RabbitMq__Username=rabbitmq-username:1,RabbitMq__Password=rabbitmq-password:1,RabbitMq__VirtualHost=rabbitmq-virtualhost:2"
+            --set-env-vars ASPNETCORE_ENVIRONMENT=Production,Jwt__Issuer=MyApp,Jwt__Audience=MyAppUser,Jwt__DurationInMinutes=60 \
+            --update-secrets "ConnectionStrings__DefaultConnection=${{ matrix.db_secret }}:3,Jwt__Key=jwt-key:1,RabbitMq__Host=rabbitmq-host:1,RabbitMq__Username=rabbitmq-username:1,RabbitMq__Password=rabbitmq-password:1,RabbitMq__VirtualHost=rabbitmq-virtualhost:2"
 
