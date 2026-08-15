@@ -70,8 +70,8 @@ jobs:
             --add-cloudsql-instances "${{ vars.CLOUD_SQL_INSTANCE }}" \
             --vpc-connector "${{ vars.VPC_CONNECTOR }}" \
             --vpc-egress private-ranges-only \
-            --port 8080 --ingress internal-and-cloud-load-balancing \
-            --no-allow-unauthenticated \
+            --port 8080 --ingress internal \
+            --allow-unauthenticated \
             --set-env-vars ASPNETCORE_ENVIRONMENT=Production \
             --update-secrets "ConnectionStrings__DefaultConnection=${{ matrix.db_secret }}:1,RabbitMq__Host=rabbitmq-host:1,RabbitMq__Username=rabbitmq-username:1,RabbitMq__Password=rabbitmq-password:1,RabbitMq__VirtualHost=rabbitmq-virtualhost:2"
 
