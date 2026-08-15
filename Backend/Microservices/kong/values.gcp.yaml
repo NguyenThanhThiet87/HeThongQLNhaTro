@@ -3,6 +3,9 @@
 # only public entry point in a later step.
 env:
   database: "off"
+  # GKE Autopilot pods do not expose the IPv6 loopback address used by the
+  # chart default. Keep the Admin API reachable only inside the pod via IPv4.
+  admin_listen: "127.0.0.1:8444 http2 ssl"
 
 ingressController:
   enabled: false
