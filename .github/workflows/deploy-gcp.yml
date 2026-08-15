@@ -73,5 +73,5 @@ jobs:
             --port 8080 --ingress internal \
             --allow-unauthenticated \
             --set-env-vars ASPNETCORE_ENVIRONMENT=Production \
-            --update-secrets "ConnectionStrings__DefaultConnection=${{ matrix.db_secret }}:2,RabbitMq__Host=rabbitmq-host:1,RabbitMq__Username=rabbitmq-username:1,RabbitMq__Password=rabbitmq-password:1,RabbitMq__VirtualHost=rabbitmq-virtualhost:2"
+            --update-secrets "ConnectionStrings__DefaultConnection=${{ matrix.db_secret }}:3,RabbitMq__Host=rabbitmq-host:1,RabbitMq__Username=rabbitmq-username:1,RabbitMq__Password=rabbitmq-password:1,RabbitMq__VirtualHost=rabbitmq-virtualhost:2"
 
