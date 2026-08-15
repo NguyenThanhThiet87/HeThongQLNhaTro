@@ -1,9 +1,10 @@
+import { API_BASE_URL } from "../config/api";
 import { getAccessToken } from "../utils/decodeToken";
 
 export const getNotifications = async (maNd) => {
     try {
         const token = await getAccessToken();
-        const response = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/ThongBao/danh-sach/${maNd}`, {
+        const response = await fetch(`${API_BASE_URL}/ThongBao/danh-sach/${maNd}`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -19,7 +20,7 @@ export const getNotifications = async (maNd) => {
 export const markAsReadApi = async (maTb) => {
     try {
         const token = await getAccessToken();
-        const response = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/ThongBao/doc-thong-bao/${maTb}`, {
+        const response = await fetch(`${API_BASE_URL}/ThongBao/doc-thong-bao/${maTb}`, {
             method: "PUT",
             headers: {
                 "Authorization": `Bearer ${token}`,

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import * as Notifications from "expo-notifications";
 import { DeviceEventEmitter, LogBox } from "react-native";
+import { API_ORIGIN } from "../../config/api";
 
 // Ẩn thông báo lỗi hệ thống của Expo Go Android SDK 53
 LogBox.ignoreLogs(['expo-notifications: Android Push notifications']);
@@ -44,8 +45,13 @@ export default function useSignalR(user) {
       return;
     }
 
+    if (!API_ORIGIN) {
+      console.error("[SIGNALR] Missing EXPO_PUBLIC_API_BASE_URL configuration");
+      return;
+    }
+
     const newConnection = new HubConnectionBuilder()
-      .withUrl("https://eveline-prenasal-concha.ngrok-free.dev/chatHub/?userId=" + user.maNd)
+      .withUrl(`${API_ORIGIN}/chathub?userId=${encodeURIComponent(user.maNd)}`)
       .configureLogging(LogLevel.Information)
       .withAutomaticReconnect()
       .build();

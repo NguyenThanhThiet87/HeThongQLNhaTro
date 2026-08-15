@@ -6,9 +6,6 @@ import ToastManager from "toastify-react-native";
 import { AuthProvider } from "./src/context/AuthContext";
 import RootNavigator from "./src/navigation/ChuNhaTro/RootNavigator";
 import { ThemeProvider } from "./src/theme/themeContext";
-import { installDebugLogging } from "./src/utils/debugLogger";
-
-installDebugLogging();
 
 export default function App() {
   return (

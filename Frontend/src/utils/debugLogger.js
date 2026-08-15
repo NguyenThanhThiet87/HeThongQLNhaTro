@@ -57,3 +57,6 @@ export function installDebugLogging() {
 
   console.info("[APP] Development diagnostics enabled");
 }
+
+// Run at module evaluation time so startup failures in navigation/screens are captured too.
+installDebugLogging();

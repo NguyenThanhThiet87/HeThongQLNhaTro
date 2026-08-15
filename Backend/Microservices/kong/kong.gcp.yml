@@ -36,7 +36,7 @@ services:
     url: https://billingservice-528371198639.asia-southeast1.run.app
     routes:
       - name: billing-route
-        paths: [ /api/HoaDonThanhToan, /api/DichVuDonHang, /api/PayOS, /api/VNPay ]
+        paths: [ /api/HoaDonThanhToan, /api/DichVuDonHang, /api/PayOS, /api/VNPay, /chathub ]
         strip_path: false
 
   - name: maintenance-service

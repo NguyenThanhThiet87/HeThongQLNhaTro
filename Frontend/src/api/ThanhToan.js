@@ -1,10 +1,11 @@
+import { API_BASE_URL } from "../config/api";
 import { getAccessToken } from "../utils/decodeToken";
 export const createPaymentUrlPayOS = async (maHd) => {
     try {
         console.log("Creating payment URL with info:", maHd);
         const token = await getAccessToken();
 
-        const res = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/PayOS/create-payment", {
+        const res = await fetch(`${API_BASE_URL}/PayOS/create-payment`, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${token}`,

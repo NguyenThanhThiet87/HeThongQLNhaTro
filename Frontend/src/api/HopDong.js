@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import axiosClient from "./axiosClient";
 import getAccessToken from "../utils/decodeToken";
 import { getCurrentUser } from "../utils/decodeToken";
@@ -7,7 +8,7 @@ export const createHopDongApi = async (hopDongData) => {
     console.log("Creating HopDong with data:", hopDongData);
     const user = await getCurrentUser();
     const token = await getAccessToken();
-    const res = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/HopDong/tao-hop-dong", {
+    const res = await fetch(`${API_BASE_URL}/HopDong/tao-hop-dong`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,7 +46,7 @@ export const createHopDongApi = async (hopDongData) => {
 export const getHopDongsApi = async (maDayNt, trangThai) => {
   try {
     const token = await getAccessToken(); 
-    const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HopDong/HopDongs?maDayNt=${maDayNt}&trangThai=${trangThai}`, {
+    const res = await fetch(`${API_BASE_URL}/HopDong/HopDongs?maDayNt=${maDayNt}&trangThai=${trangThai}`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`
@@ -66,7 +67,7 @@ export const getHopDongsApi = async (maDayNt, trangThai) => {
 export const getHopDongApi = async (maHopDong) => {
   try {
     const token = await getAccessToken(); 
-    const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HopDong/HopDong?maHopDong=${maHopDong}`, {
+    const res = await fetch(`${API_BASE_URL}/HopDong/HopDong?maHopDong=${maHopDong}`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`
@@ -87,7 +88,7 @@ export const getHopDongApi = async (maHopDong) => {
 export const addThanhVienHopDongApi = async (thanhVienData) => {
   try {
     const token = await getAccessToken(); 
-    const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HopDong/them-thanh-vien`, {
+    const res = await fetch(`${API_BASE_URL}/HopDong/them-thanh-vien`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -121,7 +122,7 @@ export const addThanhVienHopDongApi = async (thanhVienData) => {
 export const addThanhVienHopDongExistedApi = async (thanhVienData) => {
   try {
     const token = await getAccessToken(); 
-    const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HopDong/them-thanh-vien-existed`, {
+    const res = await fetch(`${API_BASE_URL}/HopDong/them-thanh-vien-existed`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -156,7 +157,7 @@ export const deleteThanhVienHopDongApi = async (maHopDong, maNt) => {
   try {
     console.log("Deleting member with MaHopDong:", maHopDong, "MaNt:", maNt);
     const token = await getAccessToken(); 
-    const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HopDong/xoa-thanh-vien`, {
+    const res = await fetch(`${API_BASE_URL}/HopDong/xoa-thanh-vien`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -182,7 +183,7 @@ export const deleteThanhVienHopDongApi = async (maHopDong, maNt) => {
 export const huyHopDongApi = async (maHopDong) => {
   try {
     const token = await getAccessToken(); 
-    const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HopDong/huy-hop-dong?maHopDong=${maHopDong}`, {
+    const res = await fetch(`${API_BASE_URL}/HopDong/huy-hop-dong?maHopDong=${maHopDong}`, {
       method: "PUT",
       headers: {
         "Authorization": `Bearer ${token}`

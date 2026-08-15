@@ -1,10 +1,11 @@
+import { API_BASE_URL } from "../config/api";
 import { getAccessToken } from "../utils/decodeToken";
 export const createPaymentUrl = async (paymentInfo) => {
     try {
         console.log("Creating payment URL with info:", paymentInfo);
         const token = await getAccessToken();
 
-        const res = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/VNPay/create-payment-url", {
+        const res = await fetch(`${API_BASE_URL}/VNPay/create-payment-url`, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -40,7 +41,7 @@ export const paymentCallbackVnpay = async (callbackUrl) => {
         const token = await getAccessToken();
         const queryString = callbackUrl.split("?")[1];
         const res = await fetch(
-            `https://eveline-prenasal-concha.ngrok-free.dev/api/VNPay/payment-callback?${queryString}`,
+            `${API_BASE_URL}/VNPay/payment-callback?${queryString}`,
             {
                 method: "GET",
                 headers: { "Authorization": `Bearer ${token}` }

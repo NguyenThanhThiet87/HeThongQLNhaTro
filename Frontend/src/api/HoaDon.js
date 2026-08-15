@@ -1,10 +1,11 @@
+import { API_BASE_URL } from "../config/api";
 import { getAccessToken } from "../utils/decodeToken";
 
 export const getDienNuocCuApi = async (maPhong, month, year) => {
     console.log("Calling getDienNuocCuApi with params:", { maPhong, month, year });
     try {
         const token = await getAccessToken();
-        const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/dien-nuoc-cu?maPhong=${maPhong}&monthCurrent=${month}&yearCurrent=${year}`, {
+        const res = await fetch(`${API_BASE_URL}/HoaDonThanhToan/dien-nuoc-cu?maPhong=${maPhong}&monthCurrent=${month}&yearCurrent=${year}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -29,7 +30,7 @@ export const getHoaDonsApi = async (maDayNt, month, year, trangThai) => {
     console.log("Calling getHoaDonsApi with params:", { maDayNt, month, year, trangThai });
     const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/hoa-dons?maDayNt=${maDayNt}&month=${month}&year=${year}&trangThai=${trangThai}`;
+    const url = `${API_BASE_URL}/HoaDonThanhToan/hoa-dons?maDayNt=${maDayNt}&month=${month}&year=${year}&trangThai=${trangThai}`;
 
     const res = await fetch(url, {
       method: "GET",
@@ -53,7 +54,7 @@ export const getHoaDonApi = async (maHd) => {
   try {
     const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/hoa-don?maHd=${maHd}`;
+    const url = `${API_BASE_URL}/HoaDonThanhToan/hoa-don?maHd=${maHd}`;
 
     const res = await fetch(url, {
       method: "GET",
@@ -79,7 +80,7 @@ export const getHoaDonNewApi = async (maNd) => {
     console.log("Calling getHoaDonNewApi with params:", { maNd });
     const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/hoa-don-moi?maNd=${maNd}`;
+    const url = `${API_BASE_URL}/HoaDonThanhToan/hoa-don-moi?maNd=${maNd}`;
 
     const res = await fetch(url, {
       method: "GET",
@@ -103,7 +104,7 @@ export const getThangNamHDApi = async (maDayNt) => {
   try {
     const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/danh-sach-thang?maDayNt=${maDayNt}`;
+    const url = `${API_BASE_URL}/HoaDonThanhToan/danh-sach-thang?maDayNt=${maDayNt}`;
 
     const res = await fetch(url, {
       method: "GET",
@@ -127,7 +128,7 @@ export const getThangNamHDApi = async (maDayNt) => {
 export const saveDienNuocMoiApi = async (maPhong, month, year, soDienMoi, soNuocMoi) => {
     try {
         const token = await getAccessToken();
-        const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/chot-dien-nuoc`, {
+        const res = await fetch(`${API_BASE_URL}/HoaDonThanhToan/chot-dien-nuoc`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -157,7 +158,7 @@ export const saveDienNuocMoiApi = async (maPhong, month, year, soDienMoi, soNuoc
 export const getDoanhThuApi = async (maNd) => {
     try {
         const token = await getAccessToken();
-        const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/doanh-thu?maNd=${maNd}`, {
+        const res = await fetch(`${API_BASE_URL}/HoaDonThanhToan/doanh-thu?maNd=${maNd}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -182,7 +183,7 @@ export const getLichSuThanhToanGanApi = async (maNd) => {
   try {
     const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/lich-su-thanh-toan-gan?maNd=${maNd}`;
+    const url = `${API_BASE_URL}/HoaDonThanhToan/lich-su-thanh-toan-gan?maNd=${maNd}`;
 
     const res = await fetch(url, {
       method: "GET",
@@ -206,7 +207,7 @@ export const getThongKeChiTieuApi = async (maNd) => {
   try {
     const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/thong-ke-chi-tieu?maNd=${maNd}`;
+    const url = `${API_BASE_URL}/HoaDonThanhToan/thong-ke-chi-tieu?maNd=${maNd}`;
 
     const res = await fetch(url, {
       method: "GET",
@@ -230,7 +231,7 @@ export const getChiTietGiaoDichApi = async (maLstt) => {
   try {
     const token = await getAccessToken();
 
-    const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/HoaDonThanhToan/chi-tiet-giao-dich?maLstt=${maLstt}`;
+    const url = `${API_BASE_URL}/HoaDonThanhToan/chi-tiet-giao-dich?maLstt=${maLstt}`;
 
     const res = await fetch(url, {
       method: "GET",

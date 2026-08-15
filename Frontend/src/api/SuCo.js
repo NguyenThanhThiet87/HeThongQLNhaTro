@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import api from "./axiosClient";
 import getAccessToken from "../utils/decodeToken";
 
@@ -87,7 +88,7 @@ export const guiBaoCaoSuCoApi = async (reporterId, maPhong, selectedDevices) => 
     });
 
     const token = await getAccessToken();
-    const res = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/SuCoBaoTri/gui-bao-cao", {
+    const res = await fetch(`${API_BASE_URL}/SuCoBaoTri/gui-bao-cao`, {
       method: "POST",
       body: formData,
       headers: {

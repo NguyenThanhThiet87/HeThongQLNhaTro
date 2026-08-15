@@ -1,26 +1,16 @@
+import { API_BASE_URL } from "../config/api";
 import api from "./axiosClient";
 
 export const loginApi = async (phone, password) => {
   try {
-    const res = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        SoDt: phone,
-        MatKhau: password
-      })
+    return await api.post("/NguoiDung/login", {
+      SoDt: phone,
+      MatKhau: password,
     });
-
-    const result = await res.json();
-
-    return result;
-
   } catch (error) {
     return {
       success: false,
-      message: error.message,
+      message: error.response?.data?.message ?? error.message,
       data: null
     };
   }
@@ -32,7 +22,7 @@ export const registerApi = (data) => {
 };
 
 export const resetPasswordApi = async (phone, newPassword, idToken) => {
-  return await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/reset-password", {
+  return await fetch(`${API_BASE_URL}/NguoiDung/reset-password`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -69,7 +59,7 @@ export const createAccount = (name, phone, password, role, idToken) => {
 
 export const updateSoDt = async (maNd, soDt, idToken) => {
   try {
-    const res = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/cap-nhat-sdt", {
+    const res = await fetch(`${API_BASE_URL}/NguoiDung/cap-nhat-sdt`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

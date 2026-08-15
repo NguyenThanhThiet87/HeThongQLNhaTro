@@ -1,10 +1,11 @@
+import { API_BASE_URL } from "../config/api";
 import axiosClient from "./axiosClient";
 import getAccessToken, { getCurrentUser } from "../utils/decodeToken";
 export const getDayNhaTrosApi = async (maCnt) => {
     try {
         const token = await getAccessToken();
 
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/day-nha-tros?maChuNt=${maCnt}`;
+        const url = `${API_BASE_URL}/PhongNhaTro/day-nha-tros?maChuNt=${maCnt}`;
 
         const res = await fetch(url, {
             method: "GET",
@@ -29,7 +30,7 @@ export const getDayNhaTroApi = async (maDayNt) => {
     try {
         const token = await getAccessToken();
 
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/day-nha-tro?maDayNt=${maDayNt}`;
+        const url = `${API_BASE_URL}/PhongNhaTro/day-nha-tro?maDayNt=${maDayNt}`;
 
         const res = await fetch(url, {
             method: "GET",
@@ -56,7 +57,7 @@ export const taoDayNhaTroApi = async (dayNhaTroData, danhSachPhong) => {
 
         const user = await getCurrentUser();
         const token = await getAccessToken();
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/tao-day-tro`;
+        const url = `${API_BASE_URL}/PhongNhaTro/tao-day-tro`;
 
         const formData = new FormData();
 
@@ -126,7 +127,7 @@ export const taoDayNhaTroApi = async (dayNhaTroData, danhSachPhong) => {
 export const suaDayNhaTroApi = async (maDayNt, dayNhaTroData) => {
     try {
         const token = await getAccessToken();
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/sua-day-tro?maDayNt=${maDayNt}`;
+        const url = `${API_BASE_URL}/PhongNhaTro/sua-day-tro?maDayNt=${maDayNt}`;
 
         const formData = new FormData();
         formData.append("TenDayNt", dayNhaTroData.TenDayNt || "");
@@ -181,7 +182,7 @@ export const getPhongTrosApi = async (maDayNt) => {
     try {
         const token = await getAccessToken();
 
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/phongs?maDayNt=${maDayNt}`;
+        const url = `${API_BASE_URL}/PhongNhaTro/phongs?maDayNt=${maDayNt}`;
 
         const res = await fetch(url, {
             method: "GET",
@@ -206,7 +207,7 @@ export const getPhongTroApi = async (maPhong) => {
     try {
         const token = await getAccessToken();
 
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/phong?maPhong=${maPhong}`;
+        const url = `${API_BASE_URL}/PhongNhaTro/phong?maPhong=${maPhong}`;
 
         const res = await fetch(url, {
             method: "GET",
@@ -231,7 +232,7 @@ export const taoPhongApi = async (newRoomData) => {
     try {
         console.log("Dữ liệu Phòng nhận vào API:", newRoomData);
         const token = await getAccessToken();
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/phong`;
+        const url = `${API_BASE_URL}/PhongNhaTro/phong`;
 
         const formData = new FormData();
 
@@ -265,7 +266,7 @@ export const taoPhongApi = async (newRoomData) => {
 export const getLoaiPhongApi = async (maCnt) => {
     try {
         const token = await getAccessToken();
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/danh-sach-loai-phong?maChuNt=${maCnt}`;
+        const url = `${API_BASE_URL}/PhongNhaTro/danh-sach-loai-phong?maChuNt=${maCnt}`;
         const res = await fetch(url, {
             method: "GET",
             headers: {
@@ -287,7 +288,7 @@ export const getLoaiPApi = async (maLoaiP) => {
     try {
         console.log("Fetching details for MaLoaiP:", maLoaiP); // Debug log
         const token = await getAccessToken();
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/loai-phong?maLoaiP=${maLoaiP}`;
+        const url = `${API_BASE_URL}/PhongNhaTro/loai-phong?maLoaiP=${maLoaiP}`;
         const res = await fetch(url, {
             method: "GET",
             headers: {
@@ -308,7 +309,7 @@ export const getLoaiPApi = async (maLoaiP) => {
 export const taoLoaiPhongApi = async (newRoomTypeData) => {
     try {
         const token = await getAccessToken();
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/tao-loai-phong`;
+        const url = `${API_BASE_URL}/PhongNhaTro/tao-loai-phong`;
 
         const formData = new FormData();
 
@@ -353,7 +354,7 @@ export const capNhatLoaiPhongApi = async (newRoomTypeData) => {
     try {
         console.log("Updating LoaiPhong with data:", newRoomTypeData); // Debug log
         const token = await getAccessToken();
-        const url = `https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/sua-loai-phong`;
+        const url = `${API_BASE_URL}/PhongNhaTro/sua-loai-phong`;
 
         const formData = new FormData();
 
@@ -396,7 +397,7 @@ export const capNhatLoaiPhongApi = async (newRoomTypeData) => {
 export const deleteLoaiPhongApi = async (maLoaiP) => {
     try {
         const token = await getAccessToken();
-        const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/xoa-loai-phong?maLoaiP=${maLoaiP}`, {
+        const res = await fetch(`${API_BASE_URL}/PhongNhaTro/xoa-loai-phong?maLoaiP=${maLoaiP}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -418,7 +419,7 @@ export const deleteLoaiPhongApi = async (maLoaiP) => {
 export const getThongKePhongApi = async (maNd) => {
     try {
         const token = await getAccessToken();
-        const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/thong-ke?maNd=${maNd}`, {
+        const res = await fetch(`${API_BASE_URL}/PhongNhaTro/thong-ke?maNd=${maNd}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -442,7 +443,7 @@ export const deletePhongApi = async (maPhong) => {
     try {
         console.log("Attempting to delete Phong with MaPhong:", maPhong); // Debug log
         const token = await getAccessToken();
-        const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/PhongNhaTro/xoa-phong?maPhong=${maPhong}`, {
+        const res = await fetch(`${API_BASE_URL}/PhongNhaTro/xoa-phong?maPhong=${maPhong}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

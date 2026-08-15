@@ -1,7 +1,8 @@
 import axios from "axios";
+import { API_BASE_URL, requireApiBaseUrl } from "../config/api";
 
 const api = axios.create({
-  baseURL: "https://eveline-prenasal-concha.ngrok-free.dev/api",
+  baseURL: API_BASE_URL ?? undefined,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json"
@@ -12,6 +13,7 @@ import { getAccessToken } from "../utils/decodeToken";
 
 api.interceptors.request.use(
   async (config) => {
+    config.baseURL = config.baseURL ?? requireApiBaseUrl();
     const token = await getAccessToken();
 
     if (token) {

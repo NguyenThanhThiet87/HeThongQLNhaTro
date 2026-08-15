@@ -1,10 +1,11 @@
+import { API_BASE_URL } from "../config/api";
 import getAccessToken from "../utils/decodeToken";
 import api from "./axiosClient";
 
 export const getNguoiDungApi = async (maNd) => {
   try {
     const token = await getAccessToken();
-    const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/nguoi-dung?maNd=${maNd}`, {
+    const res = await fetch(`${API_BASE_URL}/NguoiDung/nguoi-dung?maNd=${maNd}`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`
@@ -37,7 +38,7 @@ export const getNhaCungCapApi = (maNd) => {
 export const getChuTroApi = async (maNd) => {
   try {
     const token = await getAccessToken();
-    const res = await fetch(`https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/chi-tiet-chu-tro?maNd=${maNd}`, {
+    const res = await fetch(`${API_BASE_URL}/NguoiDung/chi-tiet-chu-tro?maNd=${maNd}`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`
@@ -123,7 +124,7 @@ export const changePasswordApi = (data) => {
 //       });
 //     }
 
-//     const res = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/cap-nhat-nguoi-thue", {
+//     const res = await fetch(`${API_BASE_URL}/NguoiDung/cap-nhat-nguoi-thue`, {
 //       method: "PUT",
 //       headers: {
 //         "Authorization": `Bearer ${token}`

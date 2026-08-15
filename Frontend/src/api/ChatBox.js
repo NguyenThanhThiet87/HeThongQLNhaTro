@@ -1,9 +1,10 @@
+import { API_BASE_URL } from "../config/api";
 import { getAccessToken } from "../utils/decodeToken";
 
 export const askChatBox = async (maNd, message) => {
   try {
     const token = await getAccessToken();
-    const res = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/ChatBox/Ask", {
+    const res = await fetch(`${API_BASE_URL}/ChatBox/Ask`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

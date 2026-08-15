@@ -1,4 +1,5 @@
 import { registerRootComponent } from 'expo';
+import './src/utils/debugLogger';
 
 import App from './App';
 

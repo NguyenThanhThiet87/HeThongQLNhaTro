@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config/api";
 import { jwtDecode } from "jwt-decode";
 import * as SecureStore from 'expo-secure-store';
 
@@ -31,7 +32,7 @@ const refreshAccessToken = async () => {
             return null;
         }
 
-        const response = await fetch("https://eveline-prenasal-concha.ngrok-free.dev/api/NguoiDung/refresh", {
+        const response = await fetch(`${API_BASE_URL}/NguoiDung/refresh`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
