@@ -9,11 +9,11 @@ export function useVerifyOTPRegister() {
   const [loading, setLoading] = useState(false);
 
   const verifyRegister = async (phone, otp, name, password, role) => {
-    console.log("Verifying OTP with data:", { phone, otp, name, password, role });
+    if (__DEV__) console.info("[AUTH] Registration OTP verification started");
     setLoading(true);
     try {
       const res = await verifyOtpRegisterService(formatPhoneNumber(phone), otp, name, password, role);
-      console.log(res)
+      if (__DEV__) console.info("[AUTH] Registration OTP verification completed", { success: Boolean(res?.success) });
       if(res.success) {
         toast.success("Tạo tài khoản thành công! Vui lòng đăng nhập.");
         navigation.reset({

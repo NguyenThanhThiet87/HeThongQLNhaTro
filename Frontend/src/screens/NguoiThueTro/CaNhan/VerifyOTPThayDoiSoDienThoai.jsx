@@ -9,6 +9,7 @@ import {
     Platform,
     ScrollView,
     StyleSheet,
+    Alert,
 } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
@@ -19,7 +20,7 @@ import LoadingOverlay from "../../../components/LoadingOverlay";
 import { getCurrentUser } from "../../../utils/decodeToken";
 
 export default function VerifyOTPThayDoiSoDienThoai({ navigation, route }) {
-    const { phone } = route.params || { phone: "" };
+    const { phone } = route.params;
 
     const { COLORS } = useTheme();
     const styles = createStyles(COLORS);
@@ -66,22 +67,23 @@ export default function VerifyOTPThayDoiSoDienThoai({ navigation, route }) {
     const handleVerify = async () => {
         setLoading(true);
         const code = otp.join("");
-        console.log("Verify OTP:", code);
+        if (__DEV__) console.info("[AUTH] Phone-change OTP verification started");
         const result = await verifyOTP(phone, code);
-        console.log("OTP verification result:", result);
+        if (__DEV__) console.info("[AUTH] Phone-change OTP verification completed", { success: Boolean(result?.success) });
 
         if (result.success) {
             const user = await getCurrentUser();
             const updateResult = await updateSoDt(user.maNd, phone, result.idToken);
             if (updateResult.success) {
-                toast.success("Số điện thoại đã được cập nhật!");
-                navigation.popToTop();
+                Alert.alert("Thành công", "Số điện thoại đã được cập nhật!", [
+                    { text: "OK", onPress: () => navigation.popToTop() }
+                ]);
             } else {
-                toast.info(updateResult.message);
+                Alert.alert("Thông báo", updateResult.message || "Không thể cập nhật số điện thoại");
                 navigation.goBack();
             }
         } else {
-            toast.error("Lỗi: " + result.message);
+            Alert.alert("Lỗi", "Mã OTP không chính xác hoặc đã hết hạn: " + result.message);
         }
         setLoading(false);
     };
@@ -259,3 +261,4 @@ const createStyles = (COLORS) => StyleSheet.create({
         color: COLORS.buttonText
     }
 });
+

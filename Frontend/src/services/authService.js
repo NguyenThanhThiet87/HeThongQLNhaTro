@@ -46,7 +46,7 @@ import { createAccount } from "../api/auth";
 export const verifyOtpRegisterService = async ( phone, code, name, password, role) => {
     const result = await verifyOTP(formatPhoneNumber(phone), code);
 
-    console.log("OTP verification result:", result);
+    if (__DEV__) console.info("[AUTH] OTP verification service completed", { success: Boolean(result?.success) });
 
     if (!result.success) {
         throw new Error(result.message || "OTP không hợp lệ");

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useVerifyOTPRegister } from "../../hooks/auth/useVerifyOTPRegister";
 import { useTheme } from "../../theme/useTheme";
-
+import { useNavigation } from "@react-navigation/native";
 import {
     View,
     Text,
@@ -10,21 +10,19 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
-    StyleSheet,
+    StyleSheet
 } from "react-native";
-import LoadingOverlay from "../../components/LoadingOverlay";
 
 import { MaterialIcons } from "@expo/vector-icons";
+import LoadingOverlay from "../../components/LoadingOverlay";
 
-import { verifyOTP } from "../../services/phoneAuthService";
-
-export default function OTPVerificationScreen({ navigation, route }) {
-    const { phone } = route.params;
-
+export default function OTPVerificationScreen_Registor({ route }) {
+    const navigation = useNavigation();
     const { COLORS } = useTheme();
     const styles = createStyles(COLORS);
 
-    const [loading, setLoading] = useState(false);
+    const { phone, name, password, role } = route.params;
+    const { verifyRegister, loading } = useVerifyOTPRegister();
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [seconds, setSeconds] = useState(119);
 
@@ -64,16 +62,16 @@ export default function OTPVerificationScreen({ navigation, route }) {
     };
 
     const handleVerify = async () => {
-        const code = otp.join("");
-        console.log("Verify OTP:", code);
-        const result = await verifyOTP(phone, code);
-        console.log("OTP verification result:", result);
-
-        if (result.success) {
-            navigation.navigate("ResetPassword", { phone, idToken: result.idToken });
-        } else {
-            Alert.alert("Lỗi", result.message);
-        }
+        if (__DEV__) console.info("[AUTH] Registration OTP verification started");
+        const result = await verifyRegister(
+            phone,
+            otp.join(""),
+            name,
+            password,
+            role
+        );
+        console.log("Verification loading:", loading);
+        if (__DEV__) console.info("[AUTH] Registration OTP verification completed", { success: Boolean(result?.success) });
     };
 
     const handleResend = () => {

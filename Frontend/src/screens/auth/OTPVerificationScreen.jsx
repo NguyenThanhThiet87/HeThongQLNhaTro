@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useVerifyOTPRegister } from "../../hooks/auth/useVerifyOTPRegister";
-import { useTheme } from "../../theme/useTheme";
 import { useNavigation } from "@react-navigation/native";
+import { useTheme } from "../../theme/useTheme";
+
 import {
     View,
     Text,
@@ -10,19 +10,21 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
-    StyleSheet
+    StyleSheet,
 } from "react-native";
-
-import { MaterialIcons } from "@expo/vector-icons";
 import LoadingOverlay from "../../components/LoadingOverlay";
 
-export default function OTPVerificationScreen_Registor({ route }) {
-    const navigation = useNavigation();
+import { MaterialIcons } from "@expo/vector-icons";
+
+import { verifyOTP } from "../../services/phoneAuthService";
+
+export default function OTPVerificationScreen({ navigation, route }) {
+    const { phone } = route.params;
+
     const { COLORS } = useTheme();
     const styles = createStyles(COLORS);
 
-    const { phone, name, password, role } = route.params;
-    const { verifyRegister, loading } = useVerifyOTPRegister();
+    const [loading, setLoading] = useState(false);
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [seconds, setSeconds] = useState(119);
 
@@ -62,16 +64,16 @@ export default function OTPVerificationScreen_Registor({ route }) {
     };
 
     const handleVerify = async () => {
-        console.log("Verifying OTP:", otp.join(""));
-        const result = await verifyRegister(
-            phone,
-            otp.join(""),
-            name,
-            password,
-            role
-        );
-        console.log("Verification loading:", loading);
-        console.log("Verify result:", result);
+        const code = otp.join("");
+        if (__DEV__) console.info("[AUTH] Password-reset OTP verification started");
+        const result = await verifyOTP(phone, code);
+        if (__DEV__) console.info("[AUTH] Password-reset OTP verification completed", { success: Boolean(result?.success) });
+
+        if (result.success) {
+            navigation.navigate("ResetPassword", { phone, idToken: result.idToken });
+        } else {
+            Alert.alert("Lỗi", result.message);
+        }
     };
 
     const handleResend = () => {

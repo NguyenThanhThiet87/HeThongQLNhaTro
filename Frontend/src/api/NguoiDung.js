@@ -80,7 +80,7 @@ export const updateNhaCungCapApi = (formData) => {
 };
 
 export const changePasswordApi = (data) => {
-  console.log("changePasswordApi - Sending data:", data);
+  if (__DEV__) console.info("[USER] Change-password API request started");
   return api.put("/NguoiDung/change-password", data, {
     headers: {
       "Content-Type": "application/json"

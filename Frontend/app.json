@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.thiet.hethongqlnhatro"
     },
     "android": {
       "adaptiveIcon": {
@@ -35,12 +36,9 @@
           "recordAudioAndroid": true,
           "barcodeScannerEnabled": true
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
-    "scheme": "myapp",
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.thiet.hethongqlnhatro"
-    }
+    "scheme": "myapp"
   }
 }

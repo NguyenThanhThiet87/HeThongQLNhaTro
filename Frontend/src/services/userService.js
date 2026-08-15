@@ -59,7 +59,7 @@ export const updateNtProfileService = async (data) => {
 };
 
 export const changePasswordService = async (data) => {
-    console.log("changePasswordService - Received data:", data);
+    if (__DEV__) console.info("[USER] Change-password request started");
     try {
         const user = await getCurrentUser();
         const res = await changePasswordApi({
