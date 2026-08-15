@@ -16,7 +16,7 @@ dblessConfig:
   configMap: kong-gcp-config
 
 proxy:
-  type: ClusterIP
+  type: LoadBalancer
 
 admin:
   enabled: false
