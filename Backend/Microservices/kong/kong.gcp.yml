@@ -1,0 +1,76 @@
+_format_version: "3.0"
+_transform: true
+
+# GCP production gateway configuration.
+# These Cloud Run URLs are reachable by Kong only from the project VPC.
+services:
+  - name: identity-service
+    url: https://identityservice-528371198639.asia-southeast1.run.app
+    routes:
+      - name: identity-route
+        paths: [ /api/NguoiDung, /api/otp ]
+        strip_path: false
+
+  - name: property-service
+    url: https://propertyservice-528371198639.asia-southeast1.run.app
+    routes:
+      - name: property-route
+        paths: [ /api/PhongNhaTro ]
+        strip_path: false
+
+  - name: contract-service
+    url: https://contractservice-528371198639.asia-southeast1.run.app
+    routes:
+      - name: contract-route
+        paths: [ /api/HopDong ]
+        strip_path: false
+
+  - name: utility-service
+    url: https://utilityservice-528371198639.asia-southeast1.run.app
+    routes:
+      - name: utility-route
+        paths: [ /api/DichVu ]
+        strip_path: false
+
+  - name: billing-service
+    url: https://billingservice-528371198639.asia-southeast1.run.app
+    routes:
+      - name: billing-route
+        paths: [ /api/HoaDonThanhToan, /api/DichVuDonHang, /api/PayOS, /api/VNPay ]
+        strip_path: false
+
+  - name: maintenance-service
+    url: https://maintenanceservice-528371198639.asia-southeast1.run.app
+    routes:
+      - name: maintenance-route
+        paths: [ /api/SuCoBaoTri ]
+        strip_path: false
+
+  - name: communication-service
+    url: https://communicationservice-528371198639.asia-southeast1.run.app
+    routes:
+      - name: communication-route
+        paths: [ /api/ThongBao ]
+        strip_path: false
+
+plugins:
+  - name: cors
+    config:
+      # Replace this with the real frontend domains before production.
+      origins: [ "https://app.example.com" ]
+      methods: [ GET, POST, PUT, PATCH, DELETE, OPTIONS ]
+      headers: [ Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Authorization, X-Request-ID ]
+      exposed_headers: [ X-Request-ID ]
+      credentials: true
+      max_age: 3600
+  - name: correlation-id
+    config:
+      header_name: X-Request-ID
+      generator: uuid
+      echo_downstream: true
+  - name: rate-limiting
+    config:
+      minute: 120
+      policy: local
+      limit_by: ip
+      fault_tolerant: true

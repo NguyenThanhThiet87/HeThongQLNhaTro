@@ -1,0 +1,23 @@
+# Helm values for Kong Gateway OSS on the kong-gateway GKE Autopilot cluster.
+# The proxy remains private; an External Application Load Balancer will be the
+# only public entry point in a later step.
+env:
+  database: "off"
+
+ingressController:
+  enabled: false
+
+replicaCount: 2
+
+dblessConfig:
+  configMap: kong-gcp-config
+
+proxy:
+  type: ClusterIP
+
+admin:
+  enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
