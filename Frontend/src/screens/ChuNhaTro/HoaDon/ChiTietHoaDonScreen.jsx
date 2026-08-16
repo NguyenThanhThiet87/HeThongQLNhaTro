@@ -98,7 +98,7 @@ export default function InvoiceDetailScreen({ route }) {
         </View>
 
         {/* Customer Info */}
-        <TouchableOpacity style={styles.customerSection} onPress={() => navigation.navigate("Contract", { screen: "HoSo", params: { maNd: hoaDon?.nguoiDaiDien?.maNt } })}>
+                <TouchableOpacity style={styles.customerSection} onPress={() => navigation.navigate("Profile", { screen: "HopDong", params: { screen: "HoSo", params: { maNd: hoaDon?.nguoiDaiDien?.maNt } } })}>
           <View style={styles.avatarContainer}>
             <Image
               source={{ uri: hoaDon?.nguoiDaiDien?.avatar || "https://i.pravatar.cc/300" }}

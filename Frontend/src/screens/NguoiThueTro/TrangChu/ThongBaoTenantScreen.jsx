@@ -13,6 +13,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../../theme/useTheme";
 import { getCurrentUser } from "../../../utils/decodeToken";
 import { getNotifications, markAsReadApi } from "../../../api/ThongBao";
+import AppHeader from "../../../components/AppHeader";
+import { FONT_SIZES, FONT_WEIGHTS } from "../../../theme/typography";
 
 export default function ThongBaoTenantScreen({ navigation }) {
     const { COLORS } = useTheme();
@@ -88,13 +90,17 @@ export default function ThongBaoTenantScreen({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <MaterialIcons name="arrow-back" size={24} color={COLORS.textMain} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Thông báo</Text>
-                <View style={{ width: 24 }} />
-            </View>
+            <AppHeader
+                left={
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <MaterialIcons name="arrow-back-ios" size={18} color={COLORS.textMain} style={{ marginLeft: 6 }} />
+                    </TouchableOpacity>
+                }
+                center={
+                    <Text style={styles.headerTitle}>Thông báo</Text>
+                }
+                right={<View style={{ width: 40 }} />}
+            />
 
             {loading ? (
                 <View style={styles.center}>
@@ -122,16 +128,7 @@ export default function ThongBaoTenantScreen({ navigation }) {
 
 const createStyles = (COLORS) => StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.bgLight },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingHorizontal: 20,
-        paddingTop: 50,
-        paddingBottom: 20,
-        backgroundColor: COLORS.card,
-    },
-    headerTitle: { fontSize: 18, fontWeight: "bold", color: COLORS.textMain },
+    headerTitle: { fontSize: FONT_SIZES.header, fontWeight: FONT_WEIGHTS.bold, color: COLORS.textMain },
     center: { flex: 1, justifyContent: "center", alignItems: "center" },
     notiItem: {
         flexDirection: "row",

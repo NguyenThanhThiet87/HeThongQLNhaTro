@@ -101,14 +101,14 @@ const ThayDoiThongTinCaNhan = ({ route }) => {
 
     const confirmLocation = async () => {
         if (!tempLocation) return;
-        
+
         try {
             setLoadingLocation(true);
             const [geo] = await Location.reverseGeocodeAsync({
                 latitude: tempLocation.latitude,
                 longitude: tempLocation.longitude
             });
-            
+
             if (geo) {
                 const addressStr = `${geo.streetNumber ? geo.streetNumber + ' ' : ''}${geo.street ? geo.street + ', ' : ''}${geo.district ? geo.district + ', ' : ''}${geo.city || geo.subregion || ''}`;
                 setKhuVucPv(addressStr);
@@ -236,7 +236,7 @@ const ThayDoiThongTinCaNhan = ({ route }) => {
                                         {loadingLocation ? <ActivityIndicator size="small" color={COLORS.primary} /> : <MaterialIcons name="my-location" size={24} color={COLORS.primary} />}
                                     </TouchableOpacity>
                                 </View>
-                                
+
                                 <TouchableOpacity style={styles.mapPreview} onPress={requestLocationPermission}>
                                     {!selectedLocation ? (
                                         <View style={styles.emptyMap}>
@@ -291,7 +291,7 @@ const ThayDoiThongTinCaNhan = ({ route }) => {
                             <Text style={styles.modalSaveBtnText}>Xong</Text>
                         </TouchableOpacity>
                     </View>
-                    
+
                     <MapView
                         ref={mapRef}
                         style={styles.fullMap}
@@ -303,13 +303,13 @@ const ThayDoiThongTinCaNhan = ({ route }) => {
 
                     {/* Static Marker in center for drag effect */}
                     <View style={styles.staticMarkerContainer} pointerEvents="none">
-                         <MaterialIcons name="location-on" size={48} color={COLORS.primary} />
-                         <View style={styles.markerShadow} />
+                        <MaterialIcons name="location-on" size={48} color={COLORS.primary} />
+                        <View style={styles.markerShadow} />
                     </View>
 
                     <View style={styles.mapInfo}>
-                         <MaterialIcons name="info" size={18} color={COLORS.primary} />
-                         <Text style={styles.mapInfoText}>Kéo bản đồ để ghim vị trí chính xác nhất</Text>
+                        <MaterialIcons name="info" size={18} color={COLORS.primary} />
+                        <Text style={styles.mapInfoText}>Kéo bản đồ để ghim vị trí chính xác nhất</Text>
                     </View>
                 </View>
             </Modal>
@@ -375,7 +375,7 @@ const createStyles = (COLORS) => StyleSheet.create({
         borderColor: COLORS.primary + '33'
     },
     changeBtnText: { color: COLORS.primary, fontWeight: '700', fontSize: 13 },
-    
+
     // Map Styles
     mapContainer: { gap: 8 },
     addressInputRow: { flexDirection: 'row' },

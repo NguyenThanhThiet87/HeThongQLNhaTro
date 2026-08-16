@@ -1,11 +1,12 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Platform, StatusBar as RNStatusBar } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useTheme } from "../theme/useTheme";
+import { COMMON_STYLES, FONT_SIZES, FONT_WEIGHTS } from "../theme/typography";
 
-export default function AppHeader({ left, center, right, style}) {
+export default function AppHeader({ left, center, right, style }) {
     const { COLORS, isDark } = useTheme();
-    
+
     // Prevent style objects from being recreated every render cycle
     const styles = React.useMemo(() => createStyles(COLORS), [COLORS]);
 
@@ -27,10 +28,10 @@ const createStyles = (COLORS) => StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         paddingHorizontal: 16,
-        paddingVertical: 10,
+        paddingVertical: 8,
         borderBottomWidth: 1,
         borderBottomColor: COLORS.border,
-        paddingTop: 40,
+        paddingTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight ? RNStatusBar.currentHeight + 10 : 40) : 40,
         backgroundColor: COLORS.bgLight,
     },
     left: { flex: 1, flexDirection: "row", alignItems: "center" },

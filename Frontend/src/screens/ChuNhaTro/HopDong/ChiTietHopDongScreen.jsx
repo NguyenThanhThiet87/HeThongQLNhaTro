@@ -20,7 +20,9 @@ import { InfoCard } from "../../../components/InfoCard.jsx";
 import { InfoRow } from "../../../components/InfoRow.jsx";
 import ActionConfirmModal from "../../../components/ActionConfirmModal.jsx";
 import LoadingOverlay from "../../../components/LoadingOverlay.jsx";
+import AppHeader from "../../../components/AppHeader.jsx";
 import toast from "../../../utils/toast.js";
+import { FONT_SIZES, FONT_WEIGHTS } from "../../../theme/typography.js";
 
 import { deleteThanhVienHopDongApi, huyHopDongApi } from "../../../api/HopDong.js";
 import { TRANG_THAI_HOP_DONG, getColorTrangThaiHopDong } from "../../../constants/TRANG_THAI_HOP_DONG.js";
@@ -99,21 +101,23 @@ export default function ChiTietHopDongScreen({ route }) {
         <View style={styles.container}>
 
             {/* HEADER */}
-            <View style={styles.header}>
-
-                <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.goBack()}>
-                    <MaterialIcons name="arrow-back-ios" size={18} color="#cbd5e1" />
-                </TouchableOpacity>
-
-                <Text style={styles.headerTitle}>
-                    Chi tiết Hợp đồng
-                </Text>
-
-                <TouchableOpacity style={styles.iconBtn}>
-                    <MaterialIcons name="more-vert" size={22} color={PRIMARY} />
-                </TouchableOpacity>
-
-            </View>
+            <AppHeader
+                left={
+                    <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.goBack()}>
+                        <MaterialIcons name="arrow-back-ios" size={18} color={COLORS.textMain} style={{ marginLeft: 6 }} />
+                    </TouchableOpacity>
+                }
+                center={
+                    <Text style={styles.headerTitle}>
+                        Chi tiết Hợp đồng
+                    </Text>
+                }
+                right={
+                    <TouchableOpacity style={styles.iconBtn}>
+                        <MaterialIcons name="more-vert" size={22} color={PRIMARY} />
+                    </TouchableOpacity>
+                }
+            />
 
             {/* CONTENT */}
             <ScrollView
@@ -346,21 +350,10 @@ const createStyles = (COLORS) => StyleSheet.create({
         backgroundColor: COLORS.bgLight
     },
 
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingTop: 50,
-        paddingHorizontal: 10,
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-        borderColor: COLORS.border
-    },
-
     headerTitle: {
         color: COLORS.textMain,
-        fontSize: 22,
-        fontWeight: "bold"
+        fontSize: FONT_SIZES.header,
+        fontWeight: FONT_WEIGHTS.bold,
     },
 
     iconBtn: {
@@ -400,31 +393,33 @@ const createStyles = (COLORS) => StyleSheet.create({
     },
 
     label: {
-        fontSize: 12,
+        fontSize: FONT_SIZES.caption,
         color: COLORS.textMain,
         marginBottom: 10
     },
 
     labelPrimary: {
-        fontSize: 12,
+        fontSize: FONT_SIZES.caption,
         color: COLORS.primary,
-        fontWeight: "600"
+        fontWeight: FONT_WEIGHTS.semiBold,
     },
 
     contractCode: {
-        fontSize: 20,
-        fontWeight: "bold",
+        fontSize: FONT_SIZES.section,
+        fontWeight: FONT_WEIGHTS.bold,
         color: COLORS.textMain
     },
 
     value: {
         color: COLORS.textMain,
-        fontWeight: "bold"
+        fontWeight: FONT_WEIGHTS.bold,
+        fontSize: FONT_SIZES.body,
     },
 
     primaryText: {
         color: COLORS.primary,
-        fontWeight: "bold"
+        fontWeight: FONT_WEIGHTS.bold,
+        fontSize: FONT_SIZES.body,
     },
 
     badgeGeneric: {
@@ -435,8 +430,8 @@ const createStyles = (COLORS) => StyleSheet.create({
     },
 
     badgeGenericText: {
-        fontWeight: "bold",
-        fontSize: 12
+        fontWeight: FONT_WEIGHTS.bold,
+        fontSize: FONT_SIZES.caption,
     },
 
     sectionTitleRow: {
@@ -448,7 +443,8 @@ const createStyles = (COLORS) => StyleSheet.create({
 
     sectionTitle: {
         color: COLORS.textMain,
-        fontWeight: "bold"
+        fontWeight: FONT_WEIGHTS.bold,
+        fontSize: FONT_SIZES.bodyLarge,
     },
 
     progressContainer: {

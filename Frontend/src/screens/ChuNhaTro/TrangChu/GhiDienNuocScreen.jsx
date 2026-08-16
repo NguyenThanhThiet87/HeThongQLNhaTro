@@ -46,7 +46,7 @@ export default function GhiDienNuocScreen() {
                         </View>
                     </View>
 
-                    <TouchableOpacity style={styles.historyBtn} onPress={()=> navigation.navigate("LichSuDienNuoc")}>
+                    <TouchableOpacity style={styles.historyBtn} onPress={() => navigation.navigate("LichSuDienNuoc")}>
                         <MaterialIcons name="history" size={22} color={PRIMARY} />
                     </TouchableOpacity>
                 </View>

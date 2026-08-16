@@ -1,6 +1,6 @@
-import { getNguoiThueApi, updateNguoiThueApi, changePasswordApi, getChuNhaTroApi, updateChuNhaTroApi, getNhaCungCapApi, updateNhaCungCapApi } from "../api/NguoiDung";
+import { getNguoiThueApi, updateNguoiThueApi, changePasswordApi, getChuNhaTroApi, updateChuNhaTroApi, getNhaCungCapApi, updateNhaCungCapApi, getNguoiDungApi } from "../api/NguoiDung";
 
-import { getCurrentUser, getAccessToken } from "../utils/decodeToken";
+import { getCurrentUser } from "../utils/decodeToken";
 
 export const getUserNtProfileService = async () => {
     const user = await getCurrentUser();
@@ -72,19 +72,57 @@ export const changePasswordService = async (data) => {
         console.error("changePasswordService error:", error);
         return {};
     }
-}
+};
 
 //CHỦ NHÀ TRỌ
 export const getUserCntProfileService = async () => {
     const user = await getCurrentUser();
-
-    const response = await getChuNhaTroApi(user.maNd);
-
-    if (!response.success) {
-        throw new Error(response.message);
+    if (!user || !user.maNd) {
+        return null;
     }
 
-    return response.data;
+    try {
+        const response = await getChuNhaTroApi(user.maNd);
+        if (response && response.success && response.data) {
+            return {
+                ...response.data,
+                maVaiTro: response.data.maVaiTro || user.maVaiTro,
+                maNguoiDung: response.data.maChuNt || user.maNd
+            };
+        }
+    } catch (error) {
+        console.log("getChuNhaTroApi fallback to getNguoiDungApi:", error.message);
+    }
+
+    // Fallback sang thông tin người dùng chung
+    try {
+        const ndRes = await getNguoiDungApi(user.maNd);
+        if (ndRes && (ndRes.success || ndRes.data)) {
+            const data = ndRes.data || ndRes;
+            return {
+                maChuNt: data.maNd || user.maNd,
+                maNguoiDung: data.maNd || user.maNd,
+                hoTen: data.hoTen || user.hoTen,
+                avatar: data.avatar,
+                soDt: data.soDt || user.soDt,
+                gioiTinh: data.gioiTinh,
+                soCccd: data.soCccd,
+                diaChi: data.diaChi,
+                ngaySinh: data.ngaySinh,
+                maVaiTro: data.maVaiTro || user.maVaiTro
+            };
+        }
+    } catch (e) {
+        console.log("getNguoiDungApi fallback error:", e.message);
+    }
+
+    return {
+        maChuNt: user.maNd,
+        maNguoiDung: user.maNd,
+        hoTen: user.hoTen,
+        soDt: user.soDt,
+        maVaiTro: user.maVaiTro
+    };
 };
 
 export const updateCntProfileService = async (data) => {

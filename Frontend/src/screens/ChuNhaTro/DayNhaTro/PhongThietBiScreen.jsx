@@ -11,6 +11,8 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../../theme/useTheme";
 import { getPhongThietBiApi, getThietBisApi, updatePhongThietBiApi, updatePhongThietBiAllApi } from "../../../api/SuCo";
+import AppHeader from "../../../components/AppHeader";
+import { FONT_SIZES, FONT_WEIGHTS } from "../../../theme/typography";
 
 export default function PhongThietBiScreen({ route, navigation }) {
     const { maPhong, maDayNt } = route.params;
@@ -91,17 +93,23 @@ export default function PhongThietBiScreen({ route, navigation }) {
 
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
-                    <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Thiết bị phòng</Text>
-                <TouchableOpacity style={styles.iconBtn}>
-                    <MaterialIcons name="more-vert" size={24} color={COLORS.primary} />
-                </TouchableOpacity>
-            </View>
+            <AppHeader
+                left={
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
+                        <MaterialIcons name="arrow-back-ios" size={18} color={COLORS.textMain} style={{ marginLeft: 6 }} />
+                    </TouchableOpacity>
+                }
+                center={
+                    <Text style={styles.headerTitle}>Thiết bị phòng</Text>
+                }
+                right={
+                    <TouchableOpacity style={styles.iconBtn}>
+                        <MaterialIcons name="more-vert" size={24} color={COLORS.primary} />
+                    </TouchableOpacity>
+                }
+            />
 
             {loading ? (
                 <View style={styles.center}>
@@ -205,24 +213,14 @@ export default function PhongThietBiScreen({ route, navigation }) {
                     <Text style={styles.confirmText}>Xác nhận &amp; Cập nhật</Text>
                 </TouchableOpacity>
             </View>
-        </SafeAreaView>
+        </View>
     );
 }
 
 const createStyles = (COLORS) => StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.bgLight },
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: 16,
-        paddingTop: 50,
-        paddingBottom: 12,
-        backgroundColor: COLORS.card,
-        elevation: 2,
-    },
     iconBtn: { padding: 8 },
-    headerTitle: { fontSize: 20, fontWeight: "700", color: COLORS.textMain },
+    headerTitle: { fontSize: FONT_SIZES.header, fontWeight: FONT_WEIGHTS.bold, color: COLORS.textMain },
     center: { flex: 1, justifyContent: "center", alignItems: "center" },
     content: { padding: 16, paddingBottom: 120 },
     sectionLabel: { fontSize: 11, fontWeight: "700", color: COLORS.textMuted, letterSpacing: 1.5, marginBottom: 4 },

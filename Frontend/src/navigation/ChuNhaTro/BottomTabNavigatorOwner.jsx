@@ -6,10 +6,10 @@ import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 
-import HopDongStack from "./HopDongStack";
 import HoaDonStack from "./HoaDonStack";
 import CaNhanStack from "./CaNhanStack";
 import TrangChuStack from "./TrangChuStack";
+import CommunityComingSoonScreen from "../../screens/ChuNhaTro/CongDong/CommunityComingSoonScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -39,8 +39,8 @@ export default function BottomTabNavigatorOwner() {
             case "Bill":
               icon = "receipt";
               break;
-            case "Contract":
-              icon = "assignment";
+            case "Community":
+              icon = "groups";
               break;
             case "Profile":
               icon = "person";
@@ -81,15 +81,9 @@ export default function BottomTabNavigatorOwner() {
       />
 
       <Tab.Screen
-        name="Contract"
-        component={HopDongStack}
-        options={{ tabBarLabel: "Hợp đồng" }}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            e.preventDefault();
-            navigation.navigate("Contract", { screen: "ContractMain" });
-          },
-        })}
+        name="Community"
+        component={CommunityComingSoonScreen}
+        options={{ tabBarLabel: "Cộng đồng" }}
       />
 
       <Tab.Screen

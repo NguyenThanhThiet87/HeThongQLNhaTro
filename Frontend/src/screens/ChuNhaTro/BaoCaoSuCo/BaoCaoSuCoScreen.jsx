@@ -17,6 +17,8 @@ import { getAllBaoCaoSuCoApi } from "../../../api/SuCo";
 import { getCurrentUser } from '../../../utils/decodeToken';
 import { ActivityIndicator } from 'react-native';
 import { formatDate } from '../../../utils/formatNgaySinh';
+import AppHeader from '../../../components/AppHeader';
+import { FONT_SIZES, FONT_WEIGHTS } from '../../../theme/typography';
 
 const { width } = Dimensions.get('window');
 
@@ -86,21 +88,24 @@ const BaoCaoSuCoScreen = ({ navigation }) => {
     const totalToProcess = pendingCount + processingCount;
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" />
+        <View style={styles.container}>
+            {/* APP HEADER */}
+            <AppHeader
+                left={
+                    <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+                        <MaterialIcons name="arrow-back-ios" size={18} color={COLORS.textMain} style={{ marginLeft: 6 }} />
+                    </TouchableOpacity>
+                }
+                center={
+                    <View style={{ alignItems: 'center' }}>
+                        <Text style={styles.headerTitle}>Quản lý sự cố</Text>
+                        <Text style={styles.headerSubtitle}>{totalToProcess} báo cáo cần xử lý</Text>
+                    </View>
+                }
+                right={<View style={{ width: 40 }} />}
+            />
 
-            {/* HEADER GHI TRỰC TIẾP */}
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-                    <MaterialIcons name="arrow-back" size={24} color={COLORS.textMain} />
-                </TouchableOpacity>
-                <View style={styles.headerTitleContainer}>
-                    <Text style={styles.headerTitle}>Quản lý sự cố</Text>
-                    <Text style={styles.headerSubtitle}>{totalToProcess} báo cáo mới cần xử lý</Text>
-                </View>
-            </View>
-
-            {/* TABS GHI TRỰC TIẾP */}
+            {/* TABS */}
             <View style={styles.tabContainer}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabScroll}>
                     {['all', 'pending', 'processing', 'completed'].map((tabId) => {
@@ -174,28 +179,18 @@ const BaoCaoSuCoScreen = ({ navigation }) => {
                     )}
                 </ScrollView>
             )}
-        </SafeAreaView>
+        </View>
     );
 };
 
 const createStyles = (COLORS) => StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#FFFFFF' },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingTop: Platform.OS === 'ios' ? 10 : 40,
-        paddingBottom: 15,
-    },
+    container: { flex: 1, backgroundColor: COLORS.bgLight },
     backBtn: {
-        padding: 8,
-        backgroundColor: COLORS.bgLight,
-        borderRadius: 12,
-        marginRight: 15,
+        padding: 6,
+        borderRadius: 8,
     },
-    headerTitleContainer: { flex: 1 },
-    headerTitle: { fontSize: 20, fontWeight: 'bold', color: COLORS.textMain },
-    headerSubtitle: { fontSize: 13, color: COLORS.textMuted, marginTop: 2 },
+    headerTitle: { fontSize: FONT_SIZES.header, fontWeight: FONT_WEIGHTS.bold, color: COLORS.textMain },
+    headerSubtitle: { fontSize: FONT_SIZES.caption, color: COLORS.textMuted, marginTop: 2 },
 
     tabContainer: { marginVertical: 10 },
     tabScroll: { paddingHorizontal: 20, gap: 10 },

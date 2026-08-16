@@ -18,6 +18,7 @@ import { getCurrentUser } from "../../../utils/decodeToken";
 import { getDayNhaTrosApi, getThongKePhongApi } from "../../../api/PhongTro";
 import { getDoanhThuApi } from "../../../api/HoaDon";
 import { formatCurrency } from "../../../utils/formatCurrency";
+import { useUnreadNotifications } from "../../../hooks/useUnreadNotifications";
 
 export default function DashboardScreen() {
     const { COLORS } = useTheme();
@@ -28,6 +29,7 @@ export default function DashboardScreen() {
     const [dayNhaTros, setDayNhaTros] = useState([]);
     const [doanhThu, setDoanhThu] = useState();
     const [thongKePhong, setThongKePhong] = useState();
+    const { hasUnreadNotifications } = useUnreadNotifications();
 
     const fetchData = useCallback(async () => {
         const currentUser = await getCurrentUser();
@@ -74,7 +76,7 @@ export default function DashboardScreen() {
                     onPress={() => navigation.navigate("ThongBao")}
                 >
                     <MaterialIcons name="notifications" size={24} color={COLORS.primary} />
-                    <View style={styles.notificationDot} />
+                    {hasUnreadNotifications && <View style={styles.notificationDot} />}
                 </TouchableOpacity>
             </View>
 
@@ -189,7 +191,7 @@ export default function DashboardScreen() {
                         </View>
                         <Text style={styles.actionText}>Tạo hóa đơn</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate("Contract", { screen: "TaoHopDongB1", params: { id: null } })}>
+                    <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate("Profile", { screen: "HopDong", params: { screen: "TaoHopDongB1", params: { id: null } } })}>
                         <View style={styles.actionIcon}>
                             <MaterialIcons name="bolt" size={26} color="#facc15" />
                         </View>

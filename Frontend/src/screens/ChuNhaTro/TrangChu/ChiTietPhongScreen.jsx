@@ -126,7 +126,7 @@ export default function ChiTietPhongScreen({ navigation, route }) {
                             NGƯỜI ĐẠI DIỆN
                         </Text>
 
-                        <TouchableOpacity style={styles.cardRow} onPress={() => navigation.navigate("Contract", { screen: "HoSo", params: { maNd: hopDong?.dsNguoiThue?.[0]?.maNt } })}>
+                        <TouchableOpacity style={styles.cardRow} onPress={() => navigation.navigate("Profile", { screen: "HopDong", params: { screen: "HoSo", params: { maNd: hopDong?.dsNguoiThue?.[0]?.maNt } } })}>
 
                             <Image
                                 source={{
@@ -185,7 +185,7 @@ export default function ChiTietPhongScreen({ navigation, route }) {
                                     </Text>
                                 </View>
 
-                                <TouchableOpacity style={styles.contractBtn} onPress={() => navigation.navigate("Contract", { screen: "ChiTietHopDong", params: { maHopDong: hopDong?.maHopDong } })}>
+                                <TouchableOpacity style={styles.contractBtn} onPress={() => navigation.navigate("Profile", { screen: "HopDong", params: { screen: "ChiTietHopDong", params: { maHopDong: hopDong?.maHopDong } } })}>
                                     <Text style={styles.contractBtnText}>
                                         Xem chi tiết
                                     </Text>
@@ -222,7 +222,7 @@ export default function ChiTietPhongScreen({ navigation, route }) {
                 </Text>
 
                 <View style={styles.actionGrid}>
-                    <TouchableOpacity style={styles.actionCard} key={"them-nguoi"} onPress={() => navigation.navigate("Contract", { screen: "TaoHopDongB1", params: { maDayNtParam: phongTro?.maDayNt, maPhongParam: phongTro.maPhong } })}>
+                    <TouchableOpacity style={styles.actionCard} key={"them-nguoi"} onPress={() => navigation.navigate("Profile", { screen: "HopDong", params: { screen: "TaoHopDongB1", params: { maDayNtParam: phongTro?.maDayNt, maPhongParam: phongTro.maPhong } } })}>
                         <MaterialIcons name="person-add" size={24} color={PRIMARY} />
                         <Text style={styles.actionText}>Thêm người</Text>
                     </TouchableOpacity>

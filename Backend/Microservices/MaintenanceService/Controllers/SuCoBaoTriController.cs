@@ -6,10 +6,10 @@ using MaintenanceService.DTOs;
 using MaintenanceService.Models;
 using MaintenanceService.Services;
 using MaintenanceService.DTOs.ResponseDtos;
-using MaintenanceService.Data;
 using Microsoft.AspNetCore.SignalR;
 using MaintenanceService.Constants;
 using MaintenanceService.Hubs;
+using MaintenanceService.Data;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -92,12 +92,11 @@ public class SuCoBaoTriController : ControllerBase
                 await _context.SaveChangesAsync();
 
                 // 5. Gửi thông báo Real-time qua SignalR
-                // Lưu ý: Sử dụng phương thức chung "ReceiveNotification" để chủ nhà nhận được mọi loại thông báo
                 await _hubContext.Clients.User(maChuNt.ToString()).SendAsync("ReceiveNotification", new
                 {
                     title = thongBao.TieuDe,
                     message = thongBao.NoiDung,
-                    type = "INCIDENT", // Phân loại để Client có thể xử lý điều hướng nếu cần
+                    type = "INCIDENT",
                     createdAt = thongBao.NgayTao,
                     maSuCo = bc.MaSuCo
                 });
@@ -112,8 +111,6 @@ public class SuCoBaoTriController : ControllerBase
             return StatusCode(500, new { success = false, message = "Lỗi hệ thống: " + ex.Message });
         }
     }
-
-
 
     // Chủ nhà cập nhật trạng thái
     [HttpPut("cap-nhat-trang-thai/{id}")]
@@ -142,6 +139,12 @@ public class SuCoBaoTriController : ControllerBase
     public async Task<IActionResult> GetThietBi()
     {
         var data = await _context.ThietBis
+            .Select(t => new
+            {
+                t.MaThBi,
+                t.TenThBi,
+                t.AnhThBi
+            })
             .ToListAsync();
         return Ok(new ApiResponse<Object>(true, "Lấy danh sách thiết bị thành công", data));
     }
@@ -149,7 +152,9 @@ public class SuCoBaoTriController : ControllerBase
     [HttpGet("thiet-bi-phong")]
     public async Task<IActionResult> GetThietBiPhong([FromQuery] int maPhong)
     {
-        var data = await _context.PhongThietBis.Where(ptb => ptb.MaPhong == maPhong).Include(ptb => ptb.MaThBiNavigation)
+        var data = await _context.PhongThietBis
+            .Where(ptb => ptb.MaPhong == maPhong)
+            .Include(ptb => ptb.MaThBiNavigation)
             .ToListAsync();
 
         List<PhongThietBiDto> lstPtb = data.Select(item => new PhongThietBiDto
@@ -157,8 +162,8 @@ public class SuCoBaoTriController : ControllerBase
             MaPhongThietBi = item.MaPhongThietBi,
             MaPhong = item.MaPhong,
             MaThBi = item.MaThBi,
-            TenThietBi = item.MaThBiNavigation.TenThBi,
-            AnhThietBi = item.MaThBiNavigation.AnhThBi
+            TenThietBi = item.MaThBiNavigation != null ? item.MaThBiNavigation.TenThBi : "Thiết bị",
+            AnhThietBi = item.MaThBiNavigation != null ? item.MaThBiNavigation.AnhThBi : null
         }).ToList();
 
         return Ok(new ApiResponse<Object>(true, "Lấy danh sách thiết bị trong phòng thành công", lstPtb));
@@ -232,20 +237,15 @@ public class SuCoBaoTriController : ControllerBase
             // 3. Xử lý cho từng phòng
             foreach (var maPhong in roomIds)
             {
-                // Thiết bị hiện tại của riêng phòng này
                 var roomDevices = allCurrentDevices.Where(x => x.MaPhong == maPhong).ToList();
                 var roomMaThBis = roomDevices.Select(x => x.MaThBi).ToList();
 
-                // A. Xác định những thiết bị cần XÓA của phòng này
-                // (Trong DB phòng này đang có cái MaThBi mà lstThietBi gửi lên không có)
                 var toRemove = roomDevices.Where(x => !lstThietBi.Contains(x.MaThBi)).ToList();
                 if (toRemove.Any())
                 {
                     _context.PhongThietBis.RemoveRange(toRemove);
                 }
 
-                // B. Xác định những thiết bị cần THÊM MỚI cho phòng này
-                // (lstThietBi gửi lên có nhưng DB phòng này chưa có)
                 var toAddIds = lstThietBi.Where(x => !roomMaThBis.Contains(x)).ToList();
                 foreach (var maThBi in toAddIds)
                 {
@@ -300,19 +300,18 @@ public class SuCoBaoTriController : ControllerBase
     {
         try
         {
-            // Sử dụng Include và ThenInclude để đi sâu vào các quan hệ lồng nhau
             var data = await _context.BaoCaoSuCos
-                .Include(sc => sc.MaNtNavigation) // Vào bảng NguoiThue
-                    .ThenInclude(nt => nt.MaNtNavigation) // Vào bảng NguoiDung (để lấy HoTen, Sdt)
                 .Include(sc => sc.MaNtNavigation)
-                    .ThenInclude(nt => nt.HopDongNguoiThues) // Vào danh sách Hợp đồng của người thuê
-                        .ThenInclude(hdnt => hdnt.MaHopDongNavigation) // Vào thông tin Hợp đồng
-                            .ThenInclude(hd => hd.MaPhongNavigation) // Vào thông tin Phòng
-                                .ThenInclude(p => p.MaDayNtNavigation) // Vào thông tin Dãy nhà trọ
-                .Include(sc => sc.MaTtxuLyNavigation) // Lấy trạng thái xử lý
-                .Include(sc => sc.ChiTietSuCos) // Lấy danh sách sự cố chi tiết
-                    .ThenInclude(ct => ct.MaPhongThietBiNavigation) // Vào bảng Phòng-Thiết bị
-                        .ThenInclude(ptb => ptb.MaThBiNavigation) // Lấy thông tin Thiết bị gốc
+                    .ThenInclude(nt => nt.MaNtNavigation)
+                .Include(sc => sc.MaNtNavigation)
+                    .ThenInclude(nt => nt.HopDongNguoiThues)
+                        .ThenInclude(hdnt => hdnt.MaHopDongNavigation)
+                            .ThenInclude(hd => hd.MaPhongNavigation)
+                                .ThenInclude(p => p.MaDayNtNavigation)
+                .Include(sc => sc.MaTtxuLyNavigation)
+                .Include(sc => sc.ChiTietSuCos)
+                    .ThenInclude(ct => ct.MaPhongThietBiNavigation)
+                        .ThenInclude(ptb => ptb.MaThBiNavigation)
                 .FirstOrDefaultAsync(sc => sc.MaSuCo == maSuCo);
 
             if (data == null)
@@ -320,29 +319,24 @@ public class SuCoBaoTriController : ControllerBase
                 return NotFound(new ApiResponse<object>(false, "Không tìm thấy báo cáo sự cố", null));
             }
 
-            // Lấy thông tin hợp đồng đầu tiên để lấy số phòng/tên dãy
             var hopDongDauTien = data.MaNtNavigation?.HopDongNguoiThues.FirstOrDefault()?.MaHopDongNavigation;
             var phong = hopDongDauTien?.MaPhongNavigation;
 
-            // Map sang dữ liệu trả về
             var result = new
             {
                 MaSuCo = data.MaSuCo,
                 HoTenNt = data.MaNtNavigation?.MaNtNavigation?.HoTen ?? "N/A",
                 TenPhong = phong?.SoPhong ?? "P.---",
                 TenDayNt = phong?.MaDayNtNavigation?.TenDayNt ?? "Dãy ---",
-                SdtNt = data.MaNtNavigation?.MaNtNavigation?.SoDt ?? "N/A", // Kiểm tra lại SoDt hay Sdt
+                SdtNt = data.MaNtNavigation?.MaNtNavigation?.SoDt ?? "N/A",
                 ThoiGian = data.ThoiGian,
                 MaTtxuLy = data.MaTtxuLy,
                 TenTrangThai = data.MaTtxuLyNavigation?.TenTtxuLy ?? "Chờ xử lý",
 
-                // Lấy danh sách thiết bị chi tiết
                 Details = data.ChiTietSuCos.Select(ct => new {
                     MaDevice = ct.MaPhongThietBiNavigation?.MaThBi,
                     TenThietBi = ct.MaPhongThietBiNavigation?.MaThBiNavigation?.TenThBi,
                     MoTa = ct.MoTaSuCo,
-                    // Nếu bạn muốn hỗ trợ nhiều ảnh, dùng .Split(';')
-                    // Nếu chỉ 1 ảnh chuỗi, dùng trực tiếp ct.MinhChung
                     Image = ct.MinhChung
                 }).ToList()
             };
@@ -354,15 +348,15 @@ public class SuCoBaoTriController : ControllerBase
             return BadRequest(new ApiResponse<object>(false, "Lỗi hệ thống: " + ex.Message, null));
         }
     }
+
     [HttpPost("cap-nhat-trang-thai")]
-    public async Task<IActionResult> UpdateTrangThai([FromBody]  UpdateStatusRequest model)
+    public async Task<IActionResult> UpdateTrangThai([FromBody] UpdateStatusRequest model)
     {
         try
         {
             var suCo = await _context.BaoCaoSuCos.FindAsync(model.MaSuCo);
             if (suCo == null) return NotFound(new ApiResponse<object>(false, "Không tìm thấy sự cố", null));
 
-            // Cập nhật trạng thái mới
             suCo.MaTtxuLy = model.MaTtxuLy;
             await _context.SaveChangesAsync();
 
@@ -380,16 +374,15 @@ public class SuCoBaoTriController : ControllerBase
     {
         try
         {
-            // 1. Lấy danh sách báo cáo mà người thuê thuộc các dãy nhà của chủ nhà (maChNt)
             var data = await _context.BaoCaoSuCos
                 .Include(bcsc => bcsc.MaNtNavigation)
-                    .ThenInclude(nt => nt.MaNtNavigation) // Để lấy HoTen người thuê
+                    .ThenInclude(nt => nt.MaNtNavigation)
                 .Include(bcsc => bcsc.MaNtNavigation)
                     .ThenInclude(nt => nt.HopDongNguoiThues)
                         .ThenInclude(hdnt => hdnt.MaHopDongNavigation)
                             .ThenInclude(hd => hd.MaPhongNavigation)
-                            .ThenInclude(p => p.MaDayNtNavigation)
-                .Include(bcsc => bcsc.MaTtxuLyNavigation) // Lấy tên trạng thái từ DB
+                                .ThenInclude(p => p.MaDayNtNavigation)
+                .Include(bcsc => bcsc.MaTtxuLyNavigation)
                 .Include(bcsc => bcsc.ChiTietSuCos)
                     .ThenInclude(ct => ct.MaPhongThietBiNavigation)
                         .ThenInclude(ptb => ptb.MaThBiNavigation)
@@ -398,9 +391,7 @@ public class SuCoBaoTriController : ControllerBase
                 .OrderByDescending(item => item.ThoiGian)
                 .ToListAsync();
 
-            // 2. Map sang DTO để trả về Frontend
             var lstBaoCao = data.Select(item => {
-                // Lấy thông tin phòng từ hợp đồng đầu tiên
                 var phong = item.MaNtNavigation?.HopDongNguoiThues.FirstOrDefault()?.MaHopDongNavigation?.MaPhongNavigation;
 
                 return new
@@ -408,17 +399,15 @@ public class SuCoBaoTriController : ControllerBase
                     MaSuCo = item.MaSuCo,
                     MaNt = item.MaNt,
                     HoTenNt = item.MaNtNavigation?.MaNtNavigation?.HoTen,
-                    TenDayNt = phong.MaDayNtNavigation.TenDayNt,
+                    TenDayNt = phong?.MaDayNtNavigation?.TenDayNt,
                     SoPhong = phong?.SoPhong ?? "N/A",
                     ThoiGian = item.ThoiGian,
                     MaTtxuLy = item.MaTtxuLy,
                     TenTrangThai = item.MaTtxuLyNavigation?.TenTtxuLy ?? "Mới gửi",
-                    // Chuyển danh sách thiết bị
                     Details = item.ChiTietSuCos.Select(i => new {
                         MaPhongThietBi = i.MaPhongThietBi,
                         TenThietBi = i.MaPhongThietBiNavigation?.MaThBiNavigation?.TenThBi,
                         MoTa = i.MoTaSuCo,
-                        // Lấy ảnh đầu tiên làm ảnh đại diện nếu có
                         Image = i.MinhChung != null ? i.MinhChung.Split(';').FirstOrDefault() : null
                     }).ToList()
                 };

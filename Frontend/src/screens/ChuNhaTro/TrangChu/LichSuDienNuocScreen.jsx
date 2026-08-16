@@ -6,9 +6,10 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
-    SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import AppHeader from "../../../components/AppHeader";
+import { FONT_SIZES, FONT_WEIGHTS } from "../../../theme/typography";
 
 const PRIMARY = "#13c8ec";
 const BG = "#0a1113";
@@ -18,22 +19,26 @@ const NEUTRAL = "#16282c";
 export default function LichSuDienNuocScreen() {
     const navigation = useNavigation();
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             {/* HEADER */}
-            <View style={styles.header}>
-                <TouchableOpacity
-                    style={styles.back}
-                    onPress={() => navigation.goBack()}
-                >
-                    <MaterialIcons name="arrow-back-ios" size={20} color="#aaa" />
-                </TouchableOpacity>
-
-                <Text style={styles.headerTitle}>Lịch Sử Điện Nước</Text>
-
-                <TouchableOpacity style={styles.searchBtn}>
-                    <MaterialIcons name="search" size={22} color="#ccc" />
-                </TouchableOpacity>
-            </View>
+            <AppHeader
+                left={
+                    <TouchableOpacity
+                        style={styles.back}
+                        onPress={() => navigation.goBack()}
+                    >
+                        <MaterialIcons name="arrow-back-ios" size={18} color="#aaa" style={{ marginLeft: 6 }} />
+                    </TouchableOpacity>
+                }
+                center={
+                    <Text style={styles.headerTitle}>Lịch Sử Điện Nước</Text>
+                }
+                right={
+                    <TouchableOpacity style={styles.searchBtn}>
+                        <MaterialIcons name="search" size={22} color="#ccc" />
+                    </TouchableOpacity>
+                }
+            />
             <View style={styles.filterRow}>
                 <View style={styles.filterBox}>
                     <View>
@@ -84,9 +89,8 @@ export default function LichSuDienNuocScreen() {
                     />
                 </View>
             </ScrollView>
-
             <BottomSection />
-        </SafeAreaView>
+        </View>
     );
 }
 function MeterItem({ room, name, contract, electric, water, total }) {
@@ -103,67 +107,62 @@ function MeterItem({ room, name, contract, electric, water, total }) {
                         <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
                             <Text style={styles.name}>{name}</Text>
                             <View style={styles.statusBadge}>
-                                <Text style={styles.statusText}>ĐÃ CHỐT</Text>
+                                <Text style={styles.statusText}>ĐÃ THU</Text>
                             </View>
                         </View>
-                        <Text style={styles.contract}>Hợp đồng: {contract}</Text>
+                        <Text style={styles.subText}>{contract} • Hạn: 15/10</Text>
                     </View>
                 </View>
 
-                <TouchableOpacity style={styles.imageBtn}>
-                    <MaterialIcons name="image" size={22} color="#777" />
+                <TouchableOpacity>
+                    <MaterialIcons name="edit" size={20} color="#888" />
                 </TouchableOpacity>
             </View>
 
-            {/* Electric + Water */}
-            <View style={styles.meterBox}>
-                <View style={{ flex: 1 }}>
-                    <View style={styles.meterLabelRow}>
-                        <MaterialIcons name="bolt" size={14} color="#facc15" />
-                        <Text style={styles.meterLabel}>ĐIỆN (SỐ MỚI)</Text>
-                    </View>
-                    <Text style={styles.meterValue}>
-                        {electric} <Text style={styles.unit}>kWh</Text>
+            {/* Indexes */}
+            <View style={styles.indexRow}>
+                <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
+                    <MaterialIcons name="bolt" size={18} color={PRIMARY} />
+                    <Text style={{ color: "#aaa" }}>
+                        Điện: <Text style={{ color: "#fff" }}>{electric} kWh</Text>
                     </Text>
                 </View>
 
-                <View style={styles.divider} />
-
-                <View style={{ flex: 1 }}>
-                    <View style={styles.meterLabelRow}>
-                        <MaterialIcons name="water-drop" size={14} color="#60a5fa" />
-                        <Text style={styles.meterLabel}>NƯỚC (SỐ MỚI)</Text>
-                    </View>
-                    <Text style={styles.meterValue}>
-                        {water} <Text style={styles.unit}>m³</Text>
+                <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
+                    <MaterialIcons name="water-drop" size={18} color="#00e5ff" />
+                    <Text style={{ color: "#aaa" }}>
+                        Nước: <Text style={{ color: "#fff" }}>{water} m³</Text>
                     </Text>
                 </View>
             </View>
 
-            {/* Footer */}
-            <View style={styles.cardFooter}>
-                <Text style={styles.totalText}>
-                    Tạm tính: <Text style={{ color: "#fff" }}>{total}</Text>
-                </Text>
-                <MaterialIcons name="chevron-right" size={18} color="#555" />
+            {/* Total */}
+            <View style={styles.totalRow}>
+                <Text style={{ color: "#888" }}>Tổng tiền</Text>
+                <Text style={styles.totalText}>{total}</Text>
             </View>
         </View>
     );
 }
 function BottomSection() {
     return (
-        <View style={styles.bottomContainer}>
-            <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.exportBtn}>
-                    <MaterialIcons name="description" size={18} color="#ccc" />
-                    <Text style={styles.exportText}>Xuất báo cáo</Text>
-                </TouchableOpacity>
+        <View style={styles.bottom}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <View>
+                    <Text style={{ color: "#888", fontSize: FONT_SIZES.caption }}>TỔNG THU DỰ KIẾN</Text>
+                    <Text style={styles.totalAll}>28,450,000đ</Text>
+                </View>
 
-                <TouchableOpacity style={styles.invoiceBtn}>
-                    <MaterialIcons name="receipt-long" size={18} color="#000" />
-                    <Text style={styles.invoiceText}>Tạo hóa đơn</Text>
-                </TouchableOpacity>
+                <View style={{ alignItems: "flex-end" }}>
+                    <Text style={{ color: "#888", fontSize: FONT_SIZES.caption }}>TIẾN ĐỘ THU</Text>
+                    <Text style={{ color: PRIMARY, fontWeight: FONT_WEIGHTS.bold }}>18/20 Phòng</Text>
+                </View>
             </View>
+
+            <TouchableOpacity style={styles.exportBtn}>
+                <MaterialIcons name="file-download" size={20} color="#000" />
+                <Text style={styles.exportText}>XUẤT BÁO CÁO (EXCEL)</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -172,33 +171,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#101f22",
-        paddingTop: 50,
-        paddingHorizontal: 20,
-    },
-
-    header: {
-        paddingHorizontal: 16,
-        paddingTop: 0,
-        paddingBottom: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: "#ffffff10",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-
-    iconCircle: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: PRIMARY + "20",
-        alignItems: "center",
-        justifyContent: "center",
     },
 
     headerTitle: {
-        fontSize: 22,
-        fontWeight: "bold",
+        fontSize: FONT_SIZES.header,
+        fontWeight: FONT_WEIGHTS.bold,
         color: "#fff",
     },
 

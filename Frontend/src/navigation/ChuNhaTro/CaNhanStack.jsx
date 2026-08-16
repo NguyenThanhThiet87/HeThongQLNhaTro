@@ -13,6 +13,7 @@ import VerifyOTPThayDoiSoDienThoai from "../../screens/NguoiThueTro/CaNhan/Verif
 import CaiDatBaoMatScreen from "../../screens/NguoiThueTro/CaNhan/CaiDatBaoMatScreen";
 import CaiDatChungScreen from "../../screens/NguoiThueTro/CaNhan/CaiDatChungScreen";
 import ThayDoiPasswordScreen from "../../screens/NguoiThueTro/CaNhan/ThayDoiPasswordScreen";
+import HopDongStack from "./HopDongStack";
 
 const Stack = createNativeStackNavigator();
 
@@ -66,6 +67,10 @@ export default function CaNhanStack() {
             <Stack.Screen
                 name="ThayDoiMatKhau"
                 component={ThayDoiPasswordScreen}
+            />
+            <Stack.Screen
+                name="HopDong"
+                component={HopDongStack}
             />
         </Stack.Navigator>
     );

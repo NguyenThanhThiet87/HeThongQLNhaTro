@@ -26,6 +26,7 @@ import { getHoaDonNewApi } from '../../../api/HoaDon';
 import { formatDate, getDeadlineDate } from '../../../utils/formatNgaySinh';
 import { formatCurrency } from '../../../utils/formatCurrency';
 import ChatSupport from "../../../components/ChatSupport";
+import { useUnreadNotifications } from '../../../hooks/useUnreadNotifications';
 
 const { width } = Dimensions.get('window');
 
@@ -41,6 +42,7 @@ export default function TenantDashboard() {
   const [tenantDetails, setTenantDetails] = useState(null);
   const [latestBill, setLatestBill] = useState(null);
   const [lichSuBaoCao, setLichSuBaoCao] = useState([]);
+  const { hasUnreadNotifications } = useUnreadNotifications();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -114,7 +116,7 @@ export default function TenantDashboard() {
         </View>
         <TouchableOpacity style={[styles.notifBtn, { backgroundColor: COLORS.card }]} onPress={() => navigation.navigate("ThongBaoTenantScreen")}>
           <MaterialIcons name="notifications-none" size={24} color={COLORS.textMuted} />
-          <View style={styles.notifBadge} />
+          {hasUnreadNotifications && <View style={styles.notifBadge} />}
         </TouchableOpacity>
       </View>
       <KeyboardAvoidingView

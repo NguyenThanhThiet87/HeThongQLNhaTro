@@ -21,6 +21,8 @@ import toast from '../../../utils/toast';
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import formatPhoneNumber from "../../../utils/formatPhoneNumber";
 import ConfirmModal from "../../../components/ConfirmModal";
+import AppHeader from "../../../components/AppHeader";
+import { FONT_SIZES, FONT_WEIGHTS } from "../../../theme/typography";
 
 export default function ThemNguoiOScreen({ route }) {
     const { maHopDong, soPhong } = route.params;
@@ -133,27 +135,24 @@ export default function ThemNguoiOScreen({ route }) {
         <View style={styles.container}>
 
             {/* HEADER */}
-            <View style={styles.header}>
-
-                <View style={styles.headerRow}>
-
-                    <TouchableOpacity style={styles.closeBtn}>
+            <AppHeader
+                left={
+                    <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
                         <MaterialIcons name="close" size={24} color={COLORS.textMain} />
                     </TouchableOpacity>
-
-                    <View style={{ flex: 1 }}>
+                }
+                center={
+                    <View style={{ alignItems: "center" }}>
                         <Text style={styles.headerTitle}>
                             Thêm thành viên
                         </Text>
-
                         <Text style={styles.headerSub}>
                             Phòng {soPhong}
                         </Text>
                     </View>
-                </View>
-
-            </View>
-
+                }
+                right={<View style={{ width: 40 }} />}
+            />
 
             {/* CONTENT */}
             <ScrollView
@@ -379,23 +378,7 @@ export default function ThemNguoiOScreen({ route }) {
 const createStyles = (COLORS) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background
-    },
-
-
-    header: {
-        paddingTop: 50,
-        paddingBottom: 12,
-        paddingHorizontal: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
-        backgroundColor: COLORS.background
-    },
-
-    headerRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 12
+        backgroundColor: COLORS.bgLight
     },
 
     closeBtn: {
@@ -407,13 +390,13 @@ const createStyles = (COLORS) => StyleSheet.create({
 
     headerTitle: {
         color: COLORS.textMain,
-        fontSize: 18,
-        fontWeight: "700"
+        fontSize: FONT_SIZES.header,
+        fontWeight: FONT_WEIGHTS.bold,
     },
 
     headerSub: {
         color: COLORS.textMuted,
-        fontSize: 13,
+        fontSize: FONT_SIZES.sub,
         marginTop: 2
     },
 

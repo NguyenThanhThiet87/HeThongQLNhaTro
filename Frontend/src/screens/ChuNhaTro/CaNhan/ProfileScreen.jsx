@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { useAuth } from "../../../context/AuthContext";
+import React from "react";
+import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../../theme/useTheme";
 
 import {
@@ -9,54 +8,26 @@ import {
     StyleSheet,
     ScrollView,
     Image,
-    TouchableOpacity
+    TouchableOpacity,
+    Platform,
+    StatusBar
 } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import { getNguoiDungApi } from "../../../api/NguoiDung";
-import { getCurrentUser } from "../../../utils/decodeToken";
 import { getTenRoleByValue } from "../../../constants/roles";
-import * as SecureStore from "expo-secure-store";
 import LoadingOverlay from "../../../components/LoadingOverlay";
-
 import { SettingItem } from "../../../components/SettingItem";
+import { useUserCntProfile } from "../../../hooks/user/useUserOwnerProfile";
+import { useLogout } from "../../../hooks/auth/useLogout";
+import { FONT_SIZES, FONT_WEIGHTS } from "../../../theme/typography";
 
 export default function ProfileScreen() {
     const { COLORS } = useTheme();
     const styles = createStyles(COLORS);
 
     const navigation = useNavigation();
-    const { logout } = useAuth();
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(false);
-
-    const fetchData = async () => {
-        const user = await getCurrentUser();
-        const response = await getNguoiDungApi(user.maNd);
-        if (response.success) {
-            console.log("Thông tin người dùng:", response.data);
-            setUser(response.data);
-        } else
-            console.log("Lỗi lấy thông tin người dùng:", response.message);
-    };
-
-    useFocusEffect(
-        React.useCallback(() => {
-            fetchData();
-        }, [])
-    );
-
-    const handleLogout = async () => {
-        setLoading(true);
-        // Delay 0.8s để tạo hiệu ứng load mượt mà
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        await SecureStore.deleteItemAsync("accessToken");
-        await SecureStore.deleteItemAsync("refreshToken");
-
-        await logout();
-        setLoading(false);
-    };
+    const { user, loading: profileLoading } = useUserCntProfile();
+    const { handleLogout, loading: logoutLoading } = useLogout();
 
     return (
         <View style={styles.container}>
@@ -72,7 +43,7 @@ export default function ProfileScreen() {
                 </Text>
 
                 {/* PROFILE CARD */}
-                <TouchableOpacity style={styles.profileCard} onPress={() => navigation.navigate("ThongTinCaNhan", { maNd: user?.maNd })}>
+                <TouchableOpacity style={styles.profileCard} onPress={() => navigation.navigate("ThongTinCaNhan", { maNd: user?.maChuNt })}>
 
                     <View style={styles.avatarContainer}>
                         <Image
@@ -157,13 +128,14 @@ export default function ProfileScreen() {
 
                     <SettingItem
                         icon="description"
-                        title="Hợp đồng mẫu"
-                        subtitle="Soạn thảo và quản lý mẫu"
+                        title="Hợp đồng"
+                        subtitle="Tạo và quản lý hợp đồng thuê"
                         color="#a855f7"
                         colorTitle={COLORS.textMain}
                         colorBorder={COLORS.border}
                         bg="rgba(168,85,247,0.15)"
                         borderBottom={false}
+                        onHandle={() => navigation.navigate("HopDong")}
                     />
 
                 </View>
@@ -202,7 +174,7 @@ export default function ProfileScreen() {
 
 
                 {/* LOGOUT */}
-                <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} disabled={loading}>
+                <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} disabled={logoutLoading}>
                     <MaterialIcons
                         name="logout"
                         size={20}
@@ -221,7 +193,7 @@ export default function ProfileScreen() {
 
             </ScrollView>
 
-            <LoadingOverlay visible={loading} />
+            <LoadingOverlay visible={profileLoading || logoutLoading} />
         </View>
     );
 }
@@ -234,12 +206,12 @@ const createStyles = (COLORS) => StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.bgLight,
         paddingHorizontal: 16,
-        paddingTop: 50
+        paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight ? StatusBar.currentHeight + 10 : 40) : 40,
     },
 
     header: {
-        fontSize: 24,
-        fontWeight: "bold",
+        fontSize: FONT_SIZES.header,
+        fontWeight: FONT_WEIGHTS.bold,
         color: COLORS.textMain,
         marginBottom: 14
     },

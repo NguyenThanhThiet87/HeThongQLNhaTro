@@ -19,6 +19,8 @@ import { getLichSuThanhToanGanApi } from '../../../api/HoaDon';
 import { getCurrentUser } from '../../../utils/decodeToken';
 import { formatDate } from '../../../utils/formatNgaySinh';
 import { formatCurrency } from '../../../utils/formatCurrency';
+import AppHeader from '../../../components/AppHeader';
+import { FONT_SIZES, FONT_WEIGHTS } from '../../../theme/typography';
 
 const LichSuGiaoDichScreen = () => {
     const { COLORS } = useTheme();
@@ -121,19 +123,19 @@ const LichSuGiaoDichScreen = () => {
     );
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: COLORS.bgLight }]}>
-            <StatusBar barStyle={COLORS.isDark ? 'light-content' : 'dark-content'} />
-
+        <View style={[styles.container, { backgroundColor: COLORS.bgLight }]}>
             {/* Header */}
-            <View style={[styles.header, { backgroundColor: COLORS.bgLight, borderBottomColor: COLORS.border }]}>
-                <View style={styles.headerTop}>
+            <AppHeader
+                left={
                     <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.goBack()}>
-                        <MaterialIcons name="arrow-back-ios" size={20} color={COLORS.primary} />
+                        <MaterialIcons name="arrow-back-ios" size={18} color={COLORS.textMain} style={{ marginLeft: 6 }} />
                     </TouchableOpacity>
+                }
+                center={
                     <Text style={[styles.headerTitle, { color: COLORS.textMain }]}>Lịch sử giao dịch</Text>
-                    <View style={styles.headerIcon} />
-                </View>
-            </View>
+                }
+                right={<View style={styles.headerIcon} />}
+            />
 
             {loading && !refreshing ? (
                 <View style={styles.loadingContainer}>
@@ -153,24 +155,13 @@ const LichSuGiaoDichScreen = () => {
                     ListEmptyComponent={EmptyComponent}
                 />
             )}
-        </SafeAreaView>
+        </View>
     );
 };
 
 const createStyles = (COLORS) => StyleSheet.create({
     container: {
         flex: 1,
-    },
-    header: {
-        paddingTop: Platform.OS === 'ios' ? 0 : 40,
-        borderBottomWidth: 1,
-    },
-    headerTop: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
     },
     headerIcon: {
         width: 40,
@@ -179,8 +170,8 @@ const createStyles = (COLORS) => StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: FONT_SIZES.header,
+        fontWeight: FONT_WEIGHTS.bold,
     },
     listContent: {
         paddingHorizontal: 16,
