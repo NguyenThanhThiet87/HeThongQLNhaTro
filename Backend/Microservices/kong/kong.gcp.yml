@@ -8,7 +8,7 @@ services:
     url: https://identityservice-528371198639.asia-southeast1.run.app
     routes:
       - name: identity-route
-        paths: [ /api/NguoiDung, /api/otp ]
+        paths: [ /api/NguoiDung ]
         strip_path: false
 
   - name: property-service

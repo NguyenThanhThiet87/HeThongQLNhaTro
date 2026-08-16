@@ -8,7 +8,6 @@ services:
       - name: identity-route
         paths:
           - /api/NguoiDung
-          - /api/otp
         strip_path: false
 
   - name: property-service
