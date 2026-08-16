@@ -10,7 +10,9 @@ env:
 ingressController:
   enabled: false
 
-replicaCount: 2
+# GKE Autopilot quota in the current trial project only supports one Kong pod.
+# Increase back to 2 after obtaining sufficient regional CPU and memory quota.
+replicaCount: 1
 
 dblessConfig:
   configMap: kong-gcp-config
