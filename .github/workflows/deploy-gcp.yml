@@ -64,6 +64,12 @@ jobs:
           SERVICE_NAME=$(echo '${{ matrix.service }}' | tr '[:upper:]' '[:lower:]')
           IMAGE_NAME=$(echo '${{ matrix.service }}' | tr '[:upper:]' '[:lower:]')
           IMAGE=${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE_NAME}:${GITHUB_SHA}
+          SERVICE_SECRETS="ConnectionStrings__DefaultConnection=${{ matrix.db_secret }}:3,Jwt__Key=jwt-key:1,RabbitMq__Host=rabbitmq-host:1,RabbitMq__Username=rabbitmq-username:1,RabbitMq__Password=rabbitmq-password:1,RabbitMq__VirtualHost=rabbitmq-virtualhost:2"
+
+          if [ "${{ matrix.service }}" = "PropertyService" ]; then
+            SERVICE_SECRETS="$SERVICE_SECRETS,CloudinarySettings__CloudName=cloudinary-cloud-name:1,CloudinarySettings__ApiKey=cloudinary-api-key:1,CloudinarySettings__ApiSecret=cloudinary-api-secret:1"
+          fi
+
           gcloud run deploy "$SERVICE_NAME" \
             --image "$IMAGE" --region "$REGION" --platform managed \
             --service-account "${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}" \
@@ -73,5 +79,4 @@ jobs:
             --port 8080 --ingress internal \
             --allow-unauthenticated \
             --set-env-vars ASPNETCORE_ENVIRONMENT=Production,Jwt__Issuer=MyApp,Jwt__Audience=MyAppUser,Jwt__DurationInMinutes=60 \
-            --update-secrets "ConnectionStrings__DefaultConnection=${{ matrix.db_secret }}:3,Jwt__Key=jwt-key:1,RabbitMq__Host=rabbitmq-host:1,RabbitMq__Username=rabbitmq-username:1,RabbitMq__Password=rabbitmq-password:1,RabbitMq__VirtualHost=rabbitmq-virtualhost:2"
-
+            --update-secrets "$SERVICE_SECRETS"

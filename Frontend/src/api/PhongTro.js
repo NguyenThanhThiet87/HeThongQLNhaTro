@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config/api";
 import axiosClient from "./axiosClient";
-import getAccessToken, { getCurrentUser } from "../utils/decodeToken";
+import { getAccessToken, getCurrentUser } from "../utils/decodeToken";
 export const getDayNhaTrosApi = async (maCnt) => {
     try {
         const token = await getAccessToken();
@@ -15,7 +15,11 @@ export const getDayNhaTrosApi = async (maCnt) => {
         });
 
         const text = await res.text();
-        return JSON.parse(text);
+        const result = JSON.parse(text);
+        if (__DEV__ && !res.ok) {
+            console.warn(`[PROPERTY] day-nha-tros failed · ${res.status} · ${result?.message ?? "Không có thông báo lỗi"}`);
+        }
+        return result;
 
     } catch (error) {
         return {
@@ -406,6 +410,9 @@ export const deleteLoaiPhongApi = async (maLoaiP) => {
         });
 
         const result = await res.json();
+        if (__DEV__ && !res.ok) {
+            console.warn(`[PROPERTY] thong-ke failed · ${res.status} · ${result?.message ?? "Không có thông báo lỗi"}`);
+        }
         return result; // Trả về ApiResponse từ Backend
 
     } catch (error) {

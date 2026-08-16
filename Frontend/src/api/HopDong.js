@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config/api";
 import axiosClient from "./axiosClient";
-import getAccessToken from "../utils/decodeToken";
+import { getAccessToken } from "../utils/decodeToken";
 import { getCurrentUser } from "../utils/decodeToken";
 
 export const createHopDongApi = async (hopDongData) => {

@@ -49,9 +49,16 @@ api.interceptors.response.use(
       const durationMs = Date.now() - (config.metadata?.startedAt ?? Date.now());
       const status = error.response?.status ?? "network error";
       const message = error.response?.data?.message ?? error.message;
-      console.error(
-        `[AXIOS] ✗ ${(config.method ?? "GET").toUpperCase()} ${config.url ?? ""} · ${status} · ${durationMs}ms · ${message}`,
-      );
+      const logMessage = `[AXIOS] ✗ ${(config.method ?? "GET").toUpperCase()} ${config.url ?? ""} · ${status} · ${durationMs}ms · ${message}`;
+
+      // 4xx là phản hồi nghiệp vụ dự kiến (ví dụ đăng nhập sai), không phải crash.
+      // Expo Go hiển thị console.error thành màn hình/cảnh báo đỏ, nên chỉ dùng
+      // mức error cho lỗi máy chủ hoặc lỗi mạng thực sự.
+      if (typeof status === "number" && status >= 400 && status < 500) {
+        console.warn(logMessage);
+      } else {
+        console.error(logMessage);
+      }
     }
 
     return Promise.reject(error);

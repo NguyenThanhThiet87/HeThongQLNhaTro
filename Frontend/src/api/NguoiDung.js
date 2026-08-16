@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../config/api";
-import getAccessToken from "../utils/decodeToken";
+import { getAccessToken } from "../utils/decodeToken";
 import api from "./axiosClient";
 
 export const getNguoiDungApi = async (maNd) => {
