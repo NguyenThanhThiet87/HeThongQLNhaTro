@@ -15,7 +15,8 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
 
 // JWT Configuration
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? "a_very_long_secret_key_for_development_purposes");
+var keyString = !string.IsNullOrEmpty(jwtSettings["Key"]) ? jwtSettings["Key"] : "a_very_long_secret_key_for_development_purposes_at_least_32_bytes";
+var key = Encoding.UTF8.GetBytes(keyString);
 
 // MassTransit/RabbitMQ is the canonical integration transport for this system.
 builder.Services.AddMassTransit(x =>
@@ -48,8 +49,8 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
+        ValidIssuer = jwtSettings["Issuer"] ?? "MyApp",
+        ValidAudience = jwtSettings["Audience"] ?? "MyAppUser",
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ClockSkew = TimeSpan.Zero
     };
