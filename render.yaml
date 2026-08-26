@@ -12,6 +12,10 @@ services:
     envVars:
       - key: KONG_DATABASE
         value: "off"
+      - key: PORT
+        value: "10000"
+      - key: KONG_PROXY_LISTEN
+        value: "0.0.0.0:10000, 0.0.0.0:8000"
 
   # ============================================================================
   # 2. IDENTITY MICROSERVICE (Web Service)
