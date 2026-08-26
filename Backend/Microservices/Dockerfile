@@ -8,7 +8,11 @@ RUN dotnet publish "${SERVICE}/${SERVICE}.csproj" -c Release -o /out /p:UseAppHo
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 ARG SERVICE
 ENV SERVICE=${SERVICE}
+ENV PORT=8080
 ENV ASPNETCORE_URLS=http://+:8080
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+ENV DOTNET_hostBuilder__reloadConfigOnChange=false
+ENV DOTNET_EnableDiagnostics=0
 WORKDIR /app
 COPY --from=build /out .
 EXPOSE 8080

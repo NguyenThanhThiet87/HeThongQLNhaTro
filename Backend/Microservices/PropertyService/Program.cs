@@ -74,6 +74,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapGet("/", () => Results.Ok(new { status = "healthy", service = "PropertyService" }));
 app.MapControllers();
 app.MapGrpcService<GrpcRoomService>();
 

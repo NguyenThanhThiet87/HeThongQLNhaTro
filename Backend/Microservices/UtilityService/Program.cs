@@ -19,7 +19,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app.MapGet("/", () => Results.Ok(new { status = "healthy", service = "UtilityService" }));
 app.MapControllers();
 app.MapGrpcService<UtilityService.Services.GrpcUtilityService>();
 

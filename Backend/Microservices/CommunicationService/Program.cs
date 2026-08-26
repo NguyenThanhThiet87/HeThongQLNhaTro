@@ -36,6 +36,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app.MapGet("/", () => Results.Ok(new { status = "healthy", service = "CommunicationService" }));
 app.MapControllers();
 app.Run();

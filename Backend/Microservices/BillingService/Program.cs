@@ -46,7 +46,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app.MapGet("/", () => Results.Ok(new { status = "healthy", service = "BillingService" }));
 app.MapControllers();
 app.MapHub<BillingService.Hubs.ChatHub>("/chathub");
 app.Run();

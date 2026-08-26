@@ -44,7 +44,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app.MapGet("/", () => Results.Ok(new { status = "healthy", service = "ContractService" }));
 app.MapControllers();
 app.MapGrpcService<ContractService.Services.GrpcContractService>();
 
