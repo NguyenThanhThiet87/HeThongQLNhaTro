@@ -2,8 +2,20 @@ _format_version: "3.0"
 _transform: true
 
 # Render production gateway configuration.
-# Kong routes incoming public traffic to Render Private Services via internal network.
+# Kong routes incoming public traffic to Render services via internal network.
 services:
+  - name: health-service
+    url: http://127.0.0.1:8001/status
+    routes:
+      - name: health-route
+        paths: [ / ]
+        strip_path: false
+    plugins:
+      - name: request-termination
+        config:
+          status_code: 200
+          message: "Kong Gateway is running"
+
   - name: identity-service
     url: http://identity-service:8080
     routes:
