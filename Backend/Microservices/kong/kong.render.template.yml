@@ -1,0 +1,81 @@
+_format_version: "3.0"
+_transform: true
+
+# Render production gateway configuration.
+# Kong dynamically resolves backend service URLs from environment variables.
+services:
+  - name: health-service
+    url: http://127.0.0.1:8001/status
+    routes:
+      - name: health-route
+        paths: [ / ]
+        strip_path: false
+    plugins:
+      - name: request-termination
+        config:
+          status_code: 200
+          message: "Kong Gateway is running"
+
+  - name: identity-service
+    url: ${IDENTITY_SERVICE_URL}
+    routes:
+      - name: identity-route
+        paths: [ /api/NguoiDung ]
+        strip_path: false
+
+  - name: property-service
+    url: ${PROPERTY_SERVICE_URL}
+    routes:
+      - name: property-route
+        paths: [ /api/PhongNhaTro ]
+        strip_path: false
+
+  - name: contract-service
+    url: ${CONTRACT_SERVICE_URL}
+    routes:
+      - name: contract-route
+        paths: [ /api/HopDong ]
+        strip_path: false
+
+  - name: utility-service
+    url: ${UTILITY_SERVICE_URL}
+    routes:
+      - name: utility-route
+        paths: [ /api/DichVu ]
+        strip_path: false
+
+  - name: billing-service
+    url: ${BILLING_SERVICE_URL}
+    routes:
+      - name: billing-route
+        paths: [ /api/HoaDonThanhToan, /api/DichVuDonHang, /api/PayOS, /api/VNPay, /chathub ]
+        strip_path: false
+
+  - name: maintenance-service
+    url: ${MAINTENANCE_SERVICE_URL}
+    routes:
+      - name: maintenance-route
+        paths: [ /api/SuCoBaoTri ]
+        strip_path: false
+
+  - name: communication-service
+    url: ${COMMUNICATION_SERVICE_URL}
+    routes:
+      - name: communication-route
+        paths: [ /api/ThongBao ]
+        strip_path: false
+
+plugins:
+  - name: cors
+    config:
+      origins: [ "*" ]
+      methods: [ GET, POST, PUT, PATCH, DELETE, OPTIONS ]
+      headers: [ Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Authorization, X-Request-ID ]
+      exposed_headers: [ X-Request-ID ]
+      credentials: true
+      max_age: 3600
+  - name: correlation-id
+    config:
+      header_name: X-Request-ID
+      generator: uuid
+      echo_downstream: true

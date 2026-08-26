@@ -16,6 +16,20 @@ services:
         value: "10000"
       - key: KONG_PROXY_LISTEN
         value: "0.0.0.0:10000, 0.0.0.0:8000"
+      - key: IDENTITY_SERVICE_URL
+        sync: false
+      - key: PROPERTY_SERVICE_URL
+        sync: false
+      - key: CONTRACT_SERVICE_URL
+        sync: false
+      - key: UTILITY_SERVICE_URL
+        sync: false
+      - key: BILLING_SERVICE_URL
+        sync: false
+      - key: MAINTENANCE_SERVICE_URL
+        sync: false
+      - key: COMMUNICATION_SERVICE_URL
+        sync: false
 
   # ============================================================================
   # 2. IDENTITY MICROSERVICE (Web Service)
@@ -119,9 +133,9 @@ services:
       - key: RabbitMq__VirtualHost
         sync: false
       - key: Services__IdentityGrpcUrl
-        value: http://identity-service:8080
+        sync: false
       - key: Services__PropertyGrpcUrl
-        value: http://property-service:8080
+        sync: false
 
   # ============================================================================
   # 5. UTILITY MICROSERVICE (Web Service)
@@ -173,11 +187,11 @@ services:
       - key: RabbitMq__VirtualHost
         sync: false
       - key: Services__IdentityGrpcUrl
-        value: http://identity-service:8080
+        sync: false
       - key: Services__UtilityGrpcUrl
-        value: http://utility-service:8080
+        sync: false
       - key: Services__ContractGrpcUrl
-        value: http://contract-service:8080
+        sync: false
 
   # ============================================================================
   # 7. MAINTENANCE MICROSERVICE (Web Service)
