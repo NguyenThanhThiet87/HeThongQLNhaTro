@@ -10,25 +10,25 @@ Chuỗi kết nối cho 7 microservices (dùng định dạng Npgsql .NET):
 
 ```text
 # IdentityService
-Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=identity_db;Username=neondb_owner;Password=npg_QWhw0og8$mLDS;SslMode=Require;Trust Server Certificate=true;
+Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=identity_db;Username=neondb_owner;Password=npg_QWhw0og8mLDS;SslMode=Require;Trust Server Certificate=true;
 
 # PropertyService
-Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=property_db;Username=neondb_owner;Password=npg_QWhw0og8$mLDS;SslMode=Require;Trust Server Certificate=true;
+Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=property_db;Username=neondb_owner;Password=npg_QWhw0og8mLDS;SslMode=Require;Trust Server Certificate=true;
 
 # ContractService
-Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=contract_db;Username=neondb_owner;Password=npg_QWhw0og8$mLDS;SslMode=Require;Trust Server Certificate=true;
+Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=contract_db;Username=neondb_owner;Password=npg_QWhw0og8mLDS;SslMode=Require;Trust Server Certificate=true;
 
 # UtilityService
-Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=utility_db;Username=neondb_owner;Password=npg_QWhw0og8$mLDS;SslMode=Require;Trust Server Certificate=true;
+Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=utility_db;Username=neondb_owner;Password=npg_QWhw0og8mLDS;SslMode=Require;Trust Server Certificate=true;
 
 # BillingService
-Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=billing_db;Username=neondb_owner;Password=npg_QWhw0og8$mLDS;SslMode=Require;Trust Server Certificate=true;
+Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=billing_db;Username=neondb_owner;Password=npg_QWhw0og8mLDS;SslMode=Require;Trust Server Certificate=true;
 
 # MaintenanceService
-Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=maintenance_db;Username=neondb_owner;Password=npg_QWhw0og8$mLDS;SslMode=Require;Trust Server Certificate=true;
+Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=maintenance_db;Username=neondb_owner;Password=npg_QWhw0og8mLDS;SslMode=Require;Trust Server Certificate=true;
 
 # CommunicationService
-Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=communication_db;Username=neondb_owner;Password=npg_QWhw0og8$mLDS;SslMode=Require;Trust Server Certificate=true;
+Host=ep-gentle-resonance-azrcsgzl-pooler.c-3.ap-southeast-1.aws.neon.tech;Port=5432;Database=communication_db;Username=neondb_owner;Password=npg_QWhw0og8mLDS;SslMode=Require;Trust Server Certificate=true;
 ```
 
 ---
