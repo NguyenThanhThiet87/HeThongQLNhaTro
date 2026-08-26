@@ -4,7 +4,7 @@ services:
   # ============================================================================
   - type: web
     name: kong-gateway
-    env: docker
+    runtime: docker
     dockerfilePath: ./Backend/Microservices/kong/Dockerfile.render
     dockerContext: ./Backend/Microservices/kong
     region: singapore
@@ -18,7 +18,7 @@ services:
   # ============================================================================
   - type: web
     name: identity-service
-    env: docker
+    runtime: docker
     dockerfilePath: ./Backend/Microservices/Dockerfile
     dockerContext: ./Backend/Microservices
     region: singapore
@@ -56,7 +56,7 @@ services:
   # ============================================================================
   - type: web
     name: property-service
-    env: docker
+    runtime: docker
     dockerfilePath: ./Backend/Microservices/Dockerfile
     dockerContext: ./Backend/Microservices
     region: singapore
@@ -94,7 +94,7 @@ services:
   # ============================================================================
   - type: web
     name: contract-service
-    env: docker
+    runtime: docker
     dockerfilePath: ./Backend/Microservices/Dockerfile
     dockerContext: ./Backend/Microservices
     region: singapore
@@ -124,7 +124,7 @@ services:
   # ============================================================================
   - type: web
     name: utility-service
-    env: docker
+    runtime: docker
     dockerfilePath: ./Backend/Microservices/Dockerfile
     dockerContext: ./Backend/Microservices
     region: singapore
@@ -148,7 +148,7 @@ services:
   # ============================================================================
   - type: web
     name: billing-service
-    env: docker
+    runtime: docker
     dockerfilePath: ./Backend/Microservices/Dockerfile
     dockerContext: ./Backend/Microservices
     region: singapore
@@ -180,7 +180,7 @@ services:
   # ============================================================================
   - type: web
     name: maintenance-service
-    env: docker
+    runtime: docker
     dockerfilePath: ./Backend/Microservices/Dockerfile
     dockerContext: ./Backend/Microservices
     region: singapore
@@ -212,7 +212,7 @@ services:
   # ============================================================================
   - type: web
     name: communication-service
-    env: docker
+    runtime: docker
     dockerfilePath: ./Backend/Microservices/Dockerfile
     dockerContext: ./Backend/Microservices
     region: singapore

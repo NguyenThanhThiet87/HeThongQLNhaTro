@@ -1,13 +1,7 @@
-name: Deploy microservices to Google Cloud Run
+name: Deploy microservices to Google Cloud Run (Archived)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'Backend/**'
-      - '.github/workflows/deploy-gcp.yml'
-  
-  workflow_dispatch:
+  workflow_dispatch: # Chỉ chạy khi bấm thủ công, không tự chạy khi push code
 
 permissions:
   contents: read
