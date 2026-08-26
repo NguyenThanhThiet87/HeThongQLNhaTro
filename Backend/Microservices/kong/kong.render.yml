@@ -2,7 +2,7 @@ _format_version: "3.0"
 _transform: true
 
 # Render production gateway configuration.
-# Kong routes incoming public traffic to Render services via internal network.
+# Kong routes incoming public traffic to the 7 Render microservices via HTTPS.
 services:
   - name: health-service
     url: http://127.0.0.1:8001/status
@@ -17,49 +17,49 @@ services:
           message: "Kong Gateway is running"
 
   - name: identity-service
-    url: http://identity-service:8080
+    url: https://identity-service-wqgy.onrender.com
     routes:
       - name: identity-route
         paths: [ /api/NguoiDung ]
         strip_path: false
 
   - name: property-service
-    url: http://property-service:8080
+    url: https://property-service-tfz1.onrender.com
     routes:
       - name: property-route
         paths: [ /api/PhongNhaTro ]
         strip_path: false
 
   - name: contract-service
-    url: http://contract-service:8080
+    url: https://contract-service-xi3h.onrender.com
     routes:
       - name: contract-route
         paths: [ /api/HopDong ]
         strip_path: false
 
   - name: utility-service
-    url: http://utility-service:8080
+    url: https://utility-service-x4fg.onrender.com
     routes:
       - name: utility-route
         paths: [ /api/DichVu ]
         strip_path: false
 
   - name: billing-service
-    url: http://billing-service:8080
+    url: https://billing-service-hkb4.onrender.com
     routes:
       - name: billing-route
         paths: [ /api/HoaDonThanhToan, /api/DichVuDonHang, /api/PayOS, /api/VNPay, /chathub ]
         strip_path: false
 
   - name: maintenance-service
-    url: http://maintenance-service:8080
+    url: https://maintenance-service-tbm5.onrender.com
     routes:
       - name: maintenance-route
         paths: [ /api/SuCoBaoTri ]
         strip_path: false
 
   - name: communication-service
-    url: http://communication-service:8080
+    url: https://communication-service-ed8m.onrender.com
     routes:
       - name: communication-route
         paths: [ /api/ThongBao ]

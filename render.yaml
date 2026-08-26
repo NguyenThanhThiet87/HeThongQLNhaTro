@@ -133,9 +133,9 @@ services:
       - key: RabbitMq__VirtualHost
         sync: false
       - key: Services__IdentityGrpcUrl
-        sync: false
+        value: https://identity-service-wqgy.onrender.com
       - key: Services__PropertyGrpcUrl
-        sync: false
+        value: https://property-service-tfz1.onrender.com
 
   # ============================================================================
   # 5. UTILITY MICROSERVICE (Web Service)
@@ -187,11 +187,11 @@ services:
       - key: RabbitMq__VirtualHost
         sync: false
       - key: Services__IdentityGrpcUrl
-        sync: false
+        value: https://identity-service-wqgy.onrender.com
       - key: Services__UtilityGrpcUrl
-        sync: false
+        value: https://utility-service-x4fg.onrender.com
       - key: Services__ContractGrpcUrl
-        sync: false
+        value: https://contract-service-xi3h.onrender.com
 
   # ============================================================================
   # 7. MAINTENANCE MICROSERVICE (Web Service)
