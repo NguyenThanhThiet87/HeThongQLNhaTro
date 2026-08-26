@@ -4,29 +4,28 @@ services:
   # ============================================================================
   - type: web
     name: kong-gateway
-    runtime: docker
-    dockerfilePath: Backend/Microservices/kong/Dockerfile.render
-    dockerContext: Backend/Microservices/kong
+    env: docker
+    dockerfilePath: ./Backend/Microservices/kong/Dockerfile.render
+    dockerContext: ./Backend/Microservices/kong
     region: singapore
-    plan: starter
+    plan: free
     envVars:
       - key: KONG_DATABASE
         value: "off"
 
   # ============================================================================
-  # 2. IDENTITY MICROSERVICE (Private Service)
+  # 2. IDENTITY MICROSERVICE (Web Service)
   # ============================================================================
-  - type: pserv
+  - type: web
     name: identity-service
-    runtime: docker
-    dockerfilePath: Backend/Microservices/Dockerfile
-    dockerContext: Backend/Microservices
+    env: docker
+    dockerfilePath: ./Backend/Microservices/Dockerfile
+    dockerContext: ./Backend/Microservices
     region: singapore
-    plan: starter
-    dockerBuildArgs:
+    plan: free
+    envVars:
       - key: SERVICE
         value: IdentityService
-    envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ConnectionStrings__DefaultConnection
@@ -53,19 +52,18 @@ services:
         sync: false
 
   # ============================================================================
-  # 3. PROPERTY MICROSERVICE (Private Service)
+  # 3. PROPERTY MICROSERVICE (Web Service)
   # ============================================================================
-  - type: pserv
+  - type: web
     name: property-service
-    runtime: docker
-    dockerfilePath: Backend/Microservices/Dockerfile
-    dockerContext: Backend/Microservices
+    env: docker
+    dockerfilePath: ./Backend/Microservices/Dockerfile
+    dockerContext: ./Backend/Microservices
     region: singapore
-    plan: starter
-    dockerBuildArgs:
+    plan: free
+    envVars:
       - key: SERVICE
         value: PropertyService
-    envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ConnectionStrings__DefaultConnection
@@ -92,19 +90,18 @@ services:
         sync: false
 
   # ============================================================================
-  # 4. CONTRACT MICROSERVICE (Private Service)
+  # 4. CONTRACT MICROSERVICE (Web Service)
   # ============================================================================
-  - type: pserv
+  - type: web
     name: contract-service
-    runtime: docker
-    dockerfilePath: Backend/Microservices/Dockerfile
-    dockerContext: Backend/Microservices
+    env: docker
+    dockerfilePath: ./Backend/Microservices/Dockerfile
+    dockerContext: ./Backend/Microservices
     region: singapore
-    plan: starter
-    dockerBuildArgs:
+    plan: free
+    envVars:
       - key: SERVICE
         value: ContractService
-    envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ConnectionStrings__DefaultConnection
@@ -123,19 +120,18 @@ services:
         value: http://property-service:8080
 
   # ============================================================================
-  # 5. UTILITY MICROSERVICE (Private Service)
+  # 5. UTILITY MICROSERVICE (Web Service)
   # ============================================================================
-  - type: pserv
+  - type: web
     name: utility-service
-    runtime: docker
-    dockerfilePath: Backend/Microservices/Dockerfile
-    dockerContext: Backend/Microservices
+    env: docker
+    dockerfilePath: ./Backend/Microservices/Dockerfile
+    dockerContext: ./Backend/Microservices
     region: singapore
-    plan: starter
-    dockerBuildArgs:
+    plan: free
+    envVars:
       - key: SERVICE
         value: UtilityService
-    envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ConnectionStrings__DefaultConnection
@@ -148,19 +144,18 @@ services:
         sync: false
 
   # ============================================================================
-  # 6. BILLING MICROSERVICE (Private Service)
+  # 6. BILLING MICROSERVICE (Web Service)
   # ============================================================================
-  - type: pserv
+  - type: web
     name: billing-service
-    runtime: docker
-    dockerfilePath: Backend/Microservices/Dockerfile
-    dockerContext: Backend/Microservices
+    env: docker
+    dockerfilePath: ./Backend/Microservices/Dockerfile
+    dockerContext: ./Backend/Microservices
     region: singapore
-    plan: starter
-    dockerBuildArgs:
+    plan: free
+    envVars:
       - key: SERVICE
         value: BillingService
-    envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ConnectionStrings__DefaultConnection
@@ -181,19 +176,18 @@ services:
         value: http://contract-service:8080
 
   # ============================================================================
-  # 7. MAINTENANCE MICROSERVICE (Private Service)
+  # 7. MAINTENANCE MICROSERVICE (Web Service)
   # ============================================================================
-  - type: pserv
+  - type: web
     name: maintenance-service
-    runtime: docker
-    dockerfilePath: Backend/Microservices/Dockerfile
-    dockerContext: Backend/Microservices
+    env: docker
+    dockerfilePath: ./Backend/Microservices/Dockerfile
+    dockerContext: ./Backend/Microservices
     region: singapore
-    plan: starter
-    dockerBuildArgs:
+    plan: free
+    envVars:
       - key: SERVICE
         value: MaintenanceService
-    envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ConnectionStrings__DefaultConnection
@@ -214,19 +208,18 @@ services:
         sync: false
 
   # ============================================================================
-  # 8. COMMUNICATION MICROSERVICE (Private Service)
+  # 8. COMMUNICATION MICROSERVICE (Web Service)
   # ============================================================================
-  - type: pserv
+  - type: web
     name: communication-service
-    runtime: docker
-    dockerfilePath: Backend/Microservices/Dockerfile
-    dockerContext: Backend/Microservices
+    env: docker
+    dockerfilePath: ./Backend/Microservices/Dockerfile
+    dockerContext: ./Backend/Microservices
     region: singapore
-    plan: starter
-    dockerBuildArgs:
+    plan: free
+    envVars:
       - key: SERVICE
         value: CommunicationService
-    envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ConnectionStrings__DefaultConnection
