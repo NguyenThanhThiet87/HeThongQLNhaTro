@@ -1,0 +1,69 @@
+_format_version: "3.0"
+_transform: true
+
+# Render production gateway configuration.
+# Kong routes incoming public traffic to Render Private Services via internal network.
+services:
+  - name: identity-service
+    url: http://identity-service:8080
+    routes:
+      - name: identity-route
+        paths: [ /api/NguoiDung ]
+        strip_path: false
+
+  - name: property-service
+    url: http://property-service:8080
+    routes:
+      - name: property-route
+        paths: [ /api/PhongNhaTro ]
+        strip_path: false
+
+  - name: contract-service
+    url: http://contract-service:8080
+    routes:
+      - name: contract-route
+        paths: [ /api/HopDong ]
+        strip_path: false
+
+  - name: utility-service
+    url: http://utility-service:8080
+    routes:
+      - name: utility-route
+        paths: [ /api/DichVu ]
+        strip_path: false
+
+  - name: billing-service
+    url: http://billing-service:8080
+    routes:
+      - name: billing-route
+        paths: [ /api/HoaDonThanhToan, /api/DichVuDonHang, /api/PayOS, /api/VNPay, /chathub ]
+        strip_path: false
+
+  - name: maintenance-service
+    url: http://maintenance-service:8080
+    routes:
+      - name: maintenance-route
+        paths: [ /api/SuCoBaoTri ]
+        strip_path: false
+
+  - name: communication-service
+    url: http://communication-service:8080
+    routes:
+      - name: communication-route
+        paths: [ /api/ThongBao ]
+        strip_path: false
+
+plugins:
+  - name: cors
+    config:
+      origins: [ "*" ]
+      methods: [ GET, POST, PUT, PATCH, DELETE, OPTIONS ]
+      headers: [ Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Authorization, X-Request-ID ]
+      exposed_headers: [ X-Request-ID ]
+      credentials: true
+      max_age: 3600
+  - name: correlation-id
+    config:
+      header_name: X-Request-ID
+      generator: uuid
+      echo_downstream: true

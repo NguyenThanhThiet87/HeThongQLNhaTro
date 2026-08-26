@@ -40,78 +40,96 @@ export default function InvoiceScreen() {
   const [selectedMonth, setSelectedMonth] = useState("");
   const [hoaDons, setHoaDons] = useState([]);
 
-  const fetchDayNhaTros = useCallback(async () => {
+  // Load danh sách Dãy nhà trọ và khởi tạo ban đầu
+  const loadInitialData = useCallback(async () => {
     const user = await getCurrentUser();
     if (!user) return;
-    const response = await getDayNhaTrosApi(user.maNd);
-    if (response.success) {
-      setDayNhaTroList(response.data);
-      if (response.data.length > 0 && !selectedDayNhaTro) {
-        setSelectedDayNhaTro(response.data[0].maDayNt);
-      }
-    } else {
-      console.error("Lỗi khi lấy danh sách dãy nhà trọ:", response.message);
-    }
-  }, [selectedDayNhaTro]);
 
-  const fetchThangNam = useCallback(async () => {
-    if (selectedDayNhaTro) {
-      const response = await getThangNamHDApi(selectedDayNhaTro);
-      if (response.success) {
-        const months = response.data.map(item => ({
-          label: `${item.month.toString().padStart(2, "0")}/${item.year}`,
-          value: `${item.year}-${item.month.toString().padStart(2, "0")}`
-        }));
-        setMonthFilterList(months);
-        if (response.data.length > 0 && !selectedMonth) {
-          setSelectedMonth(`${response.data[0].year}-${response.data[0].month.toString().padStart(2, "0")}`);
-        }
-      } else {
-        console.log("Lỗi lấy tháng năm:", response.message);
-      }
-    }
-  }, [selectedDayNhaTro, selectedMonth]);
+    const dayRes = await getDayNhaTrosApi(user.maNd);
+    if (!dayRes.success || !dayRes.data || dayRes.data.length === 0) return;
 
-  const fetchHoaDons = useCallback(async () => {
-    if (selectedDayNhaTro && selectedMonth) {
-      const [year, month] = selectedMonth.split("-");
-      const response = await getHoaDonsApi(selectedDayNhaTro, parseInt(month), parseInt(year), selectedTrangThai);
+    setDayNhaTroList(dayRes.data);
+    const dayId = selectedDayNhaTro || dayRes.data[0].maDayNt;
+    if (!selectedDayNhaTro) setSelectedDayNhaTro(dayId);
 
-      if (response.success) {
-        setHoaDons(response.data);
-      } else {
-        console.error("Lỗi lấy danh sách hóa đơn:", response.message);
-      }
+    const monthRes = await getThangNamHDApi(dayId);
+    if (monthRes.success && Array.isArray(monthRes.data) && monthRes.data.length > 0) {
+      const months = monthRes.data.map(item => ({
+        label: `${item.month.toString().padStart(2, "0")}/${item.year}`,
+        value: `${item.year}-${item.month.toString().padStart(2, "0")}`
+      }));
+      setMonthFilterList(months);
+      
+      const monthVal = selectedMonth || months[0].value;
+      if (!selectedMonth) setSelectedMonth(monthVal);
+
+      const [year, month] = monthVal.split("-");
+      const hdRes = await getHoaDonsApi(dayId, parseInt(month), parseInt(year), selectedTrangThai);
+      if (hdRes.success) setHoaDons(hdRes.data || []);
     }
   }, [selectedDayNhaTro, selectedMonth, selectedTrangThai]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchDayNhaTros();
-      fetchThangNam();
-      fetchHoaDons();
-    }, [fetchDayNhaTros, fetchThangNam, fetchHoaDons])
+      loadInitialData();
+    }, [loadInitialData])
   );
 
-  useEffect(() => {
-    fetchThangNam();
-  }, [selectedDayNhaTro]);
+  // Khi người dùng đổi dãy trọ
+  const handleSelectDay = async (maDayNt) => {
+    setSelectedDayNhaTro(maDayNt);
+    const monthRes = await getThangNamHDApi(maDayNt);
+    if (monthRes.success && Array.isArray(monthRes.data) && monthRes.data.length > 0) {
+      const months = monthRes.data.map(item => ({
+        label: `${item.month.toString().padStart(2, "0")}/${item.year}`,
+        value: `${item.year}-${item.month.toString().padStart(2, "0")}`
+      }));
+      setMonthFilterList(months);
+      const monthVal = months[0].value;
+      setSelectedMonth(monthVal);
 
-  useEffect(() => {
-    fetchHoaDons();
-  }, [selectedDayNhaTro, selectedMonth, selectedTrangThai]);
+      const [year, month] = monthVal.split("-");
+      const hdRes = await getHoaDonsApi(maDayNt, parseInt(month), parseInt(year), selectedTrangThai);
+      if (hdRes.success) setHoaDons(hdRes.data || []);
+    } else {
+      setMonthFilterList([]);
+      setSelectedMonth("");
+      setHoaDons([]);
+    }
+  };
 
-  const [totalThu, setTotalThu] = useState(0);
-  const [totalChuaThanhToan, setTotalChuaThanhToan] = useState(0);
+  // Khi người dùng đổi tháng hoặc trạng thái
+  const fetchFilteredHoaDons = useCallback(async (dayId, monthVal, trangThai) => {
+    if (!dayId || !monthVal) return;
+    const [year, month] = monthVal.split("-");
+    const hdRes = await getHoaDonsApi(dayId, parseInt(month), parseInt(year), trangThai);
+    if (hdRes.success) {
+      setHoaDons(hdRes.data || []);
+    }
+  }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const newTotalThu = hoaDons.filter(hd => hd.maTthoaDon == TRANG_THAI_HOA_DON.DA_THANH_TOAN).reduce((sum, hd) => sum + hd.tongTien, 0);
-      const newTotalChuaThanhToan = hoaDons.filter(hd => hd.maTthoaDon == TRANG_THAI_HOA_DON.CHUA_THANH_TOAN).reduce((sum, hd) => sum + hd.tongTien, 0);
-      setTotalThu(newTotalThu);
-      setTotalChuaThanhToan(newTotalChuaThanhToan);
-    };
-    fetchData();
+  const handleMonthChange = (monthVal) => {
+    setSelectedMonth(monthVal);
+    fetchFilteredHoaDons(selectedDayNhaTro, monthVal, selectedTrangThai);
+  };
+
+  const handleTrangThaiChange = (trangThaiVal) => {
+    setSelectedTrangThai(trangThaiVal);
+    fetchFilteredHoaDons(selectedDayNhaTro, selectedMonth, trangThaiVal);
+  };
+
+  // Tính tổng tiền bằng useMemo trực tiếp không cần trigger useEffect
+  const { totalThu, totalChuaThanhToan } = React.useMemo(() => {
+    let thu = 0;
+    let chuaThu = 0;
+    for (const hd of hoaDons) {
+      if (hd.maTthoaDon == TRANG_THAI_HOA_DON.DA_THANH_TOAN) {
+        thu += (hd.tongTien || 0);
+      } else if (hd.maTthoaDon == TRANG_THAI_HOA_DON.CHUA_THANH_TOAN) {
+        chuaThu += (hd.tongTien || 0);
+      }
+    }
+    return { totalThu: thu, totalChuaThanhToan: chuaThu };
   }, [hoaDons]);
 
   return (
@@ -133,7 +151,7 @@ export default function InvoiceScreen() {
           <View style={{ flexDirection: "row", gap: 8 }}>
             {
               dayNhaTroList.map((day) => (
-                <TouchableOpacity key={day.maDayNt} style={selectedDayNhaTro === day.maDayNt ? styles.chipActive : styles.chip} onPress={() => setSelectedDayNhaTro(day.maDayNt)}>
+                <TouchableOpacity key={day.maDayNt} style={selectedDayNhaTro === day.maDayNt ? styles.chipActive : styles.chip} onPress={() => handleSelectDay(day.maDayNt)}>
                   <Text style={selectedDayNhaTro === day.maDayNt ? styles.chipTextActive : styles.chipText}>{day.tenDayNt}</Text>
                 </TouchableOpacity>
               ))
@@ -147,7 +165,7 @@ export default function InvoiceScreen() {
             data={monthFilterList}
             placeholder="Chọn tháng"
             value={selectedMonth}
-            onChange={item => setSelectedMonth(item.value)}
+            onChange={item => handleMonthChange(item.value)}
             textColor={COLORS.inputText}
             placeholderColor={COLORS.textMuted}
             itemTextColor={COLORS.textMain}
@@ -157,7 +175,7 @@ export default function InvoiceScreen() {
           <ComboBox
             data={DANH_SACH_TRANG_THAI_HOA_DON}
             value={selectedTrangThai}
-            onChange={item => setSelectedTrangThai(item.value)}
+            onChange={item => handleTrangThaiChange(item.value)}
             textColor={COLORS.inputText}
             placeholderColor={COLORS.textMuted}
             itemTextColor={COLORS.textMain}

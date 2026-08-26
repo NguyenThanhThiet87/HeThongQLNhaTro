@@ -20,6 +20,13 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    if (config.data instanceof FormData || (config.data && typeof config.data.getParts === 'function') || (config.data && config.data._parts)) {
+      if (config.headers) {
+        delete config.headers["Content-Type"];
+        delete config.headers["content-type"];
+      }
+    }
+
     if (__DEV__) {
       config.metadata = { startedAt: Date.now() };
       console.info(`[AXIOS] → ${(config.method ?? "GET").toUpperCase()} ${config.baseURL ?? ""}${config.url ?? ""}`);

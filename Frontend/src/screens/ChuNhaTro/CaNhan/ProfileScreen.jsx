@@ -79,7 +79,7 @@ export default function ProfileScreen() {
                             </View>
 
                             <Text style={styles.idText}>
-                                ID: #{user?.maNguoiDung || "xxxxxx"}
+                                ID: #{user?.maNguoiDung || user?.maChuNt || user?.maNd || "xxxxxx"}
                             </Text>
 
                         </View>
@@ -193,7 +193,7 @@ export default function ProfileScreen() {
 
             </ScrollView>
 
-            <LoadingOverlay visible={profileLoading || logoutLoading} />
+            <LoadingOverlay visible={logoutLoading} />
         </View>
     );
 }

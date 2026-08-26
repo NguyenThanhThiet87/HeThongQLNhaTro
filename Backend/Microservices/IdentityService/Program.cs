@@ -31,6 +31,8 @@ builder.Services.AddMassTransit(x =>
 });
 
 builder.Services.AddScoped<JwtTokenService>();
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddScoped<IPhotoService, CloudinaryService>();
 
 builder.Services.AddAuthentication(options =>
 {

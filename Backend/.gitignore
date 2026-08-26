@@ -1,4 +1,4 @@
-﻿# .NET build and IDE output
+# .NET build and IDE output
 [Bb]in/
 [Oo]bj/
 **/[Bb]in/
@@ -9,6 +9,8 @@
 
 # Local environment settings and credentials
 appsettings.Development.json
+.env
+*.env
 *.pem
 *.key
 *.pfx

@@ -1,0 +1,241 @@
+services:
+  # ============================================================================
+  # 1. KONG API GATEWAY (Public Web Service)
+  # ============================================================================
+  - type: web
+    name: kong-gateway
+    runtime: docker
+    dockerfilePath: Backend/Microservices/kong/Dockerfile.render
+    dockerContext: Backend/Microservices/kong
+    region: singapore
+    plan: starter
+    envVars:
+      - key: KONG_DATABASE
+        value: "off"
+
+  # ============================================================================
+  # 2. IDENTITY MICROSERVICE (Private Service)
+  # ============================================================================
+  - type: pserv
+    name: identity-service
+    runtime: docker
+    dockerfilePath: Backend/Microservices/Dockerfile
+    dockerContext: Backend/Microservices
+    region: singapore
+    plan: starter
+    dockerBuildArgs:
+      - key: SERVICE
+        value: IdentityService
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: Jwt__Issuer
+        value: MyApp
+      - key: Jwt__Audience
+        value: MyAppUser
+      - key: RabbitMq__Host
+        sync: false
+      - key: RabbitMq__Username
+        sync: false
+      - key: RabbitMq__Password
+        sync: false
+      - key: RabbitMq__VirtualHost
+        sync: false
+      - key: CloudinarySettings__CloudName
+        sync: false
+      - key: CloudinarySettings__ApiKey
+        sync: false
+      - key: CloudinarySettings__ApiSecret
+        sync: false
+
+  # ============================================================================
+  # 3. PROPERTY MICROSERVICE (Private Service)
+  # ============================================================================
+  - type: pserv
+    name: property-service
+    runtime: docker
+    dockerfilePath: Backend/Microservices/Dockerfile
+    dockerContext: Backend/Microservices
+    region: singapore
+    plan: starter
+    dockerBuildArgs:
+      - key: SERVICE
+        value: PropertyService
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: Jwt__Issuer
+        value: MyApp
+      - key: Jwt__Audience
+        value: MyAppUser
+      - key: RabbitMq__Host
+        sync: false
+      - key: RabbitMq__Username
+        sync: false
+      - key: RabbitMq__Password
+        sync: false
+      - key: RabbitMq__VirtualHost
+        sync: false
+      - key: CloudinarySettings__CloudName
+        sync: false
+      - key: CloudinarySettings__ApiKey
+        sync: false
+      - key: CloudinarySettings__ApiSecret
+        sync: false
+
+  # ============================================================================
+  # 4. CONTRACT MICROSERVICE (Private Service)
+  # ============================================================================
+  - type: pserv
+    name: contract-service
+    runtime: docker
+    dockerfilePath: Backend/Microservices/Dockerfile
+    dockerContext: Backend/Microservices
+    region: singapore
+    plan: starter
+    dockerBuildArgs:
+      - key: SERVICE
+        value: ContractService
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: RabbitMq__Host
+        sync: false
+      - key: RabbitMq__Username
+        sync: false
+      - key: RabbitMq__Password
+        sync: false
+      - key: RabbitMq__VirtualHost
+        sync: false
+      - key: Services__IdentityGrpcUrl
+        value: http://identity-service:8080
+      - key: Services__PropertyGrpcUrl
+        value: http://property-service:8080
+
+  # ============================================================================
+  # 5. UTILITY MICROSERVICE (Private Service)
+  # ============================================================================
+  - type: pserv
+    name: utility-service
+    runtime: docker
+    dockerfilePath: Backend/Microservices/Dockerfile
+    dockerContext: Backend/Microservices
+    region: singapore
+    plan: starter
+    dockerBuildArgs:
+      - key: SERVICE
+        value: UtilityService
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: CloudinarySettings__CloudName
+        sync: false
+      - key: CloudinarySettings__ApiKey
+        sync: false
+      - key: CloudinarySettings__ApiSecret
+        sync: false
+
+  # ============================================================================
+  # 6. BILLING MICROSERVICE (Private Service)
+  # ============================================================================
+  - type: pserv
+    name: billing-service
+    runtime: docker
+    dockerfilePath: Backend/Microservices/Dockerfile
+    dockerContext: Backend/Microservices
+    region: singapore
+    plan: starter
+    dockerBuildArgs:
+      - key: SERVICE
+        value: BillingService
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: RabbitMq__Host
+        sync: false
+      - key: RabbitMq__Username
+        sync: false
+      - key: RabbitMq__Password
+        sync: false
+      - key: RabbitMq__VirtualHost
+        sync: false
+      - key: Services__IdentityGrpcUrl
+        value: http://identity-service:8080
+      - key: Services__UtilityGrpcUrl
+        value: http://utility-service:8080
+      - key: Services__ContractGrpcUrl
+        value: http://contract-service:8080
+
+  # ============================================================================
+  # 7. MAINTENANCE MICROSERVICE (Private Service)
+  # ============================================================================
+  - type: pserv
+    name: maintenance-service
+    runtime: docker
+    dockerfilePath: Backend/Microservices/Dockerfile
+    dockerContext: Backend/Microservices
+    region: singapore
+    plan: starter
+    dockerBuildArgs:
+      - key: SERVICE
+        value: MaintenanceService
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: RabbitMq__Host
+        sync: false
+      - key: RabbitMq__Username
+        sync: false
+      - key: RabbitMq__Password
+        sync: false
+      - key: RabbitMq__VirtualHost
+        sync: false
+      - key: CloudinarySettings__CloudName
+        sync: false
+      - key: CloudinarySettings__ApiKey
+        sync: false
+      - key: CloudinarySettings__ApiSecret
+        sync: false
+
+  # ============================================================================
+  # 8. COMMUNICATION MICROSERVICE (Private Service)
+  # ============================================================================
+  - type: pserv
+    name: communication-service
+    runtime: docker
+    dockerfilePath: Backend/Microservices/Dockerfile
+    dockerContext: Backend/Microservices
+    region: singapore
+    plan: starter
+    dockerBuildArgs:
+      - key: SERVICE
+        value: CommunicationService
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: RabbitMq__Host
+        sync: false
+      - key: RabbitMq__Username
+        sync: false
+      - key: RabbitMq__Password
+        sync: false
+      - key: RabbitMq__VirtualHost
+        sync: false

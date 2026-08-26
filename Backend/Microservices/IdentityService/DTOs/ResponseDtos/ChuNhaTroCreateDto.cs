@@ -13,7 +13,7 @@ public class ChuNhaTroCreateDto
     public int? GioiTinh { get; set; }
     public string? SoDt { get; set; }
     public string? SoCccd { get; set; }
-    public DateOnly? NgaySinh { get; set; }
+    public string? NgaySinh { get; set; }
     public string? DiaChi { get; set; }
     public IFormFile? Avatar { get; set; }
     public string? Password { get; set; }

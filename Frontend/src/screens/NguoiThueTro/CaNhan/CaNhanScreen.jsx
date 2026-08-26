@@ -72,12 +72,12 @@ export default function CaNhanScreen() {
 
                             <View style={styles.roleBadge}>
                                 <Text style={styles.roleText}>
-                                    {getTenVaiTroNguoiThueByValue(user?.vaiTroNguoiThue)}
+                                    {getTenVaiTroNguoiThueByValue(user?.vaiTroNguoiThue) || "Người thuê"}
                                 </Text>
                             </View>
 
                             <Text style={styles.idText}>
-                                ID: #{user?.maNt || "xxxxxx"}
+                                ID: #{user?.maNt || user?.maNd || user?.maNguoiDung || "xxxxxx"}
                             </Text>
 
                         </View>
@@ -167,7 +167,7 @@ export default function CaNhanScreen() {
                 </Text>
 
             </ScrollView>
-            <LoadingOverlay visible={profileLoading || logoutLoading} />
+            <LoadingOverlay visible={logoutLoading} />
         </View>
     );
 }

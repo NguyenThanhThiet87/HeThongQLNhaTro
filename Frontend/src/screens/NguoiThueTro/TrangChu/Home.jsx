@@ -44,59 +44,33 @@ export default function TenantDashboard() {
   const [lichSuBaoCao, setLichSuBaoCao] = useState([]);
   const { hasUnreadNotifications } = useUnreadNotifications();
 
+  const fetchData = React.useCallback(async () => {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) return;
+    setUser(currentUser);
+
+    const [baoCaoRes, tenantRes, billRes] = await Promise.allSettled([
+      getLichSuBaoCaoApi(currentUser.maNd),
+      getNguoiThueApi(currentUser.maNd),
+      getHoaDonNewApi(currentUser.maNd)
+    ]);
+
+    if (baoCaoRes.status === "fulfilled" && baoCaoRes.value?.success) {
+      setLichSuBaoCao(baoCaoRes.value.data || []);
+    }
+    if (tenantRes.status === "fulfilled" && tenantRes.value?.success) {
+      setTenantDetails(tenantRes.value.data);
+    }
+    if (billRes.status === "fulfilled" && billRes.value?.success) {
+      setLatestBill(billRes.value.data);
+    }
+  }, []);
+
   useFocusEffect(
     React.useCallback(() => {
-      const fetchUser = async () => {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-      };
-      fetchUser();
-    }, [])
+      fetchData();
+    }, [fetchData])
   );
-  useEffect(() => {
-    const fetchLichSuBaoCao = async () => {
-      if (user) {
-        const res = await getLichSuBaoCaoApi(user.maNd);
-        if (res.success) {
-          setLichSuBaoCao(res.data);
-          console.log("Lịch sử báo cáo:", res.data);
-        } else {
-          console.error("Lỗi lấy lịch sử báo cáo:", res.message);
-        }
-      }
-    }
-    fetchLichSuBaoCao();
-  }, [user]);
-
-  useEffect(() => {
-    const fetchTenantDetails = async () => {
-      if (user) {
-        const res = await getNguoiThueApi(user.maNd);
-        if (res.success) {
-          setTenantDetails(res.data);
-          console.log("Chi tiết người thuê:", res.data);
-        } else {
-          console.error("Lỗi lấy chi tiết người thuê:", res.message);
-        }
-      }
-    }
-    fetchTenantDetails();
-  }, [user]);
-
-  useEffect(() => {
-    const fetchLatestBill = async () => {
-      if (user) {
-        const res = await getHoaDonNewApi(user.maNd);
-        if (res.success) {
-          console.log("Hóa đơn mới nhất:", res.data);
-          setLatestBill(res.data);
-        } else {
-          console.error("Lỗi lấy hóa đơn mới:", res.message);
-        }
-      }
-    }
-    fetchLatestBill();
-  }, [user]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: COLORS.bgLight }]}>

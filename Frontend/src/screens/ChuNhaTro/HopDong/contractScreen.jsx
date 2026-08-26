@@ -20,6 +20,7 @@ import { TRANG_THAI_HOP_DONG, getTenTrangThaiHopDong, DANH_SACH_TRANG_THAI_HOP_D
 import LottieView from "lottie-react-native";
 import { Dimensions } from "react-native";
 import ComboBox from "../../../components/ComboBox";
+import AppHeader from "../../../components/AppHeader";
 import { getMonthDiff } from "../../../utils/formatNgaySinh";
 import { ActionConfirmModal } from "../../../components/ActionConfirmModal";
 
@@ -47,67 +48,88 @@ export default function contractScreen() {
 
     const { width, height } = Dimensions.get("window");
 
-    const fetchData = useCallback(async () => {
+    const loadInitialData = useCallback(async () => {
         const user = await getCurrentUser();
-        if (user) {
-            const resultDayNhaTro = await getDayNhaTrosApi(user.maNd);
-            if (resultDayNhaTro.success) {
-                setDayNhaTroList(resultDayNhaTro.data);
+        if (!user) return;
 
-                // If no building selected, select the first one
-                let currentDayNt = dayNhaTroSelected;
-                if (!currentDayNt && resultDayNhaTro.data.length > 0) {
-                    currentDayNt = resultDayNhaTro.data[0];
-                    setDayNhaTroSelected(currentDayNt);
-                }
-
-                if (currentDayNt) {
-                    const result = await getHopDongsApi(currentDayNt.maDayNt, selectedTrangThai ? selectedTrangThai : "");
-                    if (result.success) {
-                        setHopDongList(result.data);
-                    }
-                }
+        const resultDayNhaTro = await getDayNhaTrosApi(user.maNd);
+        if (resultDayNhaTro.success && Array.isArray(resultDayNhaTro.data) && resultDayNhaTro.data.length > 0) {
+            setDayNhaTroList(resultDayNhaTro.data);
+            const activeDay = dayNhaTroSelected || resultDayNhaTro.data[0];
+            if (!dayNhaTroSelected) {
+                setDayNhaTroSelected(activeDay);
+            }
+            const hdRes = await getHopDongsApi(activeDay.maDayNt, selectedTrangThai ? selectedTrangThai : "");
+            if (hdRes.success) {
+                setHopDongList(hdRes.data || []);
             }
         }
-    }, [dayNhaTroSelected, selectedTrangThai]);
+    }, [dayNhaTroSelected?.maDayNt, selectedTrangThai]);
 
     useFocusEffect(
         useCallback(() => {
-            fetchData();
-        }, [fetchData])
+            loadInitialData();
+        }, [loadInitialData])
     );
+
+    const handleSelectDay = async (item) => {
+        const selected = dayNhaTroList.find(day => day.maDayNt === item.value);
+        setDayNhaTroSelected(selected);
+        if (selected) {
+            const hdRes = await getHopDongsApi(selected.maDayNt, selectedTrangThai ? selectedTrangThai : "");
+            if (hdRes.success) {
+                setHopDongList(hdRes.data || []);
+            }
+        }
+    };
+
+    const handleSelectTrangThai = async (trangThaiVal) => {
+        setSelectedTrangThai(trangThaiVal);
+        if (dayNhaTroSelected) {
+            const hdRes = await getHopDongsApi(dayNhaTroSelected.maDayNt, trangThaiVal ? trangThaiVal : "");
+            if (hdRes.success) {
+                setHopDongList(hdRes.data || []);
+            }
+        }
+    };
 
     return (
         <View style={styles.container}>
 
-            {/* HEADER */}
-            <View style={styles.header}>
-                <View style={styles.headerTop}>
-                    <Text style={styles.title}>
+            {/* APP HEADER */}
+            <AppHeader
+                left={
+                    <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.goBack()}>
+                        <MaterialIcons name="arrow-back-ios" size={18} color={COLORS.textMain} style={{ marginLeft: 6 }} />
+                    </TouchableOpacity>
+                }
+                center={
+                    <Text style={[styles.headerTitle, { color: COLORS.textMain }]}>
                         Hợp đồng thuê
                     </Text>
+                }
+            />
 
+            {/* CONTROLS */}
+            <View style={styles.header}>
+                {/* DÃY NHÀ TRỌ SELECT */}
+                <View style={styles.selectGroup}>
+                    <Text style={styles.controlLabel}>Nhà trọ</Text>
                     <ComboBox
                         data={dayNhaTroList.map(item => ({ label: item.tenDayNt, value: item.maDayNt }))}
                         value={dayNhaTroSelected?.maDayNt}
                         placeholder="Chọn nhà trọ"
-                        onChange={item => {
-                            const selected = dayNhaTroList.find(day => day.maDayNt === item.value);
-                            setDayNhaTroSelected(selected);
-                        }}
+                        onChange={handleSelectDay}
                         textColor={COLORS.textMain}
                         placeholderColor={COLORS.textMuted}
                         itemTextColor={COLORS.textMain}
-                        style={{ backgroundColor: COLORS.card }}
-                        width={140}
-                        height={35}
+                        style={{ flex: 1, backgroundColor: COLORS.card, borderColor: COLORS.border, borderRadius: 12 }}
+                        height={46}
                     />
-
                 </View>
 
                 {/* SEARCH */}
                 <View style={styles.searchBox}>
-
                     <MaterialIcons
                         name="search"
                         size={20}
@@ -116,7 +138,7 @@ export default function contractScreen() {
                     />
 
                     <TextInput
-                        placeholder="Tìm số phòng (vd: 101), tên..."
+                        placeholder="Tìm phòng (vd: 101), tên người thuê..."
                         placeholderTextColor={COLORS.textMuted}
                         style={styles.input}
                         value={searchText}
@@ -128,29 +150,25 @@ export default function contractScreen() {
                         size={20}
                         color={COLORS.textMain}
                     />
-
                 </View>
-
 
                 {/* FILTER */}
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    style={{ marginTop: 10 }}
+                    style={{ marginTop: 12 }}
                 >
-                    <TouchableOpacity style={[styles.filter, selectedTrangThai == null ? styles.filterActive : null]} key={"all"} onPress={() => setSelectedTrangThai(null)}>
+                    <TouchableOpacity style={[styles.filter, selectedTrangThai == null ? styles.filterActive : null]} key={"all"} onPress={() => handleSelectTrangThai(null)}>
                         <Text style={[styles.filterText, selectedTrangThai == null ? styles.filterActiveText : null]}>Tất cả</Text>
                     </TouchableOpacity>
                     {
                         DANH_SACH_TRANG_THAI_HOP_DONG.map((item) => (
-                            <TouchableOpacity style={[styles.filter, selectedTrangThai == item.value ? styles.filterActive : null]} key={item.value} onPress={() => setSelectedTrangThai(item.value)}>
+                            <TouchableOpacity style={[styles.filter, selectedTrangThai == item.value ? styles.filterActive : null]} key={item.value} onPress={() => handleSelectTrangThai(item.value)}>
                                 <Text style={[styles.filterText, selectedTrangThai == item.value ? styles.filterActiveText : null]}>{item.label}</Text>
                             </TouchableOpacity>
                         ))
                     }
-
                 </ScrollView>
-
             </View>
 
             {/* LIST */}
@@ -246,56 +264,44 @@ const createStyles = (COLORS) => StyleSheet.create({
         backgroundColor: COLORS.bgLight,
     },
 
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: "700",
+    },
     header: {
-        paddingTop: 50,
         paddingHorizontal: 16,
-        paddingBottom: 10,
+        paddingTop: 8,
+        paddingBottom: 14,
         borderBottomWidth: 1,
         borderColor: COLORS.border,
+        backgroundColor: COLORS.bgLight,
     },
-    headerTop:
-    {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingBottom: 10,
-    },
-    title: {
-        color: COLORS.textMain,
-        fontSize: 22,
-        fontWeight: "bold",
-        marginBottom: 10
-    },
-
-    select: {
+    selectGroup: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: COLORS.card,
-        paddingHorizontal: 14,
-        paddingVertical: 6,
-        borderRadius: 20,
-        width: 130,
         marginBottom: 10,
-        alignSelf: "flex-end"
+        gap: 12,
     },
-    selectText: {
-        color: COLORS.primary,
-        fontWeight: "bold",
-        marginRight: 4
+    controlLabel: {
+        fontSize: 14,
+        fontWeight: "700",
+        color: COLORS.textMain,
     },
     searchBox: {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: COLORS.card,
         borderRadius: 12,
-        paddingHorizontal: 10,
-        height: 44
+        paddingHorizontal: 12,
+        height: 46,
+        borderWidth: 1,
+        borderColor: COLORS.border,
     },
 
     input: {
         flex: 1,
-        color: COLORS.textMain
+        color: COLORS.textMain,
+        fontSize: 14,
     },
 
     filterActive: {

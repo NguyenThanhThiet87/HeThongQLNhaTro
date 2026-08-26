@@ -226,7 +226,10 @@ const ThayDoiThongTinCaNhan = ({ route }) => {
                             <ComboBox
                                 data={loaiNganHangList}
                                 value={loaiNganHang}
-                                onChange={setLoaiNganHang}
+                                onChange={(item) => {
+                                    setLoaiNganHang(item?.value || item);
+                                    setTenNh(item?.label || item?.shortName || item);
+                                }}
                                 labelField="label"
                                 valueField="value"
                                 search={true}

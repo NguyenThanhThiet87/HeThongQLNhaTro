@@ -10,14 +10,14 @@ public class NguoiThueTroCreateDto
     public int? GioiTinh { get; set; }
     public string? SoDt { get; set; }
     public string? SoCccd { get; set; }
-    public DateOnly? NgaySinh { get; set; }
+    public string? NgaySinh { get; set; }
     public string? DiaChi { get; set; }
     public IFormFile? Avatar { get; set; }
     public string? Password { get; set; }
     //Thông tin cư trú
     public string? dayNhaTro { get; set; }
     public string? SoPhong { get; set; }
-    public DateOnly? NgayVaoO { get; set; }
+    public string? NgayVaoO { get; set; }
     public bool TrangThaiTamTru { get; set; }
     public int? soNguoiO { get; set; }
     //Thông tin người liên hệ khẩn cấp
@@ -28,8 +28,8 @@ public class NguoiThueTroCreateDto
     public int? MaHopDong { get; set; }
     public int? TrangThaiHopDong { get; set; }
     public int? VaiTroNguoiThue { get; set; }
-    public DateOnly? ngayBdhl { get; set; }
-    public DateOnly? ngayKthl { get; set; }
+    public string? ngayBdhl { get; set; }
+    public string? ngayKthl { get; set; }
     public decimal? tienCoc { get; set; }
 
 }

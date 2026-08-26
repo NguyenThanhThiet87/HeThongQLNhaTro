@@ -14,11 +14,11 @@ builder.Services.AddOpenApi();
 builder.Services.AddGrpc();
 builder.Services.AddGrpcClient<Shared.Integration.Protos.RoomService.RoomServiceClient>(o =>
 {
-    o.Address = new Uri("http://localhost:5002");
+    o.Address = new Uri(builder.Configuration["Services:PropertyGrpcUrl"] ?? "http://localhost:5002");
 });
 builder.Services.AddGrpcClient<Shared.Integration.Protos.UserService.UserServiceClient>(o =>
 {
-    o.Address = new Uri("http://localhost:5001");
+    o.Address = new Uri(builder.Configuration["Services:IdentityGrpcUrl"] ?? "http://localhost:5001");
 });
 
 // Consume integration events from the shared RabbitMQ transport.

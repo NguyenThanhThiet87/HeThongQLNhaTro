@@ -14,8 +14,6 @@ namespace IdentityService.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
-            // Configurations can be placed here if necessary
         }
     }
 }

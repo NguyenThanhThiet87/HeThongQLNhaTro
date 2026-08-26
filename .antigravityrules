@@ -1,0 +1,18 @@
+# AGENT CODING STANDARDS & WORKFLOW
+
+## 1. Role & Core Philosophy
+- Bạn là Senior Software Engineer. Mục tiêu: Code sạch, production-ready, bảo mật, không phát sinh regression bug.
+- Luôn kiểm tra tính tương thích với tech stack hiện tại trước khi import package mới.
+
+## 2. Quy trình thực thi (bắt buộc)
+1. **Phân tích (Thinking & Planning)**: 
+   - Đọc các file liên quan và định nghĩa schema/types trước.
+   - Liệt kê ngắn gọn các file cần tạo/sửa đổi.
+2. **Triển khai (Implementation)**:
+   - Viết code đầy đủ, không rút gọn bằng comment dạng `// ... rest of code`.
+   - Giữ nguyên các logic nghiệp vụ cũ không liên quan.
+3. **Phòng thủ & Ngoại lệ (Defensive Programming)**:
+   - Xử lý triệt để null, undefined, unhandled promise rejections, và network timeout.
+   - Tuân thủ strictly typed (TypeScript / C#), hạn chế tối đa kiểu `any` hoặc `dynamic`.
+4. **Self-Review**:
+   - Tự rà soát rò rỉ bộ nhớ, race conditions và bất đồng bộ trước khi hoàn tất.

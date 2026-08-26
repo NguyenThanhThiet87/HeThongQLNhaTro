@@ -47,5 +47,29 @@ namespace IdentityService
                 return null;
             }
         }
+
+        public static DateOnly? ParseDateOnly(string? dateStr)
+        {
+            if (string.IsNullOrWhiteSpace(dateStr)) return null;
+            string[] formats = {
+                "yyyy-MM-dd",
+                "dd/MM/yyyy",
+                "d/M/yyyy",
+                "yyyy/MM/dd",
+                "dd-MM-yyyy",
+                "yyyy-MM-ddTHH:mm:ss",
+                "yyyy-MM-ddTHH:mm:ss.fffZ",
+                "yyyy-MM-ddTHH:mm:ssZ"
+            };
+            if (DateOnly.TryParseExact(dateStr.Trim(), formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var date))
+            {
+                return date;
+            }
+            if (DateTime.TryParse(dateStr.Trim(), out var dt))
+            {
+                return DateOnly.FromDateTime(dt);
+            }
+            return null;
+        }
     }
 }

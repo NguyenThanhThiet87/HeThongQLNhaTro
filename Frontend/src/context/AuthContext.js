@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
-import { getCurrentUser } from "../utils/decodeToken";
-import * as SecureStore from "expo-secure-store";
+import { getCurrentUser, clearTokens } from "../utils/decodeToken";
+import { clearProfileCache } from "../services/userService";
 
 const AuthContext = createContext(null);
 
@@ -27,8 +27,8 @@ export function AuthProvider({ children }) {
 
   // Gọi khi đăng xuất
   const logout = async () => {
-    await SecureStore.deleteItemAsync("accessToken");
-    await SecureStore.deleteItemAsync("refreshToken");
+    await clearTokens();
+    clearProfileCache();
     setUser(null);
   };
 

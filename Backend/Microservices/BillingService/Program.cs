@@ -13,15 +13,15 @@ builder.Services.AddSignalR();
 builder.Services.AddSingleton<Microsoft.AspNetCore.SignalR.IUserIdProvider, BillingService.Hubs.CustomUserIdProvider>();
 builder.Services.AddGrpcClient<Shared.Integration.Protos.UserService.UserServiceClient>(o =>
 {
-    o.Address = new Uri("http://localhost:5001");
+    o.Address = new Uri(builder.Configuration["Services:IdentityGrpcUrl"] ?? "http://localhost:5001");
 });
 builder.Services.AddGrpcClient<Shared.Integration.Protos.UtilityIndexService.UtilityIndexServiceClient>(o =>
 {
-    o.Address = new Uri("http://localhost:5004");
+    o.Address = new Uri(builder.Configuration["Services:UtilityGrpcUrl"] ?? "http://localhost:5004");
 });
 builder.Services.AddGrpcClient<Shared.Integration.Protos.ContractQueryService.ContractQueryServiceClient>(o =>
 {
-    o.Address = new Uri("http://localhost:5003");
+    o.Address = new Uri(builder.Configuration["Services:ContractGrpcUrl"] ?? "http://localhost:5003");
 });
 
 // Consume integration events from the shared RabbitMQ transport.

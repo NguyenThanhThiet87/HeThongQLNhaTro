@@ -12,8 +12,7 @@ export const getNguoiDungApi = async (maNd) => {
       }
     });
     const text = await res.text();
-    console.log("Raw response text:", text);
-    return JSON.parse(text);
+    return text ? JSON.parse(text) : { success: false, data: null };
   } catch (error) {
     return {
       success: false,
@@ -23,19 +22,27 @@ export const getNguoiDungApi = async (maNd) => {
   }
 };
 
-export const getNguoiThueApi = (maNd) => {
-  return api.get(`/NguoiDung/chi-tiet-nguoi-thue?maNd=${maNd}`);
+export const getNguoiThueApi = async (maNd) => {
+  try {
+    const token = await getAccessToken();
+    const res = await fetch(`${API_BASE_URL}/NguoiDung/chi-tiet-nguoi-thue?maNd=${maNd}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    const text = await res.text();
+    return text ? JSON.parse(text) : { success: false, data: null };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Lỗi kết nối: " + error.message,
+      data: null
+    };
+  }
 };
 
-export const getChuNhaTroApi = (maNd) => {
-  return api.get(`/NguoiDung/chi-tiet-chu-tro?maNd=${maNd}`);
-};
-
-export const getNhaCungCapApi = (maNd) => {
-  return api.get(`/NguoiDung/chi-tiet-nha-cung-cap?maNd=${maNd}`);
-};
-
-export const getChuTroApi = async (maNd) => {
+export const getChuNhaTroApi = async (maNd) => {
   try {
     const token = await getAccessToken();
     const res = await fetch(`${API_BASE_URL}/NguoiDung/chi-tiet-chu-tro?maNd=${maNd}`, {
@@ -45,8 +52,7 @@ export const getChuTroApi = async (maNd) => {
       }
     });
     const text = await res.text();
-    console.log("Raw response text:", text);
-    return JSON.parse(text);
+    return text ? JSON.parse(text) : { success: false, data: null };
   } catch (error) {
     return {
       success: false,
@@ -56,28 +62,87 @@ export const getChuTroApi = async (maNd) => {
   }
 };
 
-export const updateNguoiThueApi = (formData) => {
-  return api.put("/NguoiDung/cap-nhat-nguoi-thue", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data"
-    }
-  });
+export const getNhaCungCapApi = async (maNd) => {
+  try {
+    const token = await getAccessToken();
+    const res = await fetch(`${API_BASE_URL}/NguoiDung/chi-tiet-nha-cung-cap?maNd=${maNd}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    const text = await res.text();
+    return text ? JSON.parse(text) : { success: false, data: null };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Lỗi kết nối: " + error.message,
+      data: null
+    };
+  }
 };
 
-export const updateChuNhaTroApi = (formData) => {
-  return api.put("/NguoiDung/cap-nhat-chu-tro", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data"
-    }
-  });
+export const updateNguoiThueApi = async (formData) => {
+  try {
+    const token = await getAccessToken();
+    const res = await fetch(`${API_BASE_URL}/NguoiDung/cap-nhat-nguoi-thue`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      },
+      body: formData
+    });
+    const text = await res.text();
+    return text ? JSON.parse(text) : { success: true, message: "Cập nhật thành công" };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Lỗi kết nối: " + error.message,
+      data: null
+    };
+  }
 };
 
-export const updateNhaCungCapApi = (formData) => {
-  return api.put("/NguoiDung/cap-nhat-nha-cung-cap", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data"
-    }
-  });
+export const updateChuNhaTroApi = async (formData) => {
+  try {
+    const token = await getAccessToken();
+    const res = await fetch(`${API_BASE_URL}/NguoiDung/cap-nhat-chu-tro`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      },
+      body: formData
+    });
+    const text = await res.text();
+    return text ? JSON.parse(text) : { success: true, message: "Cập nhật thành công" };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Lỗi kết nối: " + error.message,
+      data: null
+    };
+  }
+};
+
+export const updateNhaCungCapApi = async (formData) => {
+  try {
+    const token = await getAccessToken();
+    const res = await fetch(`${API_BASE_URL}/NguoiDung/cap-nhat-nha-cung-cap`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      },
+      body: formData
+    });
+    const text = await res.text();
+    return text ? JSON.parse(text) : { success: true, message: "Cập nhật thành công" };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Lỗi kết nối: " + error.message,
+      data: null
+    };
+  }
 };
 
 export const changePasswordApi = (data) => {
@@ -88,58 +153,3 @@ export const changePasswordApi = (data) => {
     }
   });
 };
-
-
-// export const updateNguoiThueApi = async (data) => {
-//   try {
-//     console.log("updateNguoiThueApi - Received data:", data);
-//     const token = await getAccessToken();
-
-//     const formData = new FormData();
-
-//     formData.append("MaNt", data.MaNd);
-//     formData.append("HoTen", data?.HoTen);
-//     formData.append("SoDt", data?.SoDt);
-//     formData.append("GioiTinh", data?.GioiTinh);
-//     formData.append("SoCccd", data?.SoCccd);
-//     formData.append("DiaChi", data?.DiaChi);
-//     formData.append("NgaySinh", data?.NgaySinh);
-//     formData.append("NgheNghiep", data?.NgheNghiep);
-//     formData.append("HoTenNguoiLienHe", data?.HoTenNguoiLienHe);
-//     formData.append("SdtNguoiLienHe", data?.SdtNguoiLienHe);
-//     formData.append("QuanHeNguoiLienHe", data?.QuanHeNguoiLienHe);
-
-//     // ==========================================
-//     // 2. Xử lý ảnh bìa (NẾU CÓ)
-//     // ==========================================
-//     if (data.Avatar) {
-//       const filename = data.Avatar.split('/').pop();
-//       const match = /\.(\w+)$/.exec(filename);
-//       const type = match ? `image/${match[1]}` : `image/jpeg`;
-
-//       formData.append("Avatar", {
-//         uri: data.Avatar,
-//         name: filename,
-//         type: type,
-//       });
-//     }
-
-//     const res = await fetch(`${API_BASE_URL}/NguoiDung/cap-nhat-nguoi-thue`, {
-//       method: "PUT",
-//       headers: {
-//         "Authorization": `Bearer ${token}`
-//       },
-//       body: formData
-//     });
-
-//     const text = await res.text();
-//     if (!text) {
-//       return { success: false, message: "Không có dữ liệu trả về từ server." };
-//     }
-//     return JSON.parse(text);
-
-//   } catch (error) {
-//     console.error("Lỗi Network/Fetch updateNguoiThueApi:", error);
-//     return { success: false, message: "Lỗi kết nối mạng: " + error.message };
-//   }
-// };

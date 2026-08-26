@@ -33,26 +33,26 @@ export default function DashboardScreen() {
 
     const fetchData = useCallback(async () => {
         const currentUser = await getCurrentUser();
+        if (!currentUser) return;
         setUser(currentUser);
 
-        if (currentUser) {
-            // Fetch DayNhaTros
-            const dayResult = await getDayNhaTrosApi(currentUser.maNd);
-            if (dayResult.success) {
-                setDayNhaTros(dayResult.data);
-            }
+        // Fetch parallel để tối ưu tốc độ tải trang
+        const [dayResult, doanhThuResult, thongKeResult] = await Promise.allSettled([
+            getDayNhaTrosApi(currentUser.maNd),
+            getDoanhThuApi(currentUser.maNd),
+            getThongKePhongApi(currentUser.maNd)
+        ]);
 
-            // Fetch DoanhThu
-            const doanhThuResult = await getDoanhThuApi(currentUser.maNd);
-            if (doanhThuResult.success) {
-                setDoanhThu(doanhThuResult.data);
-            }
+        if (dayResult.status === "fulfilled" && dayResult.value?.success) {
+            setDayNhaTros(dayResult.value.data || []);
+        }
 
-            // Fetch ThongKePhong
-            const thongKeResult = await getThongKePhongApi(currentUser.maNd);
-            if (thongKeResult.success) {
-                setThongKePhong(thongKeResult.data);
-            }
+        if (doanhThuResult.status === "fulfilled" && doanhThuResult.value?.success) {
+            setDoanhThu(doanhThuResult.value.data);
+        }
+
+        if (thongKeResult.status === "fulfilled" && thongKeResult.value?.success) {
+            setThongKePhong(thongKeResult.value.data);
         }
     }, []);
 

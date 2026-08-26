@@ -22,6 +22,36 @@ namespace IdentityService.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("IdentityService.Models.ChuNhaTro", b =>
+                {
+                    b.Property<int>("MaChuNt")
+                        .HasColumnType("integer")
+                        .HasColumnName("MaChuNT");
+
+                    b.Property<bool?>("DaDkkd")
+                        .HasColumnType("boolean")
+                        .HasColumnName("DaDKKD");
+
+                    b.Property<string>("SoGpkd")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("SoGPKD");
+
+                    b.Property<string>("SoTk")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("SoTK");
+
+                    b.Property<string>("TenNh")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("TenNH");
+
+                    b.HasKey("MaChuNt");
+
+                    b.ToTable("ChuNhaTro");
+                });
+
             modelBuilder.Entity("IdentityService.Models.NguoiDung", b =>
                 {
                     b.Property<int>("MaNd")
@@ -85,6 +115,78 @@ namespace IdentityService.Migrations
                     b.ToTable("NguoiDung");
                 });
 
+            modelBuilder.Entity("IdentityService.Models.NguoiLienHeKhanCap", b =>
+                {
+                    b.Property<int>("MaLh")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("MaNLH");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MaLh"));
+
+                    b.Property<string>("HoTen")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("MaNt")
+                        .HasColumnType("integer")
+                        .HasColumnName("MaNT");
+
+                    b.Property<string>("QuanHe")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("SoDt")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("SoDT");
+
+                    b.HasKey("MaLh");
+
+                    b.HasIndex("MaNt");
+
+                    b.ToTable("NguoiLienHeKhanCap");
+                });
+
+            modelBuilder.Entity("IdentityService.Models.NguoiThueTro", b =>
+                {
+                    b.Property<int>("MaNt")
+                        .HasColumnType("integer")
+                        .HasColumnName("MaNT");
+
+                    b.Property<string>("NgheNghiep")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("MaNt");
+
+                    b.ToTable("NguoiThueTro");
+                });
+
+            modelBuilder.Entity("IdentityService.Models.NhaCungCap", b =>
+                {
+                    b.Property<int>("MaNcc")
+                        .HasColumnType("integer")
+                        .HasColumnName("MaNCC");
+
+                    b.Property<decimal?>("DanhGiaTb")
+                        .HasColumnType("decimal(3, 2)");
+
+                    b.Property<string>("KhuVucPv")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("MoTaDv")
+                        .HasColumnType("text");
+
+                    b.Property<bool?>("SanSang")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("MaNcc");
+
+                    b.ToTable("NhaCungCap");
+                });
+
             modelBuilder.Entity("IdentityService.Models.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -146,6 +248,17 @@ namespace IdentityService.Migrations
                     b.ToTable("VaiTroHeThong");
                 });
 
+            modelBuilder.Entity("IdentityService.Models.ChuNhaTro", b =>
+                {
+                    b.HasOne("IdentityService.Models.NguoiDung", "MaChuNtNavigation")
+                        .WithMany()
+                        .HasForeignKey("MaChuNt")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MaChuNtNavigation");
+                });
+
             modelBuilder.Entity("IdentityService.Models.NguoiDung", b =>
                 {
                     b.HasOne("IdentityService.Models.VaiTroHeThong", "MaVaiTroNavigation")
@@ -153,6 +266,37 @@ namespace IdentityService.Migrations
                         .HasForeignKey("MaVaiTro");
 
                     b.Navigation("MaVaiTroNavigation");
+                });
+
+            modelBuilder.Entity("IdentityService.Models.NguoiLienHeKhanCap", b =>
+                {
+                    b.HasOne("IdentityService.Models.NguoiThueTro", "MaNtNavigation")
+                        .WithMany("NguoiLienHeKhanCaps")
+                        .HasForeignKey("MaNt");
+
+                    b.Navigation("MaNtNavigation");
+                });
+
+            modelBuilder.Entity("IdentityService.Models.NguoiThueTro", b =>
+                {
+                    b.HasOne("IdentityService.Models.NguoiDung", "MaNtNavigation")
+                        .WithMany()
+                        .HasForeignKey("MaNt")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MaNtNavigation");
+                });
+
+            modelBuilder.Entity("IdentityService.Models.NhaCungCap", b =>
+                {
+                    b.HasOne("IdentityService.Models.NguoiDung", "MaNccNavigation")
+                        .WithMany()
+                        .HasForeignKey("MaNcc")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MaNccNavigation");
                 });
 
             modelBuilder.Entity("IdentityService.Models.RefreshToken", b =>
@@ -167,6 +311,11 @@ namespace IdentityService.Migrations
             modelBuilder.Entity("IdentityService.Models.NguoiDung", b =>
                 {
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("IdentityService.Models.NguoiThueTro", b =>
+                {
+                    b.Navigation("NguoiLienHeKhanCaps");
                 });
 
             modelBuilder.Entity("IdentityService.Models.VaiTroHeThong", b =>

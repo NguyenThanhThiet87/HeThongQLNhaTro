@@ -2,30 +2,57 @@ import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-import { getUserNccProfileService, changePasswordService, updateNccProfileService } from "../../services/userService";
+import { getUserNccProfileService, changePasswordService, updateNccProfileService, getCachedNccProfile } from "../../services/userService";
+import { useAuth } from "../../context/AuthContext";
 import toast from "../../utils/toast";
 
 export const useUserProviderProfile = () => {
+    const { user: authUser } = useAuth();
 
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const cached = getCachedNccProfile();
+        if (cached) return cached;
+        if (authUser) {
+            return {
+                maNd: authUser.maNd,
+                maNcc: authUser.maNd,
+                maNguoiDung: authUser.maNd,
+                hoTen: authUser.hoTen,
+                soDt: authUser.soDt,
+                maVaiTro: authUser.maVaiTro
+            };
+        }
+        return null;
+    });
     const [loading, setLoading] = useState(false);
+
+    // Sync authUser immediately if user is still empty
+    useEffect(() => {
+        if (!user && authUser) {
+            setUser({
+                maNd: authUser.maNd,
+                maNcc: authUser.maNd,
+                maNguoiDung: authUser.maNd,
+                hoTen: authUser.hoTen,
+                soDt: authUser.soDt,
+                maVaiTro: authUser.maVaiTro
+            });
+        }
+    }, [authUser]);
 
     const fetchUser = async () => {
         try {
-            setLoading(true);
-
+            if (!getCachedNccProfile() && !authUser) {
+                setLoading(true);
+            }
             const data = await getUserNccProfileService();
-            console.log(data)
-            setUser(data);
-
+            if (data) {
+                setUser(data);
+            }
         } catch (err) {
-
             console.log("Lỗi lấy user:", err.message);
-
         } finally {
-
             setLoading(false);
-
         }
     };
 
@@ -44,54 +71,47 @@ export const useUserProviderProfile = () => {
 
 
 export const useEditProviderProfile = (maNdRoute, navigation) => {
-
+    const cached = getCachedNccProfile();
     const [loading, setLoading] = useState(false);
 
-    const [maNcc, setMaNcc] = useState(maNdRoute);
-    const [avatar, setAvatar] = useState("https://i.pravatar.cc/300");
-    const [fullName, setFullName] = useState("");
-    const [ngaySinh, setNgaySinh] = useState("");
-    const [idCard, setIdCard] = useState("");
-    const [soDienThoai, setSoDienThoai] = useState("");
-    const [address, setAddress] = useState("");
-    const [gioiTinh, setGioiTinh] = useState();
-    const [moTaDv, setMoTaDv] = useState("");
-    const [khuVucPv, setKhuVucPv] = useState("");
-    const [sanSang, setSanSang] = useState(true);
+    const [maNcc, setMaNcc] = useState(cached?.maNcc || maNdRoute);
+    const [avatar, setAvatar] = useState(cached?.avatar || "https://i.pravatar.cc/300");
+    const [fullName, setFullName] = useState(cached?.hoTen ?? "");
+    const [ngaySinh, setNgaySinh] = useState(cached?.ngaySinh ?? "");
+    const [idCard, setIdCard] = useState(cached?.soCccd ?? "");
+    const [soDienThoai, setSoDienThoai] = useState(cached?.soDt ?? "");
+    const [address, setAddress] = useState(cached?.diaChi ?? "");
+    const [gioiTinh, setGioiTinh] = useState(cached?.gioiTinh);
+    const [moTaDv, setMoTaDv] = useState(cached?.moTaDv ?? "");
+    const [khuVucPv, setKhuVucPv] = useState(cached?.khuVucPv ?? "");
+    const [sanSang, setSanSang] = useState(cached?.sanSang ?? true);
 
     useEffect(() => {
-
         const fetchData = async () => {
-
             try {
-
-                const data = await getUserNccProfileService(maNcc);
-
-                console.log("Fetched NCC data for editing:", data);
-
-                setMaNcc(data.maNcc);
-                setAvatar(data?.avatar || "https://i.pravatar.cc/300");
-                setFullName(data.hoTen ?? "");
-                setNgaySinh(data.ngaySinh ?? "");
-                setIdCard(data.soCccd ?? "");
-                setSoDienThoai(data.soDt ?? "");
-                setAddress(data.diaChi ?? "");
-                setGioiTinh(data.gioiTinh ?? undefined);
-                setMoTaDv(data.moTaDv ?? "");
-                setKhuVucPv(data.khuVucPv ?? "");
-                setSanSang(data.sanSang ?? true);
-
+                const data = await getUserNccProfileService(maNdRoute);
+                if (data) {
+                    setMaNcc(data.maNcc || maNdRoute);
+                    if (data.avatar) setAvatar(data.avatar);
+                    if (data.hoTen !== undefined) setFullName(data.hoTen);
+                    if (data.ngaySinh !== undefined) setNgaySinh(data.ngaySinh);
+                    if (data.soCccd !== undefined) setIdCard(data.soCccd);
+                    if (data.soDt !== undefined) setSoDienThoai(data.soDt);
+                    if (data.diaChi !== undefined) setAddress(data.diaChi);
+                    if (data.gioiTinh !== undefined) setGioiTinh(data.gioiTinh);
+                    if (data.moTaDv !== undefined) setMoTaDv(data.moTaDv);
+                    if (data.khuVucPv !== undefined) setKhuVucPv(data.khuVucPv);
+                    if (data.sanSang !== undefined) setSanSang(data.sanSang);
+                }
             } catch (err) {
                 console.error("Lỗi khi lấy thông tin nhà cung cấp:", err.message);
             }
         };
 
         fetchData();
-
-    }, []);
+    }, [maNdRoute]);
 
     const handleSaveChanges = async () => {
-
         try {
             setLoading(true);
 
@@ -111,21 +131,17 @@ export const useEditProviderProfile = (maNdRoute, navigation) => {
 
             const result = await updateNccProfileService(data);
 
-            if (result.success) {
+            if (result.success || result.data) {
                 toast.success("Cập nhật thông tin thành công!");
                 navigation.goBack();
             } else {
-                toast.error("Cập nhật thất bại: " + result.message);
+                toast.error("Cập nhật thất bại: " + (result.message || "Lỗi không xác định"));
             }
 
         } catch (err) {
-
             toast.error("Lỗi khi cập nhật thông tin: " + err.message);
-
         } finally {
-
             setLoading(false);
-
         }
     };
 
